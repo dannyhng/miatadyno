@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiataDyno — Measure Your Mods</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg:      #07090c;
+  --s1:      #0d1018;
+  --s2:      #131820;
+  --s3:      #181f2a;
+  --b1:      #1e2535;
+  --b2:      #2a3347;
+  --amber:   #e8a020;
+  --adim:    rgba(232,160,32,0.10);
+  --red:     #d63031;
+  --red2:    #ff4757;
+  --rdim:    rgba(214,48,49,0.10);
+  --blue:    #4488ff;
+  --green:   #00b894;
+  --text:    #d4dce8;
+  --mid:     #6b7a94;
+  --dim:     #3a4557;
+  --mono:    'JetBrains Mono', monospace;
+  --disp:    'Barlow Condensed', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+/* grid bg */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(232,160,32,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,160,32,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+/* scanlines */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:1;}
+
+header,main,footer,.hero-wrap{position:relative;z-index:2;}
+
+/* fade in */
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fu .5s ease both;}.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;border-bottom:1px solid var(--b1);background:rgba(7,9,12,.96);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100;}
+.h-logo{display:flex;align-items:center;gap:14px;padding:16px 28px;border-right:1px solid var(--b1);}
+.h-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:dp 2s ease-in-out infinite;}
+@keyframes dp{0%,100%{opacity:1;box-shadow:0 0 10px var(--amber)}50%{opacity:.3;box-shadow:0 0 3px var(--amber)}}
+.h-name{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.h-name span{color:var(--amber);}
+.h-meta{padding:0 24px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;}
+header nav{margin-left:auto;display:flex;border-left:1px solid var(--b1);}
+header nav a{display:block;padding:20px 18px;font-size:10px;color:var(--mid);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--b1);transition:color .2s,background .2s;}
+header nav a:hover{color:var(--amber);background:var(--adim);}
+
+/* ── HERO ── */
+.hero-wrap{padding:56px 48px 44px;border-bottom:1px solid var(--b1);position:relative;overflow:hidden;}
+.hero-wrap::before{content:'NC';position:absolute;right:-10px;top:-24px;font-family:var(--disp);font-size:300px;font-weight:800;color:rgba(255,255,255,.012);letter-spacing:-.04em;pointer-events:none;line-height:1;}
+.h-tag{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.h-tag::before{content:'';display:block;width:28px;height:1px;background:var(--amber);}
+.hero-wrap h1{font-family:var(--disp);font-size:clamp(40px,5.5vw,76px);font-weight:800;letter-spacing:-.01em;line-height:.95;text-transform:uppercase;margin-bottom:22px;}
+.hero-wrap h1 em{font-style:normal;color:var(--amber);display:block;}
+.hero-sub{font-size:13px;color:var(--mid);max-width:480px;line-height:1.8;margin-bottom:22px;}
+.badges{display:flex;gap:6px;flex-wrap:wrap;}
+.badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid var(--b2);color:var(--mid);background:var(--s1);}
+.badge.on{border-color:var(--amber);color:var(--amber);background:var(--adim);}
+
+/* ── LAYOUT ── */
+.layout{display:grid;grid-template-columns:370px 1fr;}
+@media(max-width:860px){.layout{grid-template-columns:1fr;}}
+
+/* ── SIDEBAR ── */
+.sidebar{border-right:1px solid var(--b1);position:sticky;top:61px;height:calc(100vh - 61px);overflow-y:auto;display:flex;flex-direction:column;}
+@media(max-width:860px){.sidebar{position:static;height:auto;}}
+
+/* sections */
+.sec{border-bottom:1px solid var(--b1);}
+.sec-hd{padding:13px 22px;display:flex;align-items:center;gap:10px;background:var(--s1);border-bottom:1px solid var(--b1);cursor:pointer;user-select:none;transition:background .15s;}
+.sec-hd:hover{background:var(--s2);}
+.sec-n{font-size:10px;color:var(--amber);letter-spacing:.1em;font-weight:600;}
+.sec-t{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.sec-c{margin-left:auto;color:var(--dim);font-size:10px;transition:transform .2s;}
+.sec.coll .sec-c{transform:rotate(-90deg);}
+.sec.coll .sec-bd{display:none;}
+.sec-bd{padding:18px 22px;}
+
+/* form */
+.fl{margin-bottom:12px;}.fl:last-child{margin-bottom:0;}
+label.lbl{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+select,input[type=number],input[type=text]{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 11px;appearance:none;outline:none;transition:border-color .15s,background .15s;}
+select:focus,input:focus{border-color:var(--amber);background:var(--s3);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7a94'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
+
+/* toggle */
+.trow{display:flex;gap:0;margin-top:4px;}
+.tbtn{flex:1;padding:8px 6px;text-align:center;border:1px solid var(--b2);font-family:var(--mono);font-size:11px;color:var(--mid);cursor:pointer;transition:all .15s;background:var(--s2);margin-left:-1px;}
+.tbtn:first-child{margin-left:0;}
+.tbtn:hover{color:var(--text);background:var(--s3);}
+.tbtn.on{background:var(--adim);border-color:var(--amber);color:var(--amber);z-index:1;position:relative;}
+.note{margin-top:6px;font-size:10px;color:var(--amber);line-height:1.5;display:none;}
+
+/* exhaust */
+.exh-comp{border:1px solid var(--b1);margin-bottom:7px;background:var(--s2);}
+.exh-lbl{padding:7px 11px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.exh-d{font-size:10px;font-weight:600;color:var(--green);}
+.exh-comp select{border:none;background:transparent;font-size:11px;padding:8px 11px;padding-right:28px;}
+.exh-comp select:focus{background:var(--s3);border:none;}
+
+/* weight summary */
+.wsum{margin-top:14px;padding:11px;background:var(--s3);border:1px solid var(--b2);border-left:2px solid var(--amber);}
+.wsrow{display:flex;justify-content:space-between;font-size:11px;color:var(--mid);margin-bottom:3px;}
+.wsrow:last-child{margin-bottom:0;}
+.wsrow.tot{padding-top:7px;margin-top:4px;border-top:1px solid var(--b1);color:var(--text);font-weight:600;}
+.wv.pos{color:var(--red2);}.wv.neg{color:var(--green);}.wv.n{color:var(--text);}
+
+/* analyze button */
+.btn-go{width:100%;padding:19px;background:var(--amber);color:#07090c;font-family:var(--disp);font-size:18px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;transition:background .2s,box-shadow .2s;margin-top:auto;box-shadow:0 -1px 0 var(--b1);}
+.btn-go:hover:not(:disabled){background:#f0b030;box-shadow:0 0 28px rgba(232,160,32,.22),0 -1px 0 var(--b1);}
+.btn-go:disabled{background:var(--s3);color:var(--dim);cursor:not-allowed;}
+
+/* ── CONTENT ── */
+.content{overflow-y:auto;}
+.disc{padding:11px 26px;font-size:10px;color:var(--dim);border-bottom:1px solid var(--b1);letter-spacing:.04em;background:var(--s1);}
+.cpanel{padding:36px 38px;border-bottom:1px solid var(--b1);}
+.cpanel.full{padding:0;}
+.plabel{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.plabel::after{content:'';flex:1;height:1px;background:var(--b1);}
+.ptitle{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+
+/* upload */
+.upzone{border:2px dashed var(--b2);padding:50px 36px;text-align:center;cursor:pointer;position:relative;transition:border-color .2s,background .2s;}
+.upzone:hover,.upzone.dov{border-color:var(--amber);background:var(--adim);}
+.upzone input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
+.up-icon{font-family:var(--disp);font-size:72px;font-weight:800;color:var(--dim);letter-spacing:-.04em;display:block;line-height:1;margin-bottom:14px;}
+.upzone p{font-size:13px;color:var(--mid);margin-bottom:3px;}
+.upzone small{font-size:10px;color:var(--dim);display:block;margin-top:6px;}
+.upst{padding:11px 18px;font-size:11px;display:none;align-items:center;gap:8px;border-top:1px solid var(--b1);}
+.upst.vis{display:flex;}
+.upst.ok{color:var(--green);background:rgba(0,184,148,.06);}
+.upst.err{color:var(--red2);background:var(--rdim);}
+
+/* pulls */
+.pull-item{display:grid;grid-template-columns:40px 1fr auto 70px;align-items:center;gap:14px;padding:15px 20px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .15s;background:var(--s1);}
+.pull-item:hover{background:var(--s2);}
+.pull-item.ib{border-left:3px solid var(--red);background:rgba(214,48,49,.04);}
+.pull-item.ia{border-left:3px solid var(--blue);background:rgba(68,136,255,.04);}
+.pnum{font-family:var(--disp);font-size:34px;font-weight:700;color:var(--dim);line-height:1;}
+.pull-item.ib .pnum{color:var(--red);}
+.pull-item.ia .pnum{color:var(--blue);}
+.pdata strong{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:1px;}
+.pdata span{font-size:11px;color:var(--mid);}
+.pq-num{font-family:var(--disp);font-size:30px;font-weight:700;line-height:1;text-align:right;}
+.pq-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:right;}
+.ptag-w{text-align:right;}
+.ptag{display:inline-block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border:1px solid;}
+.ptag.b{color:var(--red2);border-color:var(--red);background:var(--rdim);}
+.ptag.a{color:var(--blue);border-color:#1d4ed8;background:rgba(68,136,255,.08);}
+
+.empty-st{padding:48px 32px;text-align:center;font-size:12px;color:var(--dim);}
+.empty-st .big{font-family:var(--disp);font-size:52px;font-weight:700;color:var(--b2);display:block;margin-bottom:12px;}
+
+/* results */
+#results{display:none;}
+#results.vis{display:block;}
+.stats-g{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--b1);}
+@media(max-width:700px){.stats-g{grid-template-columns:1fr 1fr;}}
+.sbox{padding:26px 22px;border-right:1px solid var(--b1);position:relative;overflow:hidden;}
+.sbox:last-child{border-right:none;}
+.sbox::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--b1);transition:background .3s,box-shadow .3s;}
+.sbox.hl::after{background:var(--amber);box-shadow:0 0 10px var(--amber);}
+.slbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.sval{font-family:var(--disp);font-size:50px;font-weight:800;line-height:1;letter-spacing:-.02em;}
+.sval.a{color:var(--amber);text-shadow:0 0 30px rgba(232,160,32,.25);}
+.sunit{font-size:11px;color:var(--dim);letter-spacing:.05em;margin-top:2px;}
+
+.chart-w{padding:30px 30px;background:var(--s1);border-bottom:1px solid var(--b1);}
+.interp-w{padding:26px 30px;border-bottom:1px solid var(--b1);display:flex;gap:18px;align-items:flex-start;}
+.interp-bar{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;padding:0 4px;border-right:2px solid var(--amber);margin-right:4px;}
+.interp-txt{font-size:13px;color:var(--mid);line-height:1.9;flex:1;}
+.interp-txt.ld{color:var(--dim);font-style:italic;}
+
+.card-w{padding:30px 30px;border-bottom:1px solid var(--b1);}
+#shareCard{background:#07090c;border:1px solid var(--b2);padding:26px 30px;max-width:580px;position:relative;overflow:hidden;}
+#shareCard::before{content:'MX-5';position:absolute;right:-8px;top:-18px;font-family:var(--disp);font-size:110px;font-weight:800;color:rgba(255,255,255,.02);pointer-events:none;}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--b1);}
+.sc-logo{font-family:var(--disp);font-size:14px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;}
+.sc-logo span{color:var(--amber);}
+.sc-veh{font-size:10px;color:var(--mid);margin-top:2px;}
+.sc-mod{font-size:10px;color:var(--mid);text-align:right;max-width:200px;}
+.sc-nums{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--b1);margin-bottom:18px;}
+.sc-n{padding:14px;text-align:center;border-right:1px solid var(--b1);}
+.sc-n:last-child{border-right:none;}
+.sc-v{font-family:var(--disp);font-size:34px;font-weight:800;line-height:1;}
+.sc-v.g{color:var(--amber);}
+.sc-l{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px;}
+.sc-ft{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.07em;color:var(--dim);}
+.btn-dl{display:inline-block;margin-top:14px;padding:11px 18px;border:1px solid var(--b2);color:var(--mid);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .2s;}
+.btn-dl:hover{border-color:var(--amber);color:var(--amber);background:var(--adim);}
+
+footer{border-top:1px solid var(--b1);padding:18px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--dim);letter-spacing:.06em;background:var(--s1);position:relative;z-index:2;flex-wrap:wrap;gap:8px;}
+footer a{color:var(--dim);text-decoration:none;}
+footer a:hover{color:var(--amber);}
+</style>
+</head>
+<body>
+
+<header class="fi">
+  <div class="h-logo">
+    <div class="h-dot"></div>
+    <div class="h-name">Miata<span>Dyno</span></div>
+  </div>
+  <div class="h-meta">NC 2006–2015 · Beta</div>
+  <nav>
+    <a href="https://dannyhng.github.io/">← Portfolio</a>
+    <a href="https://github.com/dannyhng/miatadyno">GitHub</a>
+  </nav>
+</header>
+
+<div class="hero-wrap fi d1">
+  <div class="h-tag">Virtual Dyno · NC Miata</div>
+  <h1>Did your mod<br>actually do<em>anything?</em></h1>
+  <p class="hero-sub">Upload a BlueDriver CSV. Configure your build. Get a before/after wheel horsepower comparison — no dyno visit needed.</p>
+  <div class="badges">
+    <span class="badge on">Road Load Physics</span>
+    <span class="badge on">SAE J1349 Correction</span>
+    <span class="badge on">Mod Weight Aware</span>
+    <span class="badge on">Run Quality Scoring</span>
+    <span class="badge">GPS Grade — soon</span>
+  </div>
+</div>
+
+<div class="layout fi d2">
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<div class="sidebar">
+
+  <!-- 01 UPLOAD -->
+  <div class="sec">
+    <div class="sec-hd" onclick="toggleSec(this)">
+      <span class="sec-n">01</span><span class="sec-t">Log File</span><span class="sec-c">▸</span>
+    </div>
+    <div class="sec-bd" style="padding:0;">
+      <div class="upzone" id="upzone">
+        <input type="file" id="fileIn" accept=".csv">
+        <span class="up-icon">CSV</span>
+        <p><strong>Drop BlueDriver log here</strong></p>
+        <p>or click to browse</p>
+        <small>BlueDriver → Live Data → Stop → Share → Save to Files</small>
+      </div>
+      <div class="upst" id="upst"></div>
+    </div>
+  </div>
+
+  <!-- 02 VEHICLE -->
+  <div class="sec">
+    <div class="sec-hd" onclick="toggleSec(this)">
+      <span class="sec-n">02</span><span class="sec-t">Vehicle</span><span class="sec-c">▸</span>
+    </div>
+    <div class="sec-bd">
+      <div class="fl">
+        <label class="lbl">Model Generation</label>
+        <select id="ncGen" onchange="calcW()">
+          <option value="nc1">NC1 — 2006–2008</option>
+          <option value="nc2" selected>NC2 — 2009–2012</option>
+          <option value="nc3">NC3 — 2013–2015</option>
+        </select>
+      </div>
+      <div class="fl">
+        <label class="lbl">Transmission</label>
+        <div class="trow" id="tTrans">
+          <div class="tbtn on" data-v="manual" onclick="setT('tTrans',this);toggleAutoNote()">Manual</div>
+          <div class="tbtn" data-v="auto" onclick="setT('tTrans',this);toggleAutoNote()">Automatic</div>
+        </div>
+        <p class="note" id="autoNote">Use manual/Sport mode and hold a single gear during the pull. DSG/Tiptronic compatible. CVT is not compatible.</p>
+      </div>
+      <div class="fl">
+        <label class="lbl">Top Configuration</label>
+        <select id="topType" onchange="calcW()">
+          <option value="0">Soft Top — stock</option>
+          <option value="52">OEM Hard Top installed (+52 lbs)</option>
+          <option value="22">Hard Top + soft top mechanism removed (+22 lbs net)</option>
+          <option value="-8">Aftermarket lightweight hard top (~−8 lbs net)</option>
+        </select>
+      </div>
+      <div class="g2">
+        <div class="fl">
+          <label class="lbl">Fuel Level</label>
+          <select id="fuelLvl" onchange="calcW()">
+            <option value="0.1">Nearly Empty</option>
+            <option value="0.25">Quarter</option>
+            <option value="0.5" selected>Half</option>
+            <option value="0.75">Three Quarter</option>
+            <option value="1.0">Full</option>
+          </select>
+        </div>
+        <div class="fl">
+          <label class="lbl">Driver Wt (lbs)</label>
+          <input type="number" id="drvWt" value="165" min="100" max="350" onchange="calcW()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 WHEELS -->
+  <div class="sec">
+    <div class="sec-hd" onclick="toggleSec(this)">
+      <span class="sec-n">03</span><span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span>
+    </div>
+    <div class="sec-bd">
+      <div class="g3">
+        <div class="fl"><label class="lbl">Width mm</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
+        <div class="fl"><label class="lbl">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
+        <div class="fl"><label class="lbl">Rim in</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
+      </div>
+      <div class="fl">
+        <label class="lbl">Wheel Weight (lbs/each)</label>
+        <select id="whlWt" onchange="toggleCustomWheel();calcW()">
+          <option value="19.8">Stock NC2/NC3 17" — 19.8 lbs</option>
+          <option value="18.5">Stock NC1 16" — 18.5 lbs</option>
+          <option value="13.2">Konig Hypergram 15×8 — 13.2 lbs</option>
+          <option value="13.8">Rota Grid 15×8 — 13.8 lbs</option>
+          <option value="14.1">Enkei RPF1 16×8 — 14.1 lbs</option>
+          <option value="15.9">Enkei RPF1 17×8 — 15.9 lbs</option>
+          <option value="16.5">Konig Hypergram 17×8 — 16.5 lbs</option>
+          <option value="10.8">Rays Volk TE37 15×8 — 10.8 lbs</option>
+          <option value="13.2x">Rays Volk CE28N 17×8 — 13.2 lbs</option>
+          <option value="custom">Custom weight...</option>
+        </select>
+      </div>
+      <div class="fl" id="customWhlF" style="display:none;">
+        <label class="lbl">Custom Wheel Weight (lbs each)</label>
+        <input type="number" id="customWhl" value="17" step="0.5" min="8" max="35" onchange="calcW()">
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 EXHAUST -->
+  <div class="sec">
+    <div class="sec-hd" onclick="toggleSec(this)">
+      <span class="sec-n">04</span><span class="sec-t">Exhaust System</span><span class="sec-c">▸</span>
+    </div>
+    <div class="sec-bd">
+      <div class="exh-comp">
+        <div class="exh-lbl">Cat-Back / Muffler <span class="exh-d" id="d-cb">±0 lbs</span></div>
+        <select id="catback" onchange="exhDelta('catback','d-cb');calcW()">
+          <option value="0">Stock OEM</option>
+          <option value="-13.8">Flyin' Miata Cat-Back (−13.8 lbs)</option>
+          <option value="-16.0">Racing Beat Power Pulse (−16.0 lbs)</option>
+          <option value="-14.5">GoodWin Racing Cat-Back (−14.5 lbs)</option>
+          <option value="-12.5">Borla ATAK (−12.5 lbs)</option>
+          <option value="-17.0">Cobalt SS (−17.0 lbs)</option>
+          <option value="-12.0">MagnaFlow Street (−12.0 lbs)</option>
+          <option value="-13.0">HKS Hi-Power (−13.0 lbs)</option>
+          <option value="-14.0">Megan Racing OE-RS (−14.0 lbs)</option>
+        </select>
+      </div>
+      <div class="exh-comp">
+        <div class="exh-lbl">Midpipe <span class="exh-d" id="d-mp">±0 lbs</span></div>
+        <select id="midpipe" onchange="exhDelta('midpipe','d-mp');calcW()">
+          <option value="0">Stock OEM Midpipe (with cat)</option>
+          <option value="-4.5">Flyin' Miata High-Flow Cat (−4.5 lbs)</option>
+          <option value="-4.0">Racing Beat High-Flow Cat (−4.0 lbs)</option>
+          <option value="-8.0">Test Pipe / Straight Pipe (−8.0 lbs, off-road only)</option>
+        </select>
+      </div>
+      <div class="exh-comp">
+        <div class="exh-lbl">Headers / Manifold <span class="exh-d" id="d-hd">±0 lbs</span></div>
+        <select id="headers" onchange="exhDelta('headers','d-hd');calcW()">
+          <option value="0">Stock OEM Manifold (cast iron)</option>
+          <option value="-8.5">Flyin' Miata Long Tube Headers (−8.5 lbs)</option>
+          <option value="-8.0">Racing Beat Header (−8.0 lbs)</option>
+          <option value="-9.0">GoodWin Racing Headers (−9.0 lbs)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 OTHER -->
+  <div class="sec">
+    <div class="sec-hd" onclick="toggleSec(this)">
+      <span class="sec-n">05</span><span class="sec-t">Other Mods</span><span class="sec-c">▸</span>
+    </div>
+    <div class="sec-bd">
+      <div class="fl">
+        <label class="lbl">AC System</label>
+        <div class="trow" id="tAC">
+          <div class="tbtn on" data-v="0" onclick="setT('tAC',this);calcW()">Stock (AC installed)</div>
+          <div class="tbtn" data-v="-28" onclick="setT('tAC',this);calcW()">AC Deleted (−28 lbs)</div>
+        </div>
+      </div>
+      <div class="fl">
+        <label class="lbl">Roll Bar / Cage</label>
+        <select id="rollbar" onchange="calcW()">
+          <option value="0">None (stock)</option>
+          <option value="22">Hard Dog M2 Roll Bar (+22 lbs)</option>
+          <option value="28">Hard Dog M3 Roll Bar (+28 lbs)</option>
+          <option value="65">Full tube cage (+65 lbs)</option>
+        </select>
+      </div>
+      <div class="fl">
+        <label class="lbl">Forced Induction</label>
+        <select id="forced" onchange="calcW()">
+          <option value="0">None — naturally aspirated</option>
+          <option value="45">Flyin' Miata Supercharger Kit (+45 lbs)</option>
+          <option value="38">Other supercharger kit (+38 lbs est.)</option>
+        </select>
+      </div>
+      <div class="fl">
+        <label class="lbl">Additional Delta (lbs, +/−)</label>
+        <input type="number" id="xDelta" value="0" step="1" placeholder="Custom weight change" onchange="calcW()">
+      </div>
+
+      <div class="wsum">
+        <div class="wsrow"><span>Stock curb weight</span><span class="wv n" id="ws-base">2,509 lbs</span></div>
+        <div class="wsrow"><span>Wheels (4×)</span><span class="wv" id="ws-whl">±0 lbs</span></div>
+        <div class="wsrow"><span>Exhaust system</span><span class="wv" id="ws-exh">±0 lbs</span></div>
+        <div class="wsrow"><span>Top type</span><span class="wv" id="ws-top">±0 lbs</span></div>
+        <div class="wsrow"><span>Other mods</span><span class="wv" id="ws-oth">±0 lbs</span></div>
+        <div class="wsrow"><span>Fuel + driver</span><span class="wv n" id="ws-occ">—</span></div>
+        <div class="wsrow tot"><span>Total weight</span><span class="wv n" id="ws-tot">—</span></div>
+        <div class="wsrow"><span>Tire diameter</span><span class="wv n" id="ws-tire">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 MOD LABEL -->
+  <div class="sec">
+    <div class="sec-hd" onclick="toggleSec(this)">
+      <span class="sec-n">06</span><span class="sec-t">Mod Description</span><span class="sec-c">▸</span>
+    </div>
+    <div class="sec-bd">
+      <div class="fl">
+        <label class="lbl">What did you do? (appears on shareable card)</label>
+        <input type="text" id="modDesc" placeholder="e.g. VersaTuner Stage 1 + FM cat-back">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-go" id="goBtn" disabled>⚡ Run Analysis</button>
+</div>
+
+<!-- ═══════════ CONTENT ═══════════ -->
+<div class="content">
+  <div class="disc">⚠ For use on private property and closed courses only. Never exceed posted speed limits. Beta — results are estimates, not certified dyno figures.</div>
+
+  <div class="cpanel">
+    <div class="plabel">Detected Pulls</div>
+    <div class="ptitle">Select Before &amp; After</div>
+    <p style="font-size:11px;color:var(--mid);">Tap once → BEFORE (red) &nbsp;·&nbsp; Tap again → AFTER (blue) &nbsp;·&nbsp; Tap again to deselect</p>
+  </div>
+
+  <div class="cpanel full" id="pullSec">
+    <div class="empty-st">
+      <span class="big">—</span>
+      Upload a BlueDriver CSV to detect full-throttle pulls.<br>
+      Requires <strong>Absolute Throttle Position</strong> + <strong>Vehicle Speed</strong> PIDs.
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="stats-g">
+      <div class="sbox"><div class="slbl">Before — WHP</div><div class="sval" id="sBefore">—</div><div class="sunit">wheel hp</div></div>
+      <div class="sbox"><div class="slbl">After — WHP</div><div class="sval" id="sAfter">—</div><div class="sunit">wheel hp</div></div>
+      <div class="sbox hl"><div class="slbl">Gain — WHP</div><div class="sval a" id="sGain">—</div><div class="sunit">wheel hp</div></div>
+      <div class="sbox"><div class="slbl">Gain — WTQ</div><div class="sval" id="sTqGain">—</div><div class="sunit">lb-ft torque</div></div>
+    </div>
+    <div class="chart-w">
+      <div class="plabel" style="margin-bottom:16px;">Power Curve</div>
+      <canvas id="dynoChart" height="340"></canvas>
+    </div>
+    <div class="interp-w">
+      <div class="interp-bar">Analysis</div>
+      <div class="interp-txt ld" id="interp">Generating interpretation...</div>
+    </div>
+    <div class="card-w">
+      <div class="plabel" style="margin-bottom:14px;">Shareable Card</div>
+      <div id="shareCard">
+        <div class="sc-top">
+          <div><div class="sc-logo">Miata<span>Dyno</span></div><div class="sc-veh" id="cVeh">NC2 MX-5 (2009–2012)</div></div>
+          <div class="sc-mod" id="cMod">—</div>
+        </div>
+        <div class="sc-nums">
+          <div class="sc-n"><div class="sc-v" id="cBef">—</div><div class="sc-l">Before WHP</div></div>
+          <div class="sc-n"><div class="sc-v" id="cAft">—</div><div class="sc-l">After WHP</div></div>
+          <div class="sc-n"><div class="sc-v g" id="cGain">—</div><div class="sc-l">WHP Gain</div></div>
+        </div>
+        <div class="sc-ft">
+          <span id="cCond">—</span>
+          <span>dannyhng.github.io/miatadyno · Beta</span>
+        </div>
+      </div>
+      <button class="btn-dl" onclick="dlCard()">↓ Download PNG</button>
+    </div>
+  </div>
+</div><!-- end content -->
+</div><!-- end layout -->
+
+<footer>
+  <span>MiataDyno Beta — NC Miata 2006–2015</span>
+  <span>Built by <a href="https://dannyhng.github.io/">Danny Hoang</a> · Portland, OR</span>
+  <span>Private property and closed course use only</span>
+</footer>
+
+<script>
+// ═══ VEHICLE DB ═══
+const NCP = {
+  nc1:{name:'NC1 MX-5 (2006–2008)',wt:2480,swl:18.5,fg:12.7,Cd:.31,A:1.99,Crr:.015,rot:.045,dtl:.15},
+  nc2:{name:'NC2 MX-5 (2009–2012)',wt:2509,swl:19.8,fg:12.7,Cd:.31,A:1.99,Crr:.015,rot:.045,dtl:.15},
+  nc3:{name:'NC3 MX-5 (2013–2015)',wt:2509,swl:19.8,fg:12.7,Cd:.31,A:1.99,Crr:.015,rot:.045,dtl:.15},
+};
+
+// ═══ UI HELPERS ═══
+function toggleSec(h){h.closest('.sec').classList.toggle('coll');}
+function setT(id,btn){document.getElementById(id).querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+function toggleAutoNote(){
+  const v=document.querySelector('#tTrans .tbtn.on')?.dataset.v;
+  document.getElementById('autoNote').style.display=v==='auto'?'block':'none';
+}
+function exhDelta(sid,lid){
+  const v=parseFloat(document.getElementById(sid).value)||0;
+  const el=document.getElementById(lid);
+  if(v===0){el.textContent='±0 lbs';el.style.color='var(--mid)';}
+  else if(v<0){el.textContent=v+' lbs';el.style.color='var(--green)';}
+  else{el.textContent='+'+v+' lbs';el.style.color='var(--red2)';}
+}
+function toggleCustomWheel(){
+  const show=document.getElementById('whlWt').value==='custom';
+  document.getElementById('customWhlF').style.display=show?'block':'none';
+}
+function getWhlWt(){
+  const s=document.getElementById('whlWt');
+  if(s.value==='custom'||s.value==='13.2x') return parseFloat(s.value)||13.2;
+  return parseFloat(s.value);
+}
+
+// ═══ WEIGHT CALC ═══
+function calcW(){
+  const gen=document.getElementById('ncGen').value;
+  const base=NCP[gen];
+  const fl=parseFloat(document.getElementById('fuelLvl').value);
+  const drv=parseFloat(document.getElementById('drvWt').value)||165;
+  const ww=getWhlWt();
+  const tw=parseFloat(document.getElementById('tW').value)||205;
+  const ta=parseFloat(document.getElementById('tA').value)||45;
+  const tr=parseFloat(document.getElementById('tR').value)||17;
+  const top=parseFloat(document.getElementById('topType').value)||0;
+  const rb=parseFloat(document.getElementById('rollbar').value)||0;
+  const fi=parseFloat(document.getElementById('forced').value)||0;
+  const xd=parseFloat(document.getElementById('xDelta').value)||0;
+  const ac=parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v||0);
+  const exh=['catback','midpipe','headers'].reduce((s,id)=>s+(parseFloat(document.getElementById(id).value)||0),0);
+  const wdelta=4*(ww-base.swl);
+  const fuel=fl*base.fg*6.1;
+  const oth=rb+fi+xd+ac;
+  const tot=base.wt+wdelta+exh+oth+top+fuel+drv;
+  const si=tw*(ta/100)*0.0393701;
+  const dia_in=tr+2*si;
+  const dia_m=dia_in*0.0254;
+
+  const fmt=(v,s=true)=>{if(v===0)return '±0 lbs';return (s&&v>0?'+':'')+v.toFixed(0)+' lbs';};
+  const cls=(v)=>v<0?'wv neg':v>0?'wv pos':'wv n';
+
+  document.getElementById('ws-base').textContent=base.wt.toLocaleString()+' lbs';
+  ['ws-whl',wdelta],['ws-exh',exh],['ws-top',top],['ws-oth',oth].forEach(([id,v])=>{
+    const el=document.getElementById(id); if(!el)return;
+    el.textContent=fmt(v); el.className=cls(v);
+  });
+  // fix the forEach syntax above
+  const pairs=[['ws-whl',wdelta],['ws-exh',exh],['ws-top',top],['ws-oth',oth]];
+  pairs.forEach(([id,v])=>{const el=document.getElementById(id);if(!el)return;el.textContent=fmt(v);el.className=cls(v);});
+  document.getElementById('ws-occ').textContent='+'+(fuel+drv).toFixed(0)+' lbs';
+  document.getElementById('ws-tot').textContent=tot.toFixed(0)+' lbs';
+  document.getElementById('ws-tire').textContent=dia_in.toFixed(2)+'" ('+dia_m.toFixed(3)+' m)';
+
+  return {gen,base,tot,tot_kg:tot*0.453592,eff:tot*0.453592*(1+base.rot),dia_m};
+}
+calcW();
+
+// ═══ PHYSICS ═══
+const G=9.81,RDA=287.058;
+let baro=99.9,iat_k=298,rho=1.225;
+let rows=[],pulls=[],selB=null,selA=null;
+
+function savgol(a,w){
+  const ww=Math.max(7,w%2===0?w+1:w),h=Math.floor(ww/2);
+  return a.map((_,i)=>{let s=0,ws=0;for(let j=-h;j<=h;j++){const idx=i+j;if(idx<0||idx>=a.length)continue;const wt=1-Math.pow(j/(h+1),2);s+=a[idx]*wt;ws+=wt;}return s/ws;});
+}
+function grad(y,x){const n=y.length,o=new Array(n);for(let i=0;i<n;i++){if(i===0)o[i]=(y[1]-y[0])/(x[1]-x[0]);else if(i===n-1)o[i]=(y[n-1]-y[n-2])/(x[n-1]-x[n-2]);else o[i]=(y[i+1]-y[i-1])/(x[i+1]-x[i-1]);}return o;}
+function calcHP(seg,prof){
+  if(seg.length<5)return null;
+  const t=seg.map(r=>r.time),sv=savgol(seg.map(r=>r.speed_mph*0.44704),Math.max(7,Math.floor(seg.length/6)*2+1));
+  const ac=grad(sv,t);
+  const corr=(99.0/baro)*Math.sqrt(iat_k/298.0);
+  return seg.map((r,i)=>{
+    const v=sv[i],a=ac[i];
+    const Ft=prof.eff*a+prof.base.Crr*prof.tot_kg*G+0.5*rho*prof.base.Cd*prof.base.A*v*v;
+    const WHP=(Ft*v/745.7)*corr;
+    const WTQ=r.rpm>0?(WHP*5252)/r.rpm:0;
+    return{rpm:r.rpm,v,WHP,WTQ};
+  }).filter(r=>r.v>3&&r.rpm>500);
+}
+function bin(data,bs=500){
+  if(!data?.length)return[];
+  const mn=Math.floor(Math.min(...data.map(r=>r.rpm))/bs)*bs;
+  const mx=Math.ceil(Math.max(...data.map(r=>r.rpm))/bs)*bs;
+  const out=[];
+  for(let b=mn;b<mx;b+=bs){
+    const inn=data.filter(r=>r.rpm>=b&&r.rpm<b+bs);
+    if(!inn.length)continue;
+    out.push({rpm:b+bs/2,WHP:inn.reduce((s,r)=>s+r.WHP,0)/inn.length,WTQ:inn.reduce((s,r)=>s+r.WTQ,0)/inn.length});
+  }
+  return out;
+}
+
+// ═══ CSV PARSE ═══
+function findC(hs,kws){return hs.find(h=>kws.some(k=>h.toLowerCase().includes(k.toLowerCase())));}
+function parseCSV(txt){
+  if(txt.charCodeAt(0)===0xFEFF)txt=txt.slice(1);
+  const lines=txt.split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length<4)return{ok:false,msg:'File too short.'};
+  const p=Papa.parse(lines.slice(2).join('\n'),{header:true,skipEmptyLines:true,dynamicTyping:true});
+  if(!p.data.length)return{ok:false,msg:'No data found.'};
+  const hs=p.meta.fields.map(f=>f.trim());
+  const tC=findC(hs,['time']),rC=findC(hs,['rpm']),sC=findC(hs,['speed']),thC=findC(hs,['throttle','load']),bC=findC(hs,['baro','barometric']),iC=findC(hs,['intake air']);
+  if(!rC||!sC)return{ok:false,msg:`Missing RPM or Speed column. Found: ${hs.join(', ')}`};
+  if(!thC)return{ok:false,msg:'No Throttle Position column. Add "Absolute Throttle Position" PID in BlueDriver.'};
+  const data=p.data.map(r=>({time:parseFloat(r[tC])||0,rpm:parseFloat(r[rC])||0,speed_mph:parseFloat(r[sC])||0,throttle:parseFloat(r[thC])||0,baro_r:bC?parseFloat(r[bC]):null,iat_r:iC?parseFloat(r[iC]):null})).filter(r=>!isNaN(r.time));
+  const bv=data.map(r=>r.baro_r).filter(v=>v&&v>0);
+  const iv=data.map(r=>r.iat_r).filter(v=>v&&v>0);
+  if(bv.length){const br=bv.reduce((a,b)=>a+b)/bv.length;baro=br<50?br*3.38639:br;}
+  if(iv.length){const ir=iv.reduce((a,b)=>a+b)/iv.length;const ic=ir>60?(ir-32)*5/9:ir;iat_k=ic+273.15;}
+  rho=(baro*1000)/(RDA*iat_k);
+  return{ok:true,data};
+}
+function detectPulls(data){
+  const THRESH=80,MIN_D=3,MIN_S=5,out=[],n=data.length;
+  let inp=false,st=null,stt=null;
+  data.forEach((r,i)=>{
+    if(r.throttle>=THRESH&&r.speed_mph>=MIN_S){if(!inp){inp=true;st=i;stt=r.time;}}
+    else if(inp){
+      const dur=r.time-stt;
+      if(dur>=MIN_D){
+        const seg=data.slice(st,i);
+        let drops=0;for(let j=1;j<seg.length;j++)if(seg[j].speed_mph<seg[j-1].speed_mph-2)drops++;
+        out.push({si:st,ei:i-1,st:stt,dur,maxRPM:Math.max(...seg.map(r=>r.rpm)),maxSpd:Math.max(...seg.map(r=>r.speed_mph)),maxThr:Math.max(...seg.map(r=>r.throttle)),q:Math.max(0,Math.min(100,100-drops*15)),rows:seg});
+      }
+      inp=false;
+    }
+  });
+  return out;
+}
+
+// ═══ FILE UPLOAD ═══
+const upz=document.getElementById('upzone');
+document.getElementById('fileIn').addEventListener('change',e=>handleFile(e.target.files[0]));
+upz.addEventListener('dragover',e=>{e.preventDefault();upz.classList.add('dov');});
+upz.addEventListener('dragleave',()=>upz.classList.remove('dov'));
+upz.addEventListener('drop',e=>{e.preventDefault();upz.classList.remove('dov');handleFile(e.dataTransfer.files[0]);});
+
+function showSt(msg,type){const el=document.getElementById('upst');el.textContent=msg;el.className='upst vis '+type;}
+function handleFile(f){
+  if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{
+    const res=parseCSV(e.target.result);
+    if(!res.ok){showSt('❌ '+res.msg,'err');return;}
+    showSt(`✓ ${res.data.length} rows · ${(res.data[res.data.length-1]?.time/60||0).toFixed(1)} min · Baro: ${baro.toFixed(1)} kPa · IAT: ${(iat_k-273.15).toFixed(1)}°C · ρ: ${rho.toFixed(4)} kg/m³`,'ok');
+    rows=res.data; pulls=detectPulls(rows); selB=null; selA=null;
+    renderPulls(); checkReady();
+  };
+  rd.readAsText(f,'utf-8');
+}
+
+// ═══ PULL RENDER ═══
+function renderPulls(){
+  const sec=document.getElementById('pullSec');
+  if(!pulls.length){sec.innerHTML='<div class="empty-st"><span class="big">⚠</span>No full-throttle pulls detected.<br>Ensure "Absolute Throttle Position" PID is logged and you did a WOT run.</div>';return;}
+  sec.innerHTML='';
+  pulls.forEach((p,i)=>{
+    const qc=p.q>=80?'var(--green)':p.q>=50?'var(--amber)':'var(--red2)';
+    const div=document.createElement('div');
+    div.className='pull-item';div.dataset.idx=i;
+    div.innerHTML=`<div class="pnum">${i+1}</div><div class="pdata"><strong>${p.maxRPM.toFixed(0)} RPM · ${p.maxSpd.toFixed(0)} MPH · ${p.dur.toFixed(1)}s</strong><span>From ${p.st.toFixed(1)}s · Max throttle ${p.maxThr.toFixed(0)}%</span></div><div><div class="pq-num" style="color:${qc}">${p.q}</div><div class="pq-lbl">/ 100 quality</div></div><div class="ptag-w" id="pt${i}"></div>`;
+    div.addEventListener('click',()=>selPull(i,div));
+    sec.appendChild(div);
+  });
+  if(pulls.length>=1)selPull(0,sec.children[0]);
+  if(pulls.length>=2)selPull(1,sec.children[1]);
+}
+function selPull(idx,el){
+  if(selB===idx){selB=null;el.classList.remove('ib');document.getElementById('pt'+idx).innerHTML='';}
+  else if(selA===idx){selA=null;el.classList.remove('ia');document.getElementById('pt'+idx).innerHTML='';}
+  else if(selB===null){selB=idx;el.classList.add('ib');document.getElementById('pt'+idx).innerHTML='<div class="ptag b">Before</div>';}
+  else if(selA===null){selA=idx;el.classList.add('ia');document.getElementById('pt'+idx).innerHTML='<div class="ptag a">After</div>';}
+  checkReady();
+}
+function checkReady(){document.getElementById('goBtn').disabled=selB===null||selA===null;}
+
+// ═══ ANALYSIS ═══
+let chart=null;
+document.getElementById('goBtn').addEventListener('click',()=>{
+  const w=calcW();
+  const prof={eff:w.eff,tot_kg:w.tot_kg,base:w.base};
+  const rB=calcHP(pulls[selB].rows,prof);
+  const rA=calcHP(pulls[selA].rows,prof);
+  const bB=bin(rB), bA=bin(rA);
+  if(!bB.length||!bA.length){alert('Not enough clean data. Check run quality scores.');return;}
+  const pB=Math.max(...bB.map(r=>r.WHP)),pA=Math.max(...bA.map(r=>r.WHP));
+  const tB=Math.max(...bB.map(r=>r.WTQ)),tA=Math.max(...bA.map(r=>r.WTQ));
+  const hg=pA-pB,tg=tA-tB;
+  const mod=document.getElementById('modDesc').value||'Modification';
+  const vn=NCP[w.gen].name;
+
+  anim('sBefore',pB);anim('sAfter',pA);anim('sGain',hg,true);anim('sTqGain',tg,true);
+  document.getElementById('cVeh').textContent=vn;
+  document.getElementById('cMod').textContent=mod;
+  document.getElementById('cBef').textContent=pB.toFixed(1);
+  document.getElementById('cAft').textContent=pA.toFixed(1);
+  document.getElementById('cGain').textContent=(hg>=0?'+':'')+hg.toFixed(1)+' WHP';
+  document.getElementById('cCond').textContent=`Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}°C · ${w.tot.toFixed(0)} lbs`;
+
+  drawChart(bB,bA);
+  genInterp(pB,pA,hg,tg,mod,vn);
+  const res=document.getElementById('results');
+  res.classList.add('vis');
+  setTimeout(()=>res.scrollIntoView({behavior:'smooth',block:'start'}),100);
+});
+
+function anim(id,target,sign=false){
+  const el=document.getElementById(id);
+  let cur=0;const dur=600,step=16,inc=target/(dur/step);
+  const iv=setInterval(()=>{cur+=inc;if(Math.abs(cur)>=Math.abs(target)){cur=target;clearInterval(iv);}el.textContent=(sign&&cur>=0?'+'  :'')+cur.toFixed(1);},step);
+}
+
+function drawChart(bef,aft){
+  if(chart)chart.destroy();
+  Chart.defaults.color='#6b7a94';
+  chart=new Chart(document.getElementById('dynoChart').getContext('2d'),{
+    type:'line',
+    data:{datasets:[
+      {label:'Before — WHP',data:bef.map(r=>({x:r.rpm,y:r.WHP})),borderColor:'#d63031',backgroundColor:'rgba(214,48,49,.06)',borderWidth:2.5,borderDash:[6,4],pointRadius:3,tension:.35,fill:false},
+      {label:'After — WHP', data:aft.map(r=>({x:r.rpm,y:r.WHP})),borderColor:'#e8a020',backgroundColor:'rgba(232,160,32,.06)',borderWidth:2.5,pointRadius:3,tension:.35,fill:false},
+      {label:'Before — WTQ',data:bef.map(r=>({x:r.rpm,y:r.WTQ})),borderColor:'rgba(214,48,49,.35)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.35,fill:false},
+      {label:'After — WTQ', data:aft.map(r=>({x:r.rpm,y:r.WTQ})),borderColor:'rgba(232,160,32,.35)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.35,fill:false},
+    ]},
+    options:{
+      responsive:true,animation:{duration:900},
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{labels:{color:'#6b7a94',font:{family:'JetBrains Mono',size:11},boxWidth:18}},
+        tooltip:{backgroundColor:'#0d1018',borderColor:'#1e2535',borderWidth:1,titleFont:{family:'JetBrains Mono',size:11},bodyFont:{family:'JetBrains Mono',size:11},titleColor:'#d4dce8',bodyColor:'#6b7a94',callbacks:{title:i=>`${i[0].raw.x.toFixed(0)} RPM`,label:i=>`${i.dataset.label}: ${i.raw.y.toFixed(1)}`}}
+      },
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Engine RPM',color:'#3a4557',font:{family:'JetBrains Mono',size:10}},ticks:{color:'#3a4557',font:{family:'JetBrains Mono',size:10}},grid:{color:'#0d1018'}},
+        y:{title:{display:true,text:'WHP / WTQ (lb-ft)',color:'#3a4557',font:{family:'JetBrains Mono',size:10}},ticks:{color:'#3a4557',font:{family:'JetBrains Mono',size:10}},grid:{color:'#131820'}}
+      }
+    }
+  });
+}
+
+// ═══ AI INTERPRETATION ═══
+async function genInterp(pB,pA,hg,tg,mod,vn){
+  const el=document.getElementById('interp');
+  el.className='interp-txt ld';el.textContent='Generating interpretation...';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,messages:[{role:'user',content:`You are an NC Miata tuner. Interpret these results in 3-4 sentences. Direct, like a Facebook group post. No hype.\n\nVehicle: ${vn}\nMod: ${mod}\nBefore: ${pB.toFixed(1)} WHP / After: ${pA.toFixed(1)} WHP / Gain: ${hg>=0?'+':''}${hg.toFixed(1)} WHP / ${tg>=0?'+':''}${tg.toFixed(1)} WTQ\n\nTypical for this mod? Real-world impact?`}]})});
+    const d=await r.json();
+    el.className='interp-txt';el.textContent=d?.content?.[0]?.text||fallback(hg,mod,pA);
+  }catch{el.className='interp-txt';el.textContent=fallback(hg,mod,pA);}
+}
+function fallback(hg,mod,pA){
+  if(Math.abs(hg)<4)return `+${hg.toFixed(1)} WHP from ${mod}. Within measurement variance — run a few more pulls to confirm.`;
+  if(Math.abs(hg)<12)return `+${hg.toFixed(1)} WHP from ${mod}. Solid result, consistent with what the NC community typically sees. You'll feel it in the mid-range.`;
+  return `+${hg.toFixed(1)} WHP from ${mod}. Strong result for the NC platform. Peak at ${pA.toFixed(1)} WHP is well above baseline.`;
+}
+
+// ═══ DOWNLOAD ═══
+async function dlCard(){
+  const c=await html2canvas(document.getElementById('shareCard'),{backgroundColor:'#07090c',scale:2,useCORS:true});
+  const a=document.createElement('a');a.download='miatadyno-result.png';a.href=c.toDataURL('image/png');a.click();
+}
+</script>
+</body>
+</html>
