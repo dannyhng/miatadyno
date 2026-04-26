@@ -23,9 +23,9 @@
   --rdim:    rgba(214,48,49,0.10);
   --blue:    #4488ff;
   --green:   #00b894;
-  --text:    #d4dce8;
-  --mid:     #6b7a94;
-  --dim:     #3a4557;
+  --text:    #eaf0fc;
+  --mid:     #96a8c4;
+  --dim:     #6478a0;
   --mono:    'JetBrains Mono', monospace;
   --disp:    'Barlow Condensed', sans-serif;
 }
@@ -70,7 +70,30 @@ header nav a:hover{color:var(--amber);background:var(--adim);}
 
 /* ── LAYOUT ── */
 .layout{display:grid;grid-template-columns:370px 1fr;}
-@media(max-width:860px){.layout{grid-template-columns:1fr;}}
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr;}
+  .hero-w{padding:36px 24px 28px;}
+  .hero-w::before{display:none;}
+  .hero-w h1{font-size:clamp(36px,10vw,60px);}
+  .hero-sub{font-size:13px;}
+  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--b1);}
+  .cpanel{padding:24px 20px;}
+  .stats-g{grid-template-columns:1fr 1fr;}
+  .sval{font-size:38px;}
+  .chart-w{padding:20px 16px;}
+  .interp-w{padding:20px 16px;}
+  .card-w{padding:20px 16px;}
+  .pull-item{grid-template-columns:40px 1fr auto;gap:10px;padding:12px 16px;}
+  .ptag-w{display:none;}
+  #shareCard{padding:20px;}
+}
+@media(max-width:480px){
+  .stats-g{grid-template-columns:1fr 1fr;}
+  .sval{font-size:32px;}
+  header nav a{padding:16px 12px;font-size:10px;}
+  .h-sub{display:none;}
+  .sec-bd{padding:14px 16px;}
+}
 
 /* ── SIDEBAR ── */
 .sidebar{border-right:1px solid var(--b1);position:sticky;top:61px;height:calc(100vh - 61px);overflow-y:auto;display:flex;flex-direction:column;}
@@ -80,8 +103,8 @@ header nav a:hover{color:var(--amber);background:var(--adim);}
 .sec{border-bottom:1px solid var(--b1);}
 .sec-hd{padding:13px 22px;display:flex;align-items:center;gap:10px;background:var(--s1);border-bottom:1px solid var(--b1);cursor:pointer;user-select:none;transition:background .15s;}
 .sec-hd:hover{background:var(--s2);}
-.sec-n{font-size:10px;color:var(--amber);letter-spacing:.1em;font-weight:600;}
-.sec-t{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.sec-n{font-size:11px;color:var(--amber);letter-spacing:.1em;font-weight:600;}
+.sec-t{font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
 .sec-c{margin-left:auto;color:var(--dim);font-size:10px;transition:transform .2s;}
 .sec.coll .sec-c{transform:rotate(-90deg);}
 .sec.coll .sec-bd{display:none;}
@@ -89,7 +112,7 @@ header nav a:hover{color:var(--amber);background:var(--adim);}
 
 /* form */
 .fl{margin-bottom:12px;}.fl:last-child{margin-bottom:0;}
-label.lbl{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+label.lbl{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;}
 select,input[type=number],input[type=text]{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 11px;appearance:none;outline:none;transition:border-color .15s,background .15s;}
 select:focus,input:focus{border-color:var(--amber);background:var(--s3);}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7a94'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer;}
@@ -756,8 +779,8 @@ function drawChart(bef,aft){
         tooltip:{backgroundColor:'#0d1018',borderColor:'#1e2535',borderWidth:1,titleFont:{family:'JetBrains Mono',size:11},bodyFont:{family:'JetBrains Mono',size:11},titleColor:'#d4dce8',bodyColor:'#6b7a94',callbacks:{title:i=>`${i[0].raw.x.toFixed(0)} RPM`,label:i=>`${i.dataset.label}: ${i.raw.y.toFixed(1)}`}}
       },
       scales:{
-        x:{type:'linear',title:{display:true,text:'Engine RPM',color:'#3a4557',font:{family:'JetBrains Mono',size:10}},ticks:{color:'#3a4557',font:{family:'JetBrains Mono',size:10}},grid:{color:'#0d1018'}},
-        y:{title:{display:true,text:'WHP / WTQ (lb-ft)',color:'#3a4557',font:{family:'JetBrains Mono',size:10}},ticks:{color:'#3a4557',font:{family:'JetBrains Mono',size:10}},grid:{color:'#131820'}}
+        x:{type:'linear',title:{display:true,text:'Engine RPM',color:'#6478a0',font:{family:'JetBrains Mono',size:11}},ticks:{color:'#6478a0',font:{family:'JetBrains Mono',size:11}},grid:{color:'#0d1018'}},
+y:{title:{display:true,text:'WHP / WTQ (lb-ft)',color:'#6478a0',font:{family:'JetBrains Mono',size:11}},ticks:{color:'#6478a0',font:{family:'JetBrains Mono',size:11}},grid:{color:'#131820'}}
       }
     }
   });
