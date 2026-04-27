@@ -228,6 +228,12 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 footer{border-top:1px solid var(--b1);padding:18px 28px;display:flex;justify-content:space-between;font-size:10px;color:var(--dim);letter-spacing:.06em;background:var(--s1);position:relative;z-index:2;flex-wrap:wrap;gap:8px;}
 footer a{color:var(--dim);text-decoration:none;}
 footer a:hover{color:var(--amber);}
+
+/* ── TWO-DOOR WEIGHT SYSTEM ── */
+#path-know    { display:block; }
+#path-estimate{ display:none;  }
+.path-only-estimate { display:block; } /* sections 03-05 visibility */
+
 </style>
 </head>
 <body>
@@ -279,7 +285,7 @@ footer a:hover{color:var(--amber);}
     </div>
   </div>
 
-  <!-- 02 VEHICLE -->
+  <!-- 02 VEHICLE WEIGHT -->
   <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
       <span class="sec-n">02</span><span class="sec-t">Vehicle Weight</span><span class="sec-c">▸</span>
@@ -287,25 +293,25 @@ footer a:hover{color:var(--amber);}
     <div class="sec-bd">
 
       <div class="fl">
-        <label class="lbl">Do you know your car's total weight?</label>
+        <label class="lbl">Do you know your car's current weight?</label>
         <div class="trow" id="tWtMode">
-          <div class="tbtn on" data-v="know" onclick="setT('tWtMode',this);toggleWtMode()">I know it</div>
-          <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);toggleWtMode()">Help me estimate</div>
+          <div class="tbtn on" data-v="know" onclick="setT('tWtMode',this);setWeightMode('know')">I know it</div>
+          <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate it for me</div>
         </div>
+        <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.5;">
+          Your door jamb sticker shows curb weight. Add your body weight on top.
+          If you've weighed your car on a scale, use that number.
+        </p>
       </div>
 
-      <!-- KNOWN WEIGHT MODE -->
-      <div id="wt-known">
-        <div class="fl" style="margin-top:10px;">
-          <label class="lbl">Total weight with you in the car (lbs)</label>
-          <input type="number" id="knownWt" value="2700" min="2000" max="4500" step="10" onchange="calcW()">
-          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">
-            Include yourself, passengers, and a rough guess at fuel level.
-            Curb weight is on your door jamb sticker. Add your weight on top.
-          </p>
+      <!-- PATH A: I KNOW MY WEIGHT -->
+      <div id="path-know">
+        <div class="fl">
+          <label class="lbl">Total weight — car + you + passengers (lbs)</label>
+          <input type="number" id="knownWt" value="2700" min="2000" max="4000" step="10" onchange="calcW()">
         </div>
         <div class="fl">
-          <label class="lbl">Generation (for aero values)</label>
+          <label class="lbl">Generation (for aero values only)</label>
           <select id="ncGenK" onchange="calcW()">
             <option value="nc1">NC1 — 2006–2008</option>
             <option value="nc2" selected>NC2 — 2009–2012</option>
@@ -319,11 +325,15 @@ footer a:hover{color:var(--amber);}
             <div class="tbtn" data-v="down" onclick="setT('tPosK',this);calcW()">Top Down (+22% drag)</div>
           </div>
         </div>
+        <div class="wsum" style="margin-top:12px;">
+          <div class="wsrow"><span>Weight entered</span><span class="wv n" id="ws-known-tot">—</span></div>
+          <div class="wsrow"><span>Cd (aero)</span><span class="wv n" id="ws-known-cd">0.36</span></div>
+        </div>
       </div>
 
-      <!-- ESTIMATE MODE -->
-      <div id="wt-estimate" style="display:none;">
-        <div class="fl" style="margin-top:10px;">
+      <!-- PATH B: ESTIMATE -->
+      <div id="path-estimate" style="display:none;">
+        <div class="fl">
           <label class="lbl">Generation</label>
           <select id="ncGen" onchange="calcW()">
             <option value="nc1">NC1 — 2006–2008</option>
@@ -332,22 +342,22 @@ footer a:hover{color:var(--amber);}
           </select>
         </div>
         <div class="fl">
+          <label class="lbl">Top Type</label>
+          <div class="trow" id="tTop">
+            <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
+            <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT</div>
+          </div>
+        </div>
+        <div class="fl">
           <label class="lbl">Transmission</label>
           <div class="trow" id="tTrans">
             <div class="tbtn on" data-v="manual" onclick="setT('tTrans',this);toggleAutoNote()">Manual</div>
             <div class="tbtn" data-v="auto" onclick="setT('tTrans',this);toggleAutoNote()">Automatic</div>
           </div>
-          <p class="note" id="autoNote">Use Sport/manual mode and hold one gear during the pull. DSG/Tiptronic ok. CVT is not compatible.</p>
+          <p class="note" id="autoNote">Use Sport/manual mode and hold one gear. DSG/Tiptronic compatible. CVT is not compatible.</p>
         </div>
         <div class="fl">
-          <label class="lbl">Top Type</label>
-          <div class="trow" id="tTop">
-            <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
-            <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT Hard Top</div>
-          </div>
-        </div>
-        <div class="fl">
-          <label class="lbl">Top position during the pull</label>
+          <label class="lbl">Top position during pull</label>
           <div class="trow" id="tPos">
             <div class="tbtn on" data-v="up" onclick="setT('tPos',this);calcW()">Top Up</div>
             <div class="tbtn" data-v="down" onclick="setT('tPos',this);calcW()">Top Down (+22% drag)</div>
@@ -374,41 +384,55 @@ footer a:hover{color:var(--amber);}
     </div>
   </div>
 
-  <!-- 03 WHEELS & TIRES -->
-  <div class="sec">
+  <!-- 03 WHEELS & TIRES (estimate path only) -->
+  <div class="sec path-only-estimate" id="sec-wheels">
     <div class="sec-hd" onclick="toggleSec(this)">
       <span class="sec-n">03</span><span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
 
+      <p style="font-size:11px;color:var(--dim);margin-bottom:14px;line-height:1.6;">
+        NC curb weight already includes stock wheels and tires.
+        Only enter this if you changed from stock. We compare your
+        full corner assembly (wheel + tire) against stock.
+      </p>
+
       <div class="fl">
         <label class="lbl">Rim Size</label>
         <div class="trow" id="tRim">
-          <div class="tbtn" data-v="15" onclick="setT('tRim',this);setRimDefaults(15);calcW()">15"</div>
-          <div class="tbtn" data-v="16" onclick="setT('tRim',this);setRimDefaults(16);calcW()">16"</div>
-          <div class="tbtn on" data-v="17" onclick="setT('tRim',this);setRimDefaults(17);calcW()">17"</div>
-          <div class="tbtn" data-v="18" onclick="setT('tRim',this);setRimDefaults(18);calcW()">18"</div>
+          <div class="tbtn" data-v="15" onclick="setT('tRim',this);setRim(15)">15"</div>
+          <div class="tbtn" data-v="16" onclick="setT('tRim',this);setRim(16)">16"</div>
+          <div class="tbtn on" data-v="17" onclick="setT('tRim',this);setRim(17)">17" (stock)</div>
+          <div class="tbtn" data-v="18" onclick="setT('tRim',this);setRim(18)">18"</div>
         </div>
       </div>
 
       <div class="fl">
-        <label class="lbl">Wheel Weight per Corner (lbs)</label>
+        <label class="lbl">Wheel Weight per Corner</label>
         <select id="whlWt" onchange="calcW()">
-          <option value="10.8">Forged/lightweight (Volk, Gram Lights) — ~10–12 lbs</option>
-          <option value="13.5">Mid-range aftermarket (Enkei, Konig) — ~13–15 lbs</option>
-          <option value="18.0" selected>Stock NC OEM alloy — ~18–19 lbs</option>
-          <option value="20.5">Heavy aftermarket / steel — ~20+ lbs</option>
+          <!-- Populated by setRim() -->
         </select>
-        <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">
-          Weigh one wheel on a bathroom scale for the most accurate number. Stock NC2/3 17" = 18.8 lbs each.
+        <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;" id="whl-note">
+          Weigh one wheel on a bathroom scale for the most accurate number.
         </p>
       </div>
 
       <div class="fl">
-        <label class="lbl">Tire Size</label>
+        <label class="lbl">Tire Size &amp; Weight</label>
+        <select id="tireSel" onchange="calcW()">
+          <!-- Populated by setRim() -->
+        </select>
+        <p style="font-size:10px;color:var(--dim);margin-top:5px;">
+          Check your sidewall for your current size.
+          Stock NC1 = 195/50R16. Stock NC2/3 = 205/45R17.
+        </p>
+      </div>
+
+      <div class="fl" id="customTireRow" style="display:none;">
+        <label class="lbl">Tire Width (mm)</label>
         <div class="g3">
           <div>
-            <label class="lbl" style="font-size:9px;">Width (mm)</label>
+            <label class="lbl" style="font-size:9px;">Width</label>
             <input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()">
           </div>
           <div>
@@ -416,13 +440,10 @@ footer a:hover{color:var(--amber);}
             <input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()">
           </div>
           <div>
-            <label class="lbl" style="font-size:9px;">Rim (in)</label>
+            <label class="lbl" style="font-size:9px;">Rim</label>
             <input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()">
           </div>
         </div>
-        <p style="font-size:10px;color:var(--dim);margin-top:5px;">
-          Check your sidewall. Stock NC2/3 = 205/45R17.
-        </p>
       </div>
 
     </div>
@@ -469,8 +490,8 @@ footer a:hover{color:var(--amber);}
     </div>
   </div>
 
-  <!-- 05 OTHER -->
-  <div class="sec">
+  <!-- 05 OTHER (estimate path only) -->
+  <div class="sec path-only-estimate" id="sec-other">
     <div class="sec-hd" onclick="toggleSec(this)">
       <span class="sec-n">05</span><span class="sec-t">Other Mods</span><span class="sec-c">▸</span>
     </div>
@@ -630,13 +651,79 @@ footer a:hover{color:var(--amber);}
 <script>
 // ═══ VEHICLE DB ═══
 const NCP = {
-  nc1:{name:'NC1 MX-5 (2006–2008)',wt:2480,swl:18.0,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
-  nc2:{name:'NC2 MX-5 (2009–2012)',wt:2509,swl:18.8,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
-  nc3:{name:'NC3 MX-5 (2013–2015)',wt:2509,swl:18.8,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc1:{name:'NC1 MX-5 (2006–2008)',wt:2480,swl:15.0,stl:19.0,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc2:{name:'NC2 MX-5 (2009–2012)',wt:2509,swl:19.0,stl:18.0,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc3:{name:'NC3 MX-5 (2013–2015)',wt:2509,swl:19.0,stl:18.0,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+};
+// swl = stock wheel lbs/corner, stl = stock tire lbs/corner
+// Stock corner assembly = swl + stl
+// NC1: 15+19=34 lbs/corner  NC2/3: 19+18=37 lbs/corner
+
+const CD_MAP = { up_soft:.36, up_prht:.34, down:.44 };
+
+// ═══ WHEEL + TIRE DATABASE ═══
+// Wheel weights verified from manufacturer specs and community scales
+// Tire weights from Toyo, Continental, and community data
+const WHEEL_OPTIONS = {
+  15: [
+    {label:'Lightweight forged (Volk TE37, 949 6UL) — ~10–12 lbs', wt:11.0},
+    {label:'Flow-formed mid-range (Enkei RPF1 15×8, Konig Hypergram) — ~13 lbs', wt:13.2},
+    {label:'Budget cast (Rota, XXR) — ~15 lbs', wt:15.0},
+    {label:'Heavy cast / steel — ~18 lbs', wt:18.0},
+    {label:'Custom weight...', wt:'custom'},
+  ],
+  16: [
+    {label:'Stock NC1 OEM 16×6.5 — 15.0 lbs', wt:15.0},
+    {label:'Enkei RPF1 16×8 — 13.7 lbs', wt:13.7},
+    {label:'Mid-range aftermarket — ~15–16 lbs', wt:15.5},
+    {label:'Heavy cast / steel — ~18+ lbs', wt:18.5},
+    {label:'Custom weight...', wt:'custom'},
+  ],
+  17: [
+    {label:'Stock NC2/3 OEM 17×7 — 19.0 lbs', wt:19.0},
+    {label:'Enkei RPF1 17×8 — 15.9 lbs', wt:15.9},
+    {label:'Rays Volk CE28N 17×8 — 13.2 lbs', wt:13.2},
+    {label:'Konig Hypergram 17×8 — 16.5 lbs', wt:16.5},
+    {label:'Mid-range (17–18 lbs)', wt:17.5},
+    {label:'Custom weight...', wt:'custom'},
+  ],
+  18: [
+    {label:'Lightweight forged 18" — ~14–16 lbs', wt:15.0},
+    {label:'Mid-range cast 18" — ~18–20 lbs (performance penalty)', wt:19.0},
+    {label:'Heavy cast 18" — ~21+ lbs (not recommended for performance)', wt:21.5},
+    {label:'Custom weight...', wt:'custom'},
+  ],
 };
 
-// CD by top position
-const CD_MAP = { up_soft:.36, up_prht:.34, down:.44 };
+// Tire weights in lbs, keyed by size string
+// Sources: Toyo spec sheets, Continental verified data, community scales
+const TIRE_OPTIONS = {
+  15: [
+    {label:'205/50R15 — ~18.5 lbs (Falken RT660, Bridgestone RE-71RS)', wt:18.5, w:205,a:50,r:15},
+    {label:'195/55R15 — ~17 lbs', wt:17.0, w:195,a:55,r:15},
+    {label:'225/50R15 — ~20.5 lbs', wt:20.5, w:225,a:50,r:15},
+    {label:'Custom size...', wt:'custom', w:205,a:50,r:15},
+  ],
+  16: [
+    {label:'195/50R16 — ~19 lbs (stock NC1 size)', wt:19.0, w:195,a:50,r:16},
+    {label:'205/45R16 — ~18 lbs', wt:18.0, w:205,a:45,r:16},
+    {label:'205/50R16 — ~20 lbs', wt:20.0, w:205,a:50,r:16},
+    {label:'Custom size...', wt:'custom', w:195,a:50,r:16},
+  ],
+  17: [
+    {label:'205/45R17 — ~17.5 lbs (stock NC2/3 size)', wt:17.5, w:205,a:45,r:17},
+    {label:'215/45R17 — ~18.7 lbs', wt:18.7, w:215,a:45,r:17},
+    {label:'225/45R17 — ~21 lbs', wt:21.0, w:225,a:45,r:17},
+    {label:'235/40R17 — ~21.5 lbs', wt:21.5, w:235,a:40,r:17},
+    {label:'Custom size...', wt:'custom', w:205,a:45,r:17},
+  ],
+  18: [
+    {label:'205/40R18 — ~18.5 lbs', wt:18.5, w:205,a:40,r:18},
+    {label:'225/40R18 — ~20 lbs', wt:20.0, w:225,a:40,r:18},
+    {label:'235/40R18 — ~21.5 lbs', wt:21.5, w:235,a:40,r:18},
+    {label:'Custom size...', wt:'custom', w:225,a:40,r:18},
+  ],
+};
 
 // ═══ UI HELPERS ═══
 function toggleSec(h){h.closest('.sec').classList.toggle('coll');}
@@ -653,24 +740,180 @@ function exhDelta(sid,lid){
   else{el.textContent='+'+v+' lbs';el.style.color='var(--red2)';}
 }
 
-function toggleWtMode(){
-  const mode=document.querySelector('#tWtMode .tbtn.on')?.dataset.v;
-  document.getElementById('wt-known').style.display    = mode==='know'     ? 'block':'none';
-  document.getElementById('wt-estimate').style.display = mode==='estimate' ? 'block':'none';
+function setWeightMode(mode){
+  document.getElementById('path-know').style.display     = mode==='know'     ? 'block':'none';
+  document.getElementById('path-estimate').style.display = mode==='estimate' ? 'block':'none';
+  // Show/hide sections 03-05 depending on mode
+  ['sec-wheels','sec-exhaust','sec-other'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = mode==='estimate' ? 'block':'none';
+  });
   calcW();
 }
 
-function setRimDefaults(rim){
-  // Set sensible default tire aspect for chosen rim size
-  const tA=document.getElementById('tA');
-  const tR=document.getElementById('tR');
-  tR.value=rim;
-  if(rim===15)tA.value=50;
-  else if(rim===16)tA.value=50;
-  else if(rim===17)tA.value=45;
-  else if(rim===18)tA.value=40;
+function setRim(size){
+  // Populate wheel dropdown
+  const whlSel = document.getElementById('whlWt');
+  whlSel.innerHTML = WHEEL_OPTIONS[size].map(o=>
+    `<option value="${o.wt}">${o.label}</option>`
+  ).join('');
+
+  // Populate tire dropdown
+  const tireSel = document.getElementById('tireSel');
+  tireSel.innerHTML = TIRE_OPTIONS[size].map(o=>
+    `<option value="${o.wt}" data-w="${o.w}" data-a="${o.a}" data-r="${o.r}">${o.label}</option>`
+  ).join('');
+
+  // Show custom fields if needed
+  checkCustomTire();
+
+  // Note about 18" performance
+  const note = document.getElementById('whl-note');
+  if(size===18){
+    note.innerHTML='⚠ 18" wheels add significant rotating mass. Expect slower acceleration and heavier steering feel. Best for stance builds only.';
+    note.style.color='var(--amber)';
+  } else {
+    note.innerHTML='Weigh one wheel on a bathroom scale for the most accurate number.';
+    note.style.color='var(--dim)';
+  }
+
   calcW();
 }
+
+function checkCustomTire(){
+  const sel = document.getElementById('tireSel');
+  const custom = sel?.value === 'custom';
+  const row = document.getElementById('customTireRow');
+  if(row) row.style.display = custom ? 'block':'none';
+}
+
+// Initialize rim dropdowns with stock 17" on load
+function initWheelSelectors(){
+  setRim(17);
+  // Pre-select stock options
+  const whlSel = document.getElementById('whlWt');
+  if(whlSel) whlSel.value = 19.0;
+  const tireSel = document.getElementById('tireSel');
+  if(tireSel) tireSel.value = 17.5;
+}
+
+// ═══ WEIGHT CALC ═══
+function calcW(){
+  const mode = document.querySelector('#tWtMode .tbtn.on')?.dataset.v || 'know';
+
+  // Tire diameter calculation
+  function tireDia(w,a,r){
+    const sw_in = w*(a/100)*0.0393701;
+    return (r + 2*sw_in) * 0.0254; // meters
+  }
+
+  let tot, tot_kg, eff, Cd, dia_m;
+
+  if(mode === 'know'){
+    const gen    = document.getElementById('ncGenK').value;
+    const base   = NCP[gen];
+    tot          = parseFloat(document.getElementById('knownWt').value)||2700;
+    tot_kg       = tot * 0.453592;
+    eff          = tot_kg * (1 + base.rot);
+    const pos    = document.querySelector('#tPosK .tbtn.on')?.dataset.v || 'up';
+    Cd           = pos==='down' ? CD_MAP.down : CD_MAP.up_soft;
+    dia_m        = tireDia(205,45,17); // assume stock unless we know otherwise
+
+    if(document.getElementById('ws-known-tot'))
+      document.getElementById('ws-known-tot').textContent = tot.toFixed(0)+' lbs';
+    if(document.getElementById('ws-known-cd'))
+      document.getElementById('ws-known-cd').textContent = Cd.toFixed(2);
+
+    return {gen, base, tot, tot_kg, eff, dia_m, Cd};
+
+  } else {
+    const gen    = document.getElementById('ncGen').value;
+    const base   = NCP[gen];
+    const fl     = parseFloat(document.getElementById('fuelLvl').value);
+    const drv    = parseFloat(document.getElementById('drvWt').value)||165;
+    const topT   = document.querySelector('#tTop .tbtn.on')?.dataset.v||'soft';
+    const pos    = document.querySelector('#tPos .tbtn.on')?.dataset.v||'up';
+    Cd           = pos==='down' ? CD_MAP.down : (topT==='prht'?CD_MAP.up_prht:CD_MAP.up_soft);
+
+    // Exhaust
+    const exh = ['catback','midpipe','headers'].reduce((s,id)=>{
+      const el=document.getElementById(id);
+      return s + (el ? parseFloat(el.value)||0 : 0);
+    },0);
+
+    // Other mods
+    const rb  = parseFloat(document.getElementById('rollbar')?.value)||0;
+    const fi  = parseFloat(document.getElementById('forced')?.value)||0;
+    const xd  = parseFloat(document.getElementById('xDelta')?.value)||0;
+    const ac  = parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v||0);
+
+    // WHEEL + TIRE corner assembly delta vs stock
+    // Stock corner = base.swl (wheel) + base.stl (tire)
+    const stockCorner = base.swl + base.stl;
+
+    const whlWtEl = document.getElementById('whlWt');
+    const tireSelEl = document.getElementById('tireSel');
+
+    let newWheelWt = base.swl; // default to stock
+    let newTireWt  = base.stl; // default to stock
+    let newW=205, newA=45, newR=17;
+
+    if(whlWtEl && whlWtEl.value !== 'custom'){
+      newWheelWt = parseFloat(whlWtEl.value) || base.swl;
+    }
+
+    if(tireSelEl){
+      if(tireSelEl.value === 'custom'){
+        newTireWt = base.stl; // use stock weight if custom (size still changes diameter)
+        newW = parseFloat(document.getElementById('tW')?.value)||205;
+        newA = parseFloat(document.getElementById('tA')?.value)||45;
+        newR = parseFloat(document.getElementById('tR')?.value)||17;
+      } else {
+        newTireWt = parseFloat(tireSelEl.value) || base.stl;
+        const opt = tireSelEl.options[tireSelEl.selectedIndex];
+        newW = parseFloat(opt?.dataset.w)||205;
+        newA = parseFloat(opt?.dataset.a)||45;
+        newR = parseFloat(opt?.dataset.r)||17;
+      }
+    }
+
+    const newCorner = newWheelWt + newTireWt;
+    const cornerDelta = 4 * (newCorner - stockCorner); // total delta all 4 corners
+    dia_m = tireDia(newW, newA, newR);
+
+    const fuel  = fl * base.fg * 6.1;
+    const oth   = rb + fi + xd + ac;
+    tot         = base.wt + cornerDelta + exh + oth + fuel + drv;
+    tot_kg      = tot * 0.453592;
+    eff         = tot_kg * (1 + base.rot);
+
+    const dia_in = dia_m / 0.0254;
+    const fmt=(v)=>{if(v===0)return '±0 lbs';return (v>0?'+':'')+v.toFixed(0)+' lbs';};
+    const cls=(v)=>v<0?'wv neg':v>0?'wv pos':'wv n';
+
+    if(document.getElementById('ws-base'))
+      document.getElementById('ws-base').textContent = base.wt.toLocaleString()+' lbs';
+
+    [['ws-whl',cornerDelta],['ws-exh',exh],['ws-oth',oth]].forEach(([id,v])=>{
+      const el=document.getElementById(id);if(!el)return;
+      el.textContent=fmt(v);el.className=cls(v);
+    });
+
+    if(document.getElementById('ws-occ'))
+      document.getElementById('ws-occ').textContent = '+'+(fuel+drv).toFixed(0)+' lbs';
+    if(document.getElementById('ws-tot'))
+      document.getElementById('ws-tot').textContent = tot.toFixed(0)+' lbs';
+    if(document.getElementById('ws-tire'))
+      document.getElementById('ws-tire').textContent = dia_in.toFixed(2)+'" ('+dia_m.toFixed(3)+' m)';
+
+    return {gen, base, tot, tot_kg, eff, dia_m, Cd};
+  }
+}
+
+// Initialize
+initWheelSelectors();
+setWeightMode('know');  // start in "know" mode, sections 03-05 hidden
+calcW();
 
 // ═══ TERMS ═══
 let termsAccepted=false;
