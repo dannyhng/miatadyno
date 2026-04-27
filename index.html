@@ -532,9 +532,9 @@ footer a:hover{color:var(--amber);}
 <script>
 // ═══ VEHICLE DB ═══
 const NCP = {
-  nc1:{name:'NC1 MX-5 (2006–2008)',wt:2480,swl:18.5,fg:12.7,Cd:.31,A:1.99,Crr:.015,rot:.045,dtl:.15},
-  nc2:{name:'NC2 MX-5 (2009–2012)',wt:2509,swl:19.8,fg:12.7,Cd:.31,A:1.99,Crr:.015,rot:.045,dtl:.15},
-  nc3:{name:'NC3 MX-5 (2013–2015)',wt:2509,swl:19.8,fg:12.7,Cd:.31,A:1.99,Crr:.015,rot:.045,dtl:.15},
+  nc1:{name:'NC1 MX-5 (2006–2008)',wt:2480,swl:18.0,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc2:{name:'NC2 MX-5 (2009–2012)',wt:2509,swl:18.8,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc3:{name:'NC3 MX-5 (2013–2015)',wt:2509,swl:18.8,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
 };
 
 // ═══ UI HELPERS ═══
@@ -589,13 +589,10 @@ function calcW(){
   const cls=(v)=>v<0?'wv neg':v>0?'wv pos':'wv n';
 
   document.getElementById('ws-base').textContent=base.wt.toLocaleString()+' lbs';
-  ['ws-whl',wdelta],['ws-exh',exh],['ws-top',top],['ws-oth',oth].forEach(([id,v])=>{
-    const el=document.getElementById(id); if(!el)return;
-    el.textContent=fmt(v); el.className=cls(v);
+  [['ws-whl',wdelta],['ws-exh',exh],['ws-top',top],['ws-oth',oth]].forEach(([id,v])=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.textContent=fmt(v);el.className=cls(v);
   });
-  // fix the forEach syntax above
-  const pairs=[['ws-whl',wdelta],['ws-exh',exh],['ws-top',top],['ws-oth',oth]];
-  pairs.forEach(([id,v])=>{const el=document.getElementById(id);if(!el)return;el.textContent=fmt(v);el.className=cls(v);});
   document.getElementById('ws-occ').textContent='+'+(fuel+drv).toFixed(0)+' lbs';
   document.getElementById('ws-tot').textContent=tot.toFixed(0)+' lbs';
   document.getElementById('ws-tire').textContent=dia_in.toFixed(2)+'" ('+dia_m.toFixed(3)+' m)';
@@ -621,7 +618,8 @@ function calcHP(seg,prof){
   const corr=(99.0/baro)*Math.sqrt(iat_k/298.0);
   return seg.map((r,i)=>{
     const v=sv[i],a=ac[i];
-    const Ft=prof.eff*a+prof.base.Crr*prof.tot_kg*G+0.5*rho*prof.base.Cd*prof.base.A*v*v;
+    const RHO_STD=1.225;
+    const Ft=prof.eff*a+prof.base.Crr*prof.tot_kg*G+0.5*RHO_STD*prof.base.Cd*prof.base.A*v*v;
     const WHP=(Ft*v/745.7)*corr;
     const WTQ=r.rpm>0?(WHP*5252)/r.rpm:0;
     return{rpm:r.rpm,v,WHP,WTQ};
@@ -787,19 +785,19 @@ y:{title:{display:true,text:'WHP / WTQ (lb-ft)',color:'#6478a0',font:{family:'Je
 }
 
 // ═══ AI INTERPRETATION ═══
-async function genInterp(pB,pA,hg,tg,mod,vn){
+function genInterp(pB,pA,hg,tg,mod,vn){
   const el=document.getElementById('interp');
-  el.className='interp-txt ld';el.textContent='Generating interpretation...';
-  try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,messages:[{role:'user',content:`You are an NC Miata tuner. Interpret these results in 3-4 sentences. Direct, like a Facebook group post. No hype.\n\nVehicle: ${vn}\nMod: ${mod}\nBefore: ${pB.toFixed(1)} WHP / After: ${pA.toFixed(1)} WHP / Gain: ${hg>=0?'+':''}${hg.toFixed(1)} WHP / ${tg>=0?'+':''}${tg.toFixed(1)} WTQ\n\nTypical for this mod? Real-world impact?`}]})});
-    const d=await r.json();
-    el.className='interp-txt';el.textContent=d?.content?.[0]?.text||fallback(hg,mod,pA);
-  }catch{el.className='interp-txt';el.textContent=fallback(hg,mod,pA);}
+  el.className='interp-txt';
+  el.textContent=fallback(hg,mod,pA,tg);
 }
-function fallback(hg,mod,pA){
-  if(Math.abs(hg)<4)return `+${hg.toFixed(1)} WHP from ${mod}. Within measurement variance — run a few more pulls to confirm.`;
-  if(Math.abs(hg)<12)return `+${hg.toFixed(1)} WHP from ${mod}. Solid result, consistent with what the NC community typically sees. You'll feel it in the mid-range.`;
-  return `+${hg.toFixed(1)} WHP from ${mod}. Strong result for the NC platform. Peak at ${pA.toFixed(1)} WHP is well above baseline.`;
+function fallback(hg,mod,pA,tg){
+  const sign=hg>=0?'+':'';
+  const tsign=tg>=0?'+':'';
+  if(Math.abs(hg)<4)
+    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Within measurement variance for this type of mod — do 2-3 more pulls on the same road to confirm.`;
+  if(Math.abs(hg)<12)
+    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Solid and consistent with what the NC community typically sees from this mod. You'll feel it in the mid-range where the NC spends most of its time.`;
+  return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Strong result for the NC platform. Peak at ${pA.toFixed(1)} WHP is well above stock baseline — that's a meaningful improvement.`;
 }
 
 // ═══ DOWNLOAD ═══
