@@ -282,83 +282,149 @@ footer a:hover{color:var(--amber);}
   <!-- 02 VEHICLE -->
   <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-n">02</span><span class="sec-t">Vehicle</span><span class="sec-c">▸</span>
+      <span class="sec-n">02</span><span class="sec-t">Vehicle Weight</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
+
       <div class="fl">
-        <label class="lbl">Model Generation</label>
-        <select id="ncGen" onchange="calcW()">
-          <option value="nc1">NC1 — 2006–2008</option>
-          <option value="nc2" selected>NC2 — 2009–2012</option>
-          <option value="nc3">NC3 — 2013–2015</option>
-        </select>
-      </div>
-      <div class="fl">
-        <label class="lbl">Transmission</label>
-        <div class="trow" id="tTrans">
-          <div class="tbtn on" data-v="manual" onclick="setT('tTrans',this);toggleAutoNote()">Manual</div>
-          <div class="tbtn" data-v="auto" onclick="setT('tTrans',this);toggleAutoNote()">Automatic</div>
+        <label class="lbl">Do you know your car's total weight?</label>
+        <div class="trow" id="tWtMode">
+          <div class="tbtn on" data-v="know" onclick="setT('tWtMode',this);toggleWtMode()">I know it</div>
+          <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);toggleWtMode()">Help me estimate</div>
         </div>
-        <p class="note" id="autoNote">Use manual/Sport mode and hold a single gear during the pull. DSG/Tiptronic compatible. CVT is not compatible.</p>
       </div>
-      <div class="fl">
-        <label class="lbl">Top Configuration</label>
-        <select id="topType" onchange="calcW()">
-          <option value="0">Soft Top — stock</option>
-          <option value="52">OEM Hard Top installed (+52 lbs)</option>
-          <option value="22">Hard Top + soft top mechanism removed (+22 lbs net)</option>
-          <option value="-8">Aftermarket lightweight hard top (~−8 lbs net)</option>
-        </select>
-      </div>
-      <div class="g2">
+
+      <!-- KNOWN WEIGHT MODE -->
+      <div id="wt-known">
+        <div class="fl" style="margin-top:10px;">
+          <label class="lbl">Total weight with you in the car (lbs)</label>
+          <input type="number" id="knownWt" value="2700" min="2000" max="4500" step="10" onchange="calcW()">
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">
+            Include yourself, passengers, and a rough guess at fuel level.
+            Curb weight is on your door jamb sticker. Add your weight on top.
+          </p>
+        </div>
         <div class="fl">
-          <label class="lbl">Fuel Level</label>
-          <select id="fuelLvl" onchange="calcW()">
-            <option value="0.1">Nearly Empty</option>
-            <option value="0.25">Quarter</option>
-            <option value="0.5" selected>Half</option>
-            <option value="0.75">Three Quarter</option>
-            <option value="1.0">Full</option>
+          <label class="lbl">Generation (for aero values)</label>
+          <select id="ncGenK" onchange="calcW()">
+            <option value="nc1">NC1 — 2006–2008</option>
+            <option value="nc2" selected>NC2 — 2009–2012</option>
+            <option value="nc3">NC3 — 2013–2015</option>
           </select>
         </div>
         <div class="fl">
-          <label class="lbl">Driver Wt (lbs)</label>
-          <input type="number" id="drvWt" value="165" min="100" max="350" onchange="calcW()">
+          <label class="lbl">Top position during the pull</label>
+          <div class="trow" id="tPosK">
+            <div class="tbtn on" data-v="up" onclick="setT('tPosK',this);calcW()">Top Up</div>
+            <div class="tbtn" data-v="down" onclick="setT('tPosK',this);calcW()">Top Down (+22% drag)</div>
+          </div>
         </div>
       </div>
+
+      <!-- ESTIMATE MODE -->
+      <div id="wt-estimate" style="display:none;">
+        <div class="fl" style="margin-top:10px;">
+          <label class="lbl">Generation</label>
+          <select id="ncGen" onchange="calcW()">
+            <option value="nc1">NC1 — 2006–2008</option>
+            <option value="nc2" selected>NC2 — 2009–2012</option>
+            <option value="nc3">NC3 — 2013–2015</option>
+          </select>
+        </div>
+        <div class="fl">
+          <label class="lbl">Transmission</label>
+          <div class="trow" id="tTrans">
+            <div class="tbtn on" data-v="manual" onclick="setT('tTrans',this);toggleAutoNote()">Manual</div>
+            <div class="tbtn" data-v="auto" onclick="setT('tTrans',this);toggleAutoNote()">Automatic</div>
+          </div>
+          <p class="note" id="autoNote">Use Sport/manual mode and hold one gear during the pull. DSG/Tiptronic ok. CVT is not compatible.</p>
+        </div>
+        <div class="fl">
+          <label class="lbl">Top Type</label>
+          <div class="trow" id="tTop">
+            <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
+            <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT Hard Top</div>
+          </div>
+        </div>
+        <div class="fl">
+          <label class="lbl">Top position during the pull</label>
+          <div class="trow" id="tPos">
+            <div class="tbtn on" data-v="up" onclick="setT('tPos',this);calcW()">Top Up</div>
+            <div class="tbtn" data-v="down" onclick="setT('tPos',this);calcW()">Top Down (+22% drag)</div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fl">
+            <label class="lbl">Fuel Level</label>
+            <select id="fuelLvl" onchange="calcW()">
+              <option value="0.1">Nearly Empty</option>
+              <option value="0.25">Quarter</option>
+              <option value="0.5" selected>Half</option>
+              <option value="0.75">Three Quarter</option>
+              <option value="1.0">Full</option>
+            </select>
+          </div>
+          <div class="fl">
+            <label class="lbl">Driver Wt (lbs)</label>
+            <input type="number" id="drvWt" value="165" min="100" max="350" onchange="calcW()">
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- 03 WHEELS -->
+  <!-- 03 WHEELS & TIRES -->
   <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
       <span class="sec-n">03</span><span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
-      <div class="g3">
-        <div class="fl"><label class="lbl">Width mm</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
-        <div class="fl"><label class="lbl">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
-        <div class="fl"><label class="lbl">Rim in</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
-      </div>
+
       <div class="fl">
-        <label class="lbl">Wheel Weight (lbs/each)</label>
-        <select id="whlWt" onchange="toggleCustomWheel();calcW()">
-          <option value="19.8">Stock NC2/NC3 17" — 19.8 lbs</option>
-          <option value="18.5">Stock NC1 16" — 18.5 lbs</option>
-          <option value="13.2">Konig Hypergram 15×8 — 13.2 lbs</option>
-          <option value="13.8">Rota Grid 15×8 — 13.8 lbs</option>
-          <option value="14.1">Enkei RPF1 16×8 — 14.1 lbs</option>
-          <option value="15.9">Enkei RPF1 17×8 — 15.9 lbs</option>
-          <option value="16.5">Konig Hypergram 17×8 — 16.5 lbs</option>
-          <option value="10.8">Rays Volk TE37 15×8 — 10.8 lbs</option>
-          <option value="13.2x">Rays Volk CE28N 17×8 — 13.2 lbs</option>
-          <option value="custom">Custom weight...</option>
+        <label class="lbl">Rim Size</label>
+        <div class="trow" id="tRim">
+          <div class="tbtn" data-v="15" onclick="setT('tRim',this);setRimDefaults(15);calcW()">15"</div>
+          <div class="tbtn" data-v="16" onclick="setT('tRim',this);setRimDefaults(16);calcW()">16"</div>
+          <div class="tbtn on" data-v="17" onclick="setT('tRim',this);setRimDefaults(17);calcW()">17"</div>
+          <div class="tbtn" data-v="18" onclick="setT('tRim',this);setRimDefaults(18);calcW()">18"</div>
+        </div>
+      </div>
+
+      <div class="fl">
+        <label class="lbl">Wheel Weight per Corner (lbs)</label>
+        <select id="whlWt" onchange="calcW()">
+          <option value="10.8">Forged/lightweight (Volk, Gram Lights) — ~10–12 lbs</option>
+          <option value="13.5">Mid-range aftermarket (Enkei, Konig) — ~13–15 lbs</option>
+          <option value="18.0" selected>Stock NC OEM alloy — ~18–19 lbs</option>
+          <option value="20.5">Heavy aftermarket / steel — ~20+ lbs</option>
         </select>
+        <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">
+          Weigh one wheel on a bathroom scale for the most accurate number. Stock NC2/3 17" = 18.8 lbs each.
+        </p>
       </div>
-      <div class="fl" id="customWhlF" style="display:none;">
-        <label class="lbl">Custom Wheel Weight (lbs each)</label>
-        <input type="number" id="customWhl" value="17" step="0.5" min="8" max="35" onchange="calcW()">
+
+      <div class="fl">
+        <label class="lbl">Tire Size</label>
+        <div class="g3">
+          <div>
+            <label class="lbl" style="font-size:9px;">Width (mm)</label>
+            <input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:9px;">Aspect</label>
+            <input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:9px;">Rim (in)</label>
+            <input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()">
+          </div>
+        </div>
+        <p style="font-size:10px;color:var(--dim);margin-top:5px;">
+          Check your sidewall. Stock NC2/3 = 205/45R17.
+        </p>
       </div>
+
     </div>
   </div>
 
@@ -471,6 +537,38 @@ footer a:hover{color:var(--amber);}
 <div class="content">
   <div class="disc">⚠ For use on private property and closed courses only. Never exceed posted speed limits. Beta — results are estimates, not certified dyno figures.</div>
 
+  <!-- PULL GUIDE -->
+  <div class="cpanel" style="background:var(--s1);">
+    <div class="plabel">How to Get Good Data</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px;">
+      <div>
+        <p style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:8px;font-family:var(--disp);letter-spacing:.08em;text-transform:uppercase;">The Pull</p>
+        <ol style="font-size:12px;color:var(--mid);line-height:1.9;padding-left:16px;">
+          <li>Engine fully warm — drive at least 10 min first</li>
+          <li>Pick 2nd gear — pulls from ~20 to ~60 MPH</li>
+          <li>Slow to 20 MPH, ~2,000 RPM</li>
+          <li>Press throttle to the floor — hold it there</li>
+          <li>Hold until 6,500 RPM then lift off</li>
+          <li>Coast down. Don't brake hard immediately</li>
+          <li>Repeat once more — 2 pulls is better than 1</li>
+        </ol>
+      </div>
+      <div>
+        <p style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:8px;font-family:var(--disp);letter-spacing:.08em;text-transform:uppercase;">What to Avoid</p>
+        <ul style="font-size:12px;color:var(--mid);line-height:1.9;padding-left:16px;">
+          <li>Don't shift mid-pull — one gear only</li>
+          <li>Avoid hills and on/off-ramps with a slope</li>
+          <li>Don't pull into a headwind if you can help it</li>
+          <li>Skip the run if road is wet or cold (&lt;40°F)</li>
+          <li>Wait for traffic to clear — don't rush it</li>
+        </ul>
+        <p style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.6;">
+          BlueDriver logs at ~1–2 Hz. Fewer PIDs logged = faster polling = cleaner curve.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <div class="cpanel">
     <div class="plabel">Detected Pulls</div>
     <div class="ptitle">Select Before &amp; After</div>
@@ -537,6 +635,9 @@ const NCP = {
   nc3:{name:'NC3 MX-5 (2013–2015)',wt:2509,swl:18.8,fg:12.7,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
 };
 
+// CD by top position
+const CD_MAP = { up_soft:.36, up_prht:.34, down:.44 };
+
 // ═══ UI HELPERS ═══
 function toggleSec(h){h.closest('.sec').classList.toggle('coll');}
 function setT(id,btn){document.getElementById(id).querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
@@ -551,53 +652,102 @@ function exhDelta(sid,lid){
   else if(v<0){el.textContent=v+' lbs';el.style.color='var(--green)';}
   else{el.textContent='+'+v+' lbs';el.style.color='var(--red2)';}
 }
-function toggleCustomWheel(){
-  const show=document.getElementById('whlWt').value==='custom';
-  document.getElementById('customWhlF').style.display=show?'block':'none';
+
+function toggleWtMode(){
+  const mode=document.querySelector('#tWtMode .tbtn.on')?.dataset.v;
+  document.getElementById('wt-known').style.display    = mode==='know'     ? 'block':'none';
+  document.getElementById('wt-estimate').style.display = mode==='estimate' ? 'block':'none';
+  calcW();
 }
-function getWhlWt(){
-  const s=document.getElementById('whlWt');
-  if(s.value==='custom'||s.value==='13.2x') return parseFloat(s.value)||13.2;
-  return parseFloat(s.value);
+
+function setRimDefaults(rim){
+  // Set sensible default tire aspect for chosen rim size
+  const tA=document.getElementById('tA');
+  const tR=document.getElementById('tR');
+  tR.value=rim;
+  if(rim===15)tA.value=50;
+  else if(rim===16)tA.value=50;
+  else if(rim===17)tA.value=45;
+  else if(rim===18)tA.value=40;
+  calcW();
+}
+
+// ═══ TERMS ═══
+let termsAccepted=false;
+
+document.getElementById('termsCheck').addEventListener('change',function(){
+  const btn=document.getElementById('termsAccept');
+  btn.disabled=!this.checked;
+  btn.style.background=this.checked?'var(--amber)':'var(--s3)';
+  btn.style.color=this.checked?'#07090c':'var(--dim)';
+  btn.style.cursor=this.checked?'pointer':'not-allowed';
+});
+
+function acceptTerms(){
+  termsAccepted=true;
+  document.getElementById('termsModal').style.display='none';
+  // proceed with analysis
+  runAnalysis();
 }
 
 // ═══ WEIGHT CALC ═══
 function calcW(){
-  const gen=document.getElementById('ncGen').value;
-  const base=NCP[gen];
-  const fl=parseFloat(document.getElementById('fuelLvl').value);
-  const drv=parseFloat(document.getElementById('drvWt').value)||165;
-  const ww=getWhlWt();
+  const mode=document.querySelector('#tWtMode .tbtn.on')?.dataset.v||'know';
+
   const tw=parseFloat(document.getElementById('tW').value)||205;
   const ta=parseFloat(document.getElementById('tA').value)||45;
   const tr=parseFloat(document.getElementById('tR').value)||17;
-  const top=parseFloat(document.getElementById('topType').value)||0;
-  const rb=parseFloat(document.getElementById('rollbar').value)||0;
-  const fi=parseFloat(document.getElementById('forced').value)||0;
-  const xd=parseFloat(document.getElementById('xDelta').value)||0;
-  const ac=parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v||0);
-  const exh=['catback','midpipe','headers'].reduce((s,id)=>s+(parseFloat(document.getElementById(id).value)||0),0);
-  const wdelta=4*(ww-base.swl);
-  const fuel=fl*base.fg*6.1;
-  const oth=rb+fi+xd+ac;
-  const tot=base.wt+wdelta+exh+oth+top+fuel+drv;
+  const ww=parseFloat(document.getElementById('whlWt').value)||18.0;
   const si=tw*(ta/100)*0.0393701;
   const dia_in=tr+2*si;
   const dia_m=dia_in*0.0254;
 
-  const fmt=(v,s=true)=>{if(v===0)return '±0 lbs';return (s&&v>0?'+':'')+v.toFixed(0)+' lbs';};
-  const cls=(v)=>v<0?'wv neg':v>0?'wv pos':'wv n';
+  let gen, tot, tot_kg, eff, Cd;
 
-  document.getElementById('ws-base').textContent=base.wt.toLocaleString()+' lbs';
-  [['ws-whl',wdelta],['ws-exh',exh],['ws-top',top],['ws-oth',oth]].forEach(([id,v])=>{
-    const el=document.getElementById(id);if(!el)return;
-    el.textContent=fmt(v);el.className=cls(v);
-  });
-  document.getElementById('ws-occ').textContent='+'+(fuel+drv).toFixed(0)+' lbs';
-  document.getElementById('ws-tot').textContent=tot.toFixed(0)+' lbs';
-  document.getElementById('ws-tire').textContent=dia_in.toFixed(2)+'" ('+dia_m.toFixed(3)+' m)';
+  if(mode==='know'){
+    gen = document.getElementById('ncGenK').value;
+    const base = NCP[gen];
+    tot = parseFloat(document.getElementById('knownWt').value)||2700;
+    tot_kg = tot*0.453592;
+    eff = tot_kg*(1+base.rot);
+    const pos = document.querySelector('#tPosK .tbtn.on')?.dataset.v||'up';
+    Cd = pos==='down' ? CD_MAP.down : CD_MAP.up_soft;
+  } else {
+    gen = document.getElementById('ncGen').value;
+    const base = NCP[gen];
+    const fl = parseFloat(document.getElementById('fuelLvl').value);
+    const drv = parseFloat(document.getElementById('drvWt').value)||165;
+    const top = document.querySelector('#tTop .tbtn.on')?.dataset.v||'soft';
+    const pos = document.querySelector('#tPos .tbtn.on')?.dataset.v||'up';
+    const rb = parseFloat(document.getElementById('rollbar').value)||0;
+    const fi = parseFloat(document.getElementById('forced').value)||0;
+    const xd = parseFloat(document.getElementById('xDelta').value)||0;
+    const ac = parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v||0);
+    const exh=['catback','midpipe','headers'].reduce((s,id)=>s+(parseFloat(document.getElementById(id).value)||0),0);
+    const wdelta=4*(ww-base.swl);
+    const fuel=fl*base.fg*6.1;
+    const oth=rb+fi+xd+ac;
+    tot=base.wt+wdelta+exh+oth+fuel+drv;
+    tot_kg=tot*0.453592;
+    eff=tot_kg*(1+base.rot);
+    Cd = pos==='down' ? CD_MAP.down : (top==='prht'?CD_MAP.up_prht:CD_MAP.up_soft);
 
-  return {gen,base,tot,tot_kg:tot*0.453592,eff:tot*0.453592*(1+base.rot),dia_m};
+    // Update weight summary display
+    const fmt=(v)=>{if(v===0)return '±0 lbs';return (v>0?'+':'')+v.toFixed(0)+' lbs';};
+    const cls=(v)=>v<0?'wv neg':v>0?'wv pos':'wv n';
+    [['ws-whl',wdelta],['ws-exh',exh],['ws-oth',oth]].forEach(([id,v])=>{
+      const el=document.getElementById(id);if(!el)return;
+      el.textContent=fmt(v);el.className=cls(v);
+    });
+    if(document.getElementById('ws-base')) document.getElementById('ws-base').textContent=base.wt.toLocaleString()+' lbs';
+    if(document.getElementById('ws-occ'))  document.getElementById('ws-occ').textContent='+'+(fuel+drv).toFixed(0)+' lbs';
+    if(document.getElementById('ws-tot'))  document.getElementById('ws-tot').textContent=tot.toFixed(0)+' lbs';
+  }
+
+  if(document.getElementById('ws-tire')) document.getElementById('ws-tire').textContent=dia_in.toFixed(2)+'" ('+dia_m.toFixed(3)+' m)';
+  if(document.getElementById('ws-tot') && mode==='know') document.getElementById('ws-tot').textContent=tot.toFixed(0)+' lbs (entered)';
+
+  return {gen, base:NCP[gen], tot, tot_kg, eff, dia_m, Cd};
 }
 calcW();
 
@@ -725,6 +875,14 @@ function checkReady(){document.getElementById('goBtn').disabled=selB===null||sel
 // ═══ ANALYSIS ═══
 let chart=null;
 document.getElementById('goBtn').addEventListener('click',()=>{
+  if(!termsAccepted){
+    document.getElementById('termsModal').style.display='flex';
+    return;
+  }
+  runAnalysis();
+});
+
+function runAnalysis(){
   const w=calcW();
   const prof={eff:w.eff,tot_kg:w.tot_kg,base:w.base};
   const rB=calcHP(pulls[selB].rows,prof);
@@ -750,7 +908,7 @@ document.getElementById('goBtn').addEventListener('click',()=>{
   const res=document.getElementById('results');
   res.classList.add('vis');
   setTimeout(()=>res.scrollIntoView({behavior:'smooth',block:'start'}),100);
-});
+}
 
 function anim(id,target,sign=false){
   const el=document.getElementById(id);
@@ -806,5 +964,36 @@ async function dlCard(){
   const a=document.createElement('a');a.download='miatadyno-result.png';a.href=c.toDataURL('image/png');a.click();
 }
 </script>
+
+<!-- TERMS MODAL -->
+<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:520px;width:90%;padding:36px;margin:0 16px;">
+    <p style="font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;color:var(--text);">Before You Run</p>
+    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:20px;">
+      MiataDyno estimates wheel horsepower using road load physics applied to your OBD log data.
+      Results are estimates — not certified dyno figures. Accuracy depends on pull quality,
+      road conditions, and how well your build is configured.
+    </p>
+    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:24px;">
+      To collect data, you'll need to do a wide-open throttle acceleration run.
+      <strong style="color:var(--text);">This must only be done on private property, a closed course,
+      or a legal road where it is safe and lawful to do so.</strong>
+      Never exceed posted speed limits. Never endanger yourself, passengers, or other road users.
+      MiataDyno does not encourage reckless driving — you are solely responsible for how you use this tool.
+    </p>
+    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:24px;">
+      <input type="checkbox" id="termsCheck" style="margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex-shrink:0;">
+      <span style="font-size:12px;color:var(--mid);line-height:1.6;">
+        I understand this tool is for estimation purposes only. I will only perform acceleration
+        runs where it is safe and legal to do so, and I take full responsibility for my driving.
+      </span>
+    </label>
+    <button id="termsAccept" onclick="acceptTerms()" disabled
+      style="width:100%;padding:16px;background:var(--s3);color:var(--dim);font-family:var(--disp);font-size:16px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:not-allowed;transition:all .2s;">
+      I Understand — Continue
+    </button>
+  </div>
+</div>
+
 </body>
 </html>
