@@ -253,7 +253,7 @@ footer a:hover{color:var(--amber);}
 <div class="hero-wrap fi d1">
   <div class="h-tag">Virtual Dyno · NC Miata</div>
   <h1>Did your mod<br>actually do<em>anything?</em></h1>
-  <p class="hero-sub">Upload a BlueDriver CSV. Configure your build. Get a before/after wheel horsepower comparison — no dyno visit needed.</p>
+  <p class="hero-sub">Upload a CSV file. Configure your build. Get a before/after wheel horsepower comparison — no dyno visit needed.</p>
   <div class="badges">
     <span class="badge on">Road Load Physics</span>
     <span class="badge on">SAE J1349 Correction</span>
@@ -277,9 +277,9 @@ footer a:hover{color:var(--amber);}
       <div class="upzone" id="upzone">
         <input type="file" id="fileIn" accept=".csv">
         <span class="up-icon">CSV</span>
-        <p><strong>Drop BlueDriver log here</strong></p>
+        <p><strong>Drop your OBD log here</strong></p>
         <p>or click to browse</p>
-        <small>BlueDriver → Live Data → Stop → Share → Save to Files</small>
+        <small>OBD Scanner → Live Data → Stop → Share → Save to Files</small>
       </div>
       <div class="upst" id="upst"></div>
     </div>
@@ -584,7 +584,7 @@ footer a:hover{color:var(--amber);}
           <li>Wait for traffic to clear — don't rush it</li>
         </ul>
         <p style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.6;">
-          BlueDriver logs at ~1–2 Hz. Fewer PIDs logged = faster polling = cleaner curve.
+          Most of the OBD scanners log at ~1–2 Hz. Fewer PIDs logged = faster polling = cleaner curve.
         </p>
       </div>
     </div>
@@ -599,7 +599,7 @@ footer a:hover{color:var(--amber);}
   <div class="cpanel full" id="pullSec">
     <div class="empty-st">
       <span class="big">—</span>
-      Upload a BlueDriver CSV to detect full-throttle pulls.<br>
+      Upload a CSV file to detect full-throttle pulls.<br>
       Requires <strong>Absolute Throttle Position</strong> + <strong>Vehicle Speed</strong> PIDs.
     </div>
   </div>
@@ -1042,7 +1042,7 @@ function parseCSV(txt){
   const hs=p.meta.fields.map(f=>f.trim());
   const tC=findC(hs,['time']),rC=findC(hs,['rpm']),sC=findC(hs,['speed']),thC=findC(hs,['throttle','load']),bC=findC(hs,['baro','barometric']),iC=findC(hs,['intake air']);
   if(!rC||!sC)return{ok:false,msg:`Missing RPM or Speed column. Found: ${hs.join(', ')}`};
-  if(!thC)return{ok:false,msg:'No Throttle Position column. Add "Absolute Throttle Position" PID in BlueDriver.'};
+  if(!thC)return{ok:false,msg:'No Throttle Position column. Add "Absolute Throttle Position" PID in your OBD app.'};
   const data=p.data.map(r=>({time:parseFloat(r[tC])||0,rpm:parseFloat(r[rC])||0,speed_mph:parseFloat(r[sC])||0,throttle:parseFloat(r[thC])||0,baro_r:bC?parseFloat(r[bC]):null,iat_r:iC?parseFloat(r[iC]):null})).filter(r=>!isNaN(r.time));
   const bv=data.map(r=>r.baro_r).filter(v=>v&&v>0);
   const iv=data.map(r=>r.iat_r).filter(v=>v&&v>0);
