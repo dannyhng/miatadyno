@@ -648,6 +648,36 @@ footer a:hover{color:var(--amber);}
   <span>Private property and closed course use only</span>
 </footer>
 
+<!-- TERMS MODAL -->
+<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:520px;width:90%;padding:36px;margin:0 16px;">
+    <p style="font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;color:var(--text);">Before You Run</p>
+    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:20px;">
+      MiataDyno estimates wheel horsepower using road load physics applied to your OBD log data.
+      Results are estimates — not certified dyno figures. Accuracy depends on pull quality,
+      road conditions, and how well your build is configured.
+    </p>
+    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:24px;">
+      To collect data, you'll need to do a wide-open throttle acceleration run.
+      <strong style="color:var(--text);">This must only be done on private property, a closed course,
+      or a legal road where it is safe and lawful to do so.</strong>
+      Never exceed posted speed limits. Never endanger yourself, passengers, or other road users.
+      MiataDyno does not encourage reckless driving — you are solely responsible for how you use this tool.
+    </p>
+    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:24px;">
+      <input type="checkbox" id="termsCheck" style="margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex-shrink:0;">
+      <span style="font-size:12px;color:var(--mid);line-height:1.6;">
+        I understand this tool is for estimation purposes only. I will only perform acceleration
+        runs where it is safe and legal to do so, and I take full responsibility for my driving.
+      </span>
+    </label>
+    <button id="termsAccept" onclick="acceptTerms()" disabled
+      style="width:100%;padding:16px;background:var(--s3);color:var(--dim);font-family:var(--disp);font-size:16px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:not-allowed;transition:all .2s;">
+      I Understand — Continue
+    </button>
+  </div>
+</div>
+
 <script>
 // ═══ VEHICLE DB ═══
 const NCP = {
@@ -915,84 +945,6 @@ initWheelSelectors();
 setWeightMode('know');  // start in "know" mode, sections 03-05 hidden
 calcW();
 
-// ═══ TERMS ═══
-let termsAccepted=false;
-
-document.getElementById('termsCheck').addEventListener('change',function(){
-  const btn=document.getElementById('termsAccept');
-  btn.disabled=!this.checked;
-  btn.style.background=this.checked?'var(--amber)':'var(--s3)';
-  btn.style.color=this.checked?'#07090c':'var(--dim)';
-  btn.style.cursor=this.checked?'pointer':'not-allowed';
-});
-
-function acceptTerms(){
-  termsAccepted=true;
-  document.getElementById('termsModal').style.display='none';
-  // proceed with analysis
-  runAnalysis();
-}
-
-// ═══ WEIGHT CALC ═══
-function calcW(){
-  const mode=document.querySelector('#tWtMode .tbtn.on')?.dataset.v||'know';
-
-  const tw=parseFloat(document.getElementById('tW').value)||205;
-  const ta=parseFloat(document.getElementById('tA').value)||45;
-  const tr=parseFloat(document.getElementById('tR').value)||17;
-  const ww=parseFloat(document.getElementById('whlWt').value)||18.0;
-  const si=tw*(ta/100)*0.0393701;
-  const dia_in=tr+2*si;
-  const dia_m=dia_in*0.0254;
-
-  let gen, tot, tot_kg, eff, Cd;
-
-  if(mode==='know'){
-    gen = document.getElementById('ncGenK').value;
-    const base = NCP[gen];
-    tot = parseFloat(document.getElementById('knownWt').value)||2700;
-    tot_kg = tot*0.453592;
-    eff = tot_kg*(1+base.rot);
-    const pos = document.querySelector('#tPosK .tbtn.on')?.dataset.v||'up';
-    Cd = pos==='down' ? CD_MAP.down : CD_MAP.up_soft;
-  } else {
-    gen = document.getElementById('ncGen').value;
-    const base = NCP[gen];
-    const fl = parseFloat(document.getElementById('fuelLvl').value);
-    const drv = parseFloat(document.getElementById('drvWt').value)||165;
-    const top = document.querySelector('#tTop .tbtn.on')?.dataset.v||'soft';
-    const pos = document.querySelector('#tPos .tbtn.on')?.dataset.v||'up';
-    const rb = parseFloat(document.getElementById('rollbar').value)||0;
-    const fi = parseFloat(document.getElementById('forced').value)||0;
-    const xd = parseFloat(document.getElementById('xDelta').value)||0;
-    const ac = parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v||0);
-    const exh=['catback','midpipe','headers'].reduce((s,id)=>s+(parseFloat(document.getElementById(id).value)||0),0);
-    const wdelta=4*(ww-base.swl);
-    const fuel=fl*base.fg*6.1;
-    const oth=rb+fi+xd+ac;
-    tot=base.wt+wdelta+exh+oth+fuel+drv;
-    tot_kg=tot*0.453592;
-    eff=tot_kg*(1+base.rot);
-    Cd = pos==='down' ? CD_MAP.down : (top==='prht'?CD_MAP.up_prht:CD_MAP.up_soft);
-
-    // Update weight summary display
-    const fmt=(v)=>{if(v===0)return '±0 lbs';return (v>0?'+':'')+v.toFixed(0)+' lbs';};
-    const cls=(v)=>v<0?'wv neg':v>0?'wv pos':'wv n';
-    [['ws-whl',wdelta],['ws-exh',exh],['ws-oth',oth]].forEach(([id,v])=>{
-      const el=document.getElementById(id);if(!el)return;
-      el.textContent=fmt(v);el.className=cls(v);
-    });
-    if(document.getElementById('ws-base')) document.getElementById('ws-base').textContent=base.wt.toLocaleString()+' lbs';
-    if(document.getElementById('ws-occ'))  document.getElementById('ws-occ').textContent='+'+(fuel+drv).toFixed(0)+' lbs';
-    if(document.getElementById('ws-tot'))  document.getElementById('ws-tot').textContent=tot.toFixed(0)+' lbs';
-  }
-
-  if(document.getElementById('ws-tire')) document.getElementById('ws-tire').textContent=dia_in.toFixed(2)+'" ('+dia_m.toFixed(3)+' m)';
-  if(document.getElementById('ws-tot') && mode==='know') document.getElementById('ws-tot').textContent=tot.toFixed(0)+' lbs (entered)';
-
-  return {gen, base:NCP[gen], tot, tot_kg, eff, dia_m, Cd};
-}
-calcW();
 
 // ═══ PHYSICS ═══
 const G=9.81,RDA=287.058;
@@ -1206,37 +1158,29 @@ async function dlCard(){
   const c=await html2canvas(document.getElementById('shareCard'),{backgroundColor:'#07090c',scale:2,useCORS:true});
   const a=document.createElement('a');a.download='miatadyno-result.png';a.href=c.toDataURL('image/png');a.click();
 }
-</script>
 
-<!-- TERMS MODAL -->
-<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-  <div style="background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:520px;width:90%;padding:36px;margin:0 16px;">
-    <p style="font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;color:var(--text);">Before You Run</p>
-    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:20px;">
-      MiataDyno estimates wheel horsepower using road load physics applied to your OBD log data.
-      Results are estimates — not certified dyno figures. Accuracy depends on pull quality,
-      road conditions, and how well your build is configured.
-    </p>
-    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:24px;">
-      To collect data, you'll need to do a wide-open throttle acceleration run.
-      <strong style="color:var(--text);">This must only be done on private property, a closed course,
-      or a legal road where it is safe and lawful to do so.</strong>
-      Never exceed posted speed limits. Never endanger yourself, passengers, or other road users.
-      MiataDyno does not encourage reckless driving — you are solely responsible for how you use this tool.
-    </p>
-    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:24px;">
-      <input type="checkbox" id="termsCheck" style="margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex-shrink:0;">
-      <span style="font-size:12px;color:var(--mid);line-height:1.6;">
-        I understand this tool is for estimation purposes only. I will only perform acceleration
-        runs where it is safe and legal to do so, and I take full responsibility for my driving.
-      </span>
-    </label>
-    <button id="termsAccept" onclick="acceptTerms()" disabled
-      style="width:100%;padding:16px;background:var(--s3);color:var(--dim);font-family:var(--disp);font-size:16px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:not-allowed;transition:all .2s;">
-      I Understand — Continue
-    </button>
-  </div>
-</div>
+// ═══ TERMS ═══
+let termsAccepted=false;
+
+const termsChk = document.getElementById('termsCheck');
+if(termsChk){
+  termsChk.addEventListener('change',function(){
+    const btn=document.getElementById('termsAccept');
+    if(!btn) return;
+    btn.disabled=!this.checked;
+    btn.style.background=this.checked?'var(--amber)':'var(--s3)';
+    btn.style.color=this.checked?'#07090c':'var(--dim)';
+    btn.style.cursor=this.checked?'pointer':'not-allowed';
+  });
+}
+
+function acceptTerms(){
+  termsAccepted=true;
+  document.getElementById('termsModal').style.display='none';
+  runAnalysis();
+}
+
+</script>
 
 </body>
 </html>
