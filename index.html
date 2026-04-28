@@ -234,6 +234,138 @@ footer a:hover{color:var(--amber);}
 #path-estimate{ display:none;  }
 .path-only-estimate { display:block; } /* sections 03-05 visibility */
 
+/* PROGRESS INDICATOR */
+.prog-wrap{
+  display:flex;align-items:stretch;background:var(--s1);
+  border-bottom:1px solid var(--b1);padding:18px 28px;gap:0;
+}
+.prog-step{
+  display:flex;align-items:center;gap:12px;flex:1;
+  padding:8px 16px;transition:opacity .25s;opacity:.4;
+}
+.prog-step.active{opacity:1;}
+.prog-step.done{opacity:1;}
+.prog-num{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-size:16px;font-weight:700;
+  border:1.5px solid var(--b2);color:var(--dim);background:var(--s2);
+  transition:all .3s;flex-shrink:0;
+}
+.prog-step.active .prog-num{
+  border-color:var(--amber);color:var(--amber);background:var(--adim);
+  box-shadow:0 0 16px rgba(232,160,32,.25);
+}
+.prog-step.done .prog-num{
+  border-color:var(--green);color:var(--green);background:rgba(0,184,148,.10);
+}
+.prog-step.done .prog-num::before{
+  content:'\2713';font-size:18px;
+}
+.prog-step.done .prog-num span{display:none;}
+.prog-info{display:flex;flex-direction:column;line-height:1.2;}
+.prog-title{
+  font-family:var(--disp);font-size:13px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text);
+}
+.prog-step:not(.active):not(.done) .prog-title{color:var(--mid);}
+.prog-sub{
+  font-size:10px;color:var(--dim);letter-spacing:.04em;margin-top:3px;
+}
+.prog-line{
+  flex:0 0 40px;align-self:center;height:1px;background:var(--b2);
+  margin:0 4px;transition:background .3s;
+}
+.prog-line.done{background:var(--green);}
+@media(max-width:700px){
+  .prog-wrap{padding:14px 16px;}
+  .prog-step{padding:6px 4px;gap:8px;}
+  .prog-num{width:30px;height:30px;font-size:14px;}
+  .prog-title{font-size:11px;}
+  .prog-sub{display:none;}
+  .prog-line{flex:0 0 16px;}
+}
+
+/* UPLOAD ZONE STATES */
+.upzone.success{
+  border-color:var(--green);border-style:solid;
+  background:rgba(0,184,148,.08);
+}
+.upzone.success .up-icon{color:var(--green);}
+.upzone.error{
+  border-color:var(--red2);border-style:solid;
+  background:rgba(214,48,49,.08);
+}
+.upzone.error .up-icon{color:var(--red2);}
+
+/* FEEDBACK MODAL */
+.fb-modal{
+  display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);
+  z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);
+}
+.fb-modal.vis{display:flex;}
+.fb-box{
+  background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);
+  max-width:520px;width:90%;padding:32px;margin:0 16px;
+}
+.fb-box h3{
+  font-family:var(--disp);font-size:18px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;color:var(--text);
+}
+.fb-box p{font-size:12px;color:var(--mid);line-height:1.7;margin-bottom:16px;}
+.fb-box select,.fb-box textarea,.fb-box input{margin-bottom:12px;}
+.fb-box textarea{
+  resize:vertical;min-height:100px;
+  background:var(--s2);border:1px solid var(--b2);color:var(--text);
+  font-family:var(--mono);font-size:12px;padding:10px;width:100%;
+}
+.fb-box textarea:focus{outline:none;border-color:var(--amber);}
+.fb-actions{display:flex;gap:10px;margin-top:8px;}
+.fb-btn{
+  flex:1;padding:14px;font-family:var(--disp);font-size:14px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;transition:all .2s;
+}
+.fb-btn.primary{background:var(--amber);color:#07090c;}
+.fb-btn.primary:hover{background:#f0b030;}
+.fb-btn.cancel{background:var(--s3);color:var(--mid);}
+.fb-btn.cancel:hover{background:var(--b1);color:var(--text);}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--b1);background:var(--s1);
+  padding:0;font-size:11px;color:var(--dim);
+  letter-spacing:.04em;position:relative;z-index:2;
+}
+.ft-grid{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;
+  padding:36px 40px 28px;
+}
+.ft-col{display:flex;flex-direction:column;}
+.ft-title{
+  font-family:var(--disp);font-size:11px;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--text);margin-bottom:12px;
+}
+.ft-link{
+  color:var(--mid);text-decoration:none;font-size:11px;
+  padding:4px 0;transition:color .15s;
+}
+.ft-link:hover{color:var(--amber);}
+.ft-text{
+  font-size:11px;color:var(--dim);line-height:1.7;
+}
+.ft-bottom{
+  display:flex;justify-content:space-between;
+  padding:16px 40px;border-top:1px solid var(--b1);
+  font-size:10px;color:var(--dim);flex-wrap:wrap;gap:8px;
+}
+@media(max-width:860px){
+  .ft-grid{grid-template-columns:1fr 1fr;gap:24px;padding:28px 20px 20px;}
+  .ft-bottom{padding:14px 20px;}
+}
+@media(max-width:480px){
+  .ft-grid{grid-template-columns:1fr;}
+}
+
 </style>
 </head>
 <body>
@@ -243,10 +375,11 @@ footer a:hover{color:var(--amber);}
     <div class="h-dot"></div>
     <div class="h-name">Miata<span>Dyno</span></div>
   </div>
-  <div class="h-meta">NC 2006–2015 · Beta</div>
+  <div class="h-meta">NC 2006-2015 · Beta</div>
   <nav>
-    <a href="https://dannyhng.github.io/">← Portfolio</a>
-    <a href="https://github.com/dannyhng/miatadyno">GitHub</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#feedback" onclick="openFeedback();return false;">Feedback</a>
+    <a href="mailto:thuvhoang19@gmail.com">Contact</a>
   </nav>
 </header>
 
@@ -522,7 +655,34 @@ footer a:hover{color:var(--amber);}
 
 <!-- ═══════════ CONTENT ═══════════ -->
 <div class="content">
-  <div class="disc">⚠ For use on private property and closed courses only. Never exceed posted speed limits. Beta — results are estimates, not certified dyno figures.</div>
+  <div class="disc">For use on private property and closed courses only. Never exceed posted speed limits. Beta. Results are estimates, not certified dyno figures.</div>
+
+  <!-- PROGRESS INDICATOR -->
+  <div class="prog-wrap">
+    <div class="prog-step" id="step-1">
+      <div class="prog-num">1</div>
+      <div class="prog-info">
+        <div class="prog-title">Upload Log</div>
+        <div class="prog-sub">CSV from your OBD scanner</div>
+      </div>
+    </div>
+    <div class="prog-line" id="line-1-2"></div>
+    <div class="prog-step" id="step-2">
+      <div class="prog-num">2</div>
+      <div class="prog-info">
+        <div class="prog-title">Configure Car</div>
+        <div class="prog-sub">Generation, weight, mods</div>
+      </div>
+    </div>
+    <div class="prog-line" id="line-2-3"></div>
+    <div class="prog-step" id="step-3">
+      <div class="prog-num">3</div>
+      <div class="prog-info">
+        <div class="prog-title">Run Analysis</div>
+        <div class="prog-sub">Get your power curve</div>
+      </div>
+    </div>
+  </div>
 
   <!-- PULL GUIDE -->
   <div class="cpanel" style="background:var(--s1);">
@@ -552,6 +712,28 @@ footer a:hover{color:var(--amber);}
         <p style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.6;">
           Most of the OBD scanners log at ~1–2 Hz. Fewer PIDs logged = faster polling = cleaner curve.
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS ANCHOR -->
+  <div class="cpanel" id="how-it-works" style="background:var(--s1);">
+    <div class="plabel">How It Works</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:14px;">
+      <div>
+        <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">01</div>
+        <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Capture</p>
+        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your pull. Required PIDs: RPM, Vehicle Speed, Throttle Position. Recommended: Barometric Pressure and IAT.</p>
+      </div>
+      <div>
+        <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">02</div>
+        <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Analyze</p>
+        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Road load physics calculates wheel horsepower from acceleration, mass, aero drag, and rolling resistance. SAE J1349 atmospheric correction normalizes to standard conditions.</p>
+      </div>
+      <div>
+        <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">03</div>
+        <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Compare</p>
+        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Run quality scoring rejects bad data. Multi-run averaging reduces noise. Stock reference band shows where your number lands relative to a baseline NC.</p>
       </div>
     </div>
   </div>
@@ -609,9 +791,34 @@ footer a:hover{color:var(--amber);}
 </div><!-- end layout -->
 
 <footer>
-  <span>MiataDyno Beta — NC Miata 2006–2015</span>
-  <span>Built by <a href="https://dannyhng.github.io/">Danny Hoang</a> · Portland, OR</span>
-  <span>Private property and closed course use only</span>
+  <div class="ft-grid">
+    <div class="ft-col">
+      <div class="ft-title">MiataDyno</div>
+      <p class="ft-text">Virtual dyno analysis built for the NC Miata community. Upload an OBD log, get a real power estimate, share results.</p>
+      <p class="ft-text" style="margin-top:8px;">Currently in beta. Free while we validate accuracy with real users.</p>
+    </div>
+    <div class="ft-col">
+      <div class="ft-title">Product</div>
+      <a class="ft-link" href="#how-it-works">How It Works</a>
+      <a class="ft-link" href="#" onclick="openFeedback();return false;">Send Feedback</a>
+      <a class="ft-link" href="mailto:thuvhoang19@gmail.com?subject=MiataDyno%20Bug%20Report">Report a Bug</a>
+    </div>
+    <div class="ft-col">
+      <div class="ft-title">Contact</div>
+      <a class="ft-link" href="mailto:thuvhoang19@gmail.com">thuvhoang19@gmail.com</a>
+      <p class="ft-text" style="margin-top:8px;">Based in Portland, Oregon</p>
+    </div>
+    <div class="ft-col">
+      <div class="ft-title">Legal</div>
+      <a class="ft-link" href="#" onclick="openLegal('terms');return false;">Terms of Use</a>
+      <a class="ft-link" href="#" onclick="openLegal('privacy');return false;">Privacy</a>
+      <a class="ft-link" href="#" onclick="openLegal('disclaimer');return false;">Accuracy Disclaimer</a>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <span>&copy; 2026 MiataDyno. All rights reserved.</span>
+    <span>Results are estimates. Not affiliated with Mazda Motor Corporation.</span>
+  </div>
 </footer>
 
 <!-- TERMS MODAL -->
@@ -620,7 +827,7 @@ footer a:hover{color:var(--amber);}
     <p style="font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;color:var(--text);">Before You Run</p>
     <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:20px;">
       MiataDyno estimates wheel horsepower using road load physics applied to your OBD log data.
-      Results are estimates — not certified dyno figures. Accuracy depends on pull quality,
+      Results are estimates, not certified dyno figures. Accuracy depends on pull quality,
       road conditions, and how well your build is configured.
     </p>
     <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:24px;">
@@ -641,6 +848,44 @@ footer a:hover{color:var(--amber);}
       style="width:100%;padding:16px;background:var(--s3);color:var(--dim);font-family:var(--disp);font-size:16px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:not-allowed;transition:all .2s;">
       I Understand — Continue
     </button>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="fb-modal" id="fbModal">
+  <div class="fb-box">
+    <h3>Send Feedback</h3>
+    <p>Found a bug, have a feature request, or want to share your result? Your input shapes what gets built next.</p>
+
+    <label class="lbl">Type</label>
+    <select id="fbType">
+      <option value="bug">Bug Report</option>
+      <option value="feature">Feature Request</option>
+      <option value="result">Sharing My Result</option>
+      <option value="general">General Feedback</option>
+    </select>
+
+    <label class="lbl">Your Email (optional, for replies)</label>
+    <input type="email" id="fbEmail" placeholder="you@example.com">
+
+    <label class="lbl">Message</label>
+    <textarea id="fbMsg" placeholder="What's on your mind?"></textarea>
+
+    <div class="fb-actions">
+      <button class="fb-btn cancel" onclick="closeFeedback()">Cancel</button>
+      <button class="fb-btn primary" onclick="sendFeedback()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL MODAL -->
+<div class="fb-modal" id="legalModal">
+  <div class="fb-box" style="max-width:640px;max-height:80vh;overflow-y:auto;">
+    <h3 id="legalTitle">Terms</h3>
+    <div id="legalContent" style="font-size:12px;color:var(--mid);line-height:1.8;"></div>
+    <div class="fb-actions" style="margin-top:20px;">
+      <button class="fb-btn primary" onclick="closeLegal()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -950,7 +1195,17 @@ upz.addEventListener('dragover',e=>{e.preventDefault();upz.classList.add('dov');
 upz.addEventListener('dragleave',()=>upz.classList.remove('dov'));
 upz.addEventListener('drop',e=>{e.preventDefault();upz.classList.remove('dov');handleFile(e.dataTransfer.files[0]);});
 
-function showSt(msg,type){const el=document.getElementById('upst');el.textContent=msg;el.className='upst vis '+type;}
+function showSt(msg,type){
+  const el=document.getElementById('upst');
+  el.textContent=msg;
+  el.className='upst vis '+type;
+  // Apply visual state to upload zone itself
+  const zone=document.getElementById('upzone');
+  zone.classList.remove('success','error');
+  if(type==='ok') zone.classList.add('success');
+  else if(type==='err') zone.classList.add('error');
+}
+
 function handleFile(f){
   if(!f)return;
   const rd=new FileReader();
@@ -959,7 +1214,7 @@ function handleFile(f){
     if(!res.ok){showSt('❌ '+res.msg,'err');return;}
     showSt(`✓ ${res.data.length} rows · ${(res.data[res.data.length-1]?.time/60||0).toFixed(1)} min · Baro: ${baro.toFixed(1)} kPa · IAT: ${(iat_k-273.15).toFixed(1)}°C · ρ: ${rho.toFixed(4)} kg/m³`,'ok');
     rows=res.data; pulls=detectPulls(rows); selB=null; selA=null;
-    renderPulls(); checkReady();
+    renderPulls(); checkReady(); updateProgress();
   };
   rd.readAsText(f,'utf-8');
 }
@@ -985,8 +1240,9 @@ function selPull(idx,el){
   else if(selA===idx){selA=null;el.classList.remove('ia');document.getElementById('pt'+idx).innerHTML='';}
   else if(selB===null){selB=idx;el.classList.add('ib');document.getElementById('pt'+idx).innerHTML='<div class="ptag b">Before</div>';}
   else if(selA===null){selA=idx;el.classList.add('ia');document.getElementById('pt'+idx).innerHTML='<div class="ptag a">After</div>';}
-  checkReady();
+  checkReady(); updateProgress();
 }
+
 function checkReady(){document.getElementById('goBtn').disabled=selB===null||selA===null;}
 
 // ═══ ANALYSIS ═══
@@ -1250,6 +1506,104 @@ function acceptTerms(){
   termsAccepted=true;
   document.getElementById('termsModal').style.display='none';
   runAnalysis();
+}
+
+// ═══ PROGRESS INDICATOR ═══
+function updateProgress(){
+  const fileLoaded = rows.length > 0;
+  const pullsSelected = selB !== null && selA !== null;
+
+  const s1 = document.getElementById('step-1');
+  const s2 = document.getElementById('step-2');
+  const s3 = document.getElementById('step-3');
+  const l12 = document.getElementById('line-1-2');
+  const l23 = document.getElementById('line-2-3');
+
+  // Reset
+  [s1,s2,s3].forEach(s=>s.className='prog-step');
+  [l12,l23].forEach(l=>l.className='prog-line');
+
+  if(!fileLoaded){
+    s1.classList.add('active');
+  } else if(!pullsSelected){
+    s1.classList.add('done');
+    s2.classList.add('active');
+    l12.classList.add('done');
+  } else {
+    s1.classList.add('done');
+    s2.classList.add('done');
+    s3.classList.add('active');
+    l12.classList.add('done');
+    l23.classList.add('done');
+  }
+}
+
+// Initialize on load
+updateProgress();
+
+// ═══ FEEDBACK MODAL ═══
+function openFeedback(){
+  document.getElementById('fbModal').classList.add('vis');
+}
+function closeFeedback(){
+  document.getElementById('fbModal').classList.remove('vis');
+}
+function sendFeedback(){
+  const type = document.getElementById('fbType').value;
+  const email = document.getElementById('fbEmail').value;
+  const msg = document.getElementById('fbMsg').value;
+
+  if(!msg.trim()){
+    alert('Please enter a message before sending.');
+    return;
+  }
+
+  const subject = `MiataDyno Feedback: ${type}`;
+  const body = `Type: ${type}\nFrom: ${email||'(not provided)'}\n\n${msg}`;
+  const mailto = `mailto:thuvhoang19@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+  closeFeedback();
+  document.getElementById('fbMsg').value = '';
+}
+
+// ═══ LEGAL MODALS ═══
+const LEGAL_CONTENT = {
+  terms: {
+    title: 'Terms of Use',
+    body: `<p><strong>Acceptance.</strong> By using MiataDyno, you agree to these terms.</p>
+<p><strong>Permitted Use.</strong> MiataDyno is provided for personal, non-commercial use. Acceleration runs required to collect data must be performed only on private property, closed courses, or roads where it is safe and legal to do so.</p>
+<p><strong>No Warranty.</strong> Results are estimates derived from physics models applied to OBD log data. They are not certified dyno measurements. Accuracy depends on data quality, road conditions, and configuration accuracy.</p>
+<p><strong>No Liability.</strong> MiataDyno is not responsible for any property damage, personal injury, traffic violations, or other consequences resulting from use of this tool. You are solely responsible for how and where you collect data.</p>
+<p><strong>No Affiliation.</strong> MiataDyno is an independent project. It is not affiliated with, endorsed by, or sponsored by Mazda Motor Corporation, BlueDriver, or any other company referenced on this site.</p>
+<p><strong>Beta Software.</strong> This is beta software. Features may change, break, or be removed without notice.</p>
+<p><strong>Last updated:</strong> April 28, 2026</p>`
+  },
+  privacy: {
+    title: 'Privacy Policy',
+    body: `<p><strong>What We Collect.</strong> MiataDyno currently runs entirely in your browser. CSV files you upload are processed locally and are not sent to any server.</p>
+<p><strong>Weather API.</strong> If you provide GPS coordinates for atmospheric correction, those coordinates are sent to Open-Meteo (open-meteo.com) to retrieve current weather. We do not store these coordinates.</p>
+<p><strong>Feedback.</strong> If you submit feedback, your message is sent via your email client to thuvhoang19@gmail.com. We do not collect this through any third-party service.</p>
+<p><strong>Cookies.</strong> We do not use cookies, analytics, or tracking pixels.</p>
+<p><strong>Future Changes.</strong> When user accounts launch, this policy will be updated to reflect any data we store. You will be notified before any change.</p>
+<p><strong>Last updated:</strong> April 28, 2026</p>`
+  },
+  disclaimer: {
+    title: 'Accuracy Disclaimer',
+    body: `<p>MiataDyno measures the difference between two acceleration runs performed on the same road in similar conditions. The delta (before vs after) is the reliable output. The absolute power number is an estimate.</p>
+<p><strong>What This Means.</strong> Use this tool to answer "did my mod work, and by how much" with confidence. Do not use this tool as a substitute for a certified dyno when absolute power numbers matter (insurance, sale, sanctioned competition).</p>
+<p><strong>Sources of Variance.</strong> Atmospheric conditions, road surface, road grade, OBD scanner polling rate, vehicle configuration accuracy, and pull quality all affect the absolute number. The tool corrects for as many of these as possible but cannot eliminate them entirely.</p>
+<p><strong>Validation.</strong> The physics engine has been validated against a stock NC2 PRHT producing ~126 WHP, which falls within the 118-128 WHP Dynojet reference range for that platform.</p>`
+  }
+};
+
+function openLegal(key){
+  const c = LEGAL_CONTENT[key];
+  document.getElementById('legalTitle').textContent = c.title;
+  document.getElementById('legalContent').innerHTML = c.body;
+  document.getElementById('legalModal').classList.add('vis');
+}
+function closeLegal(){
+  document.getElementById('legalModal').classList.remove('vis');
 }
 
 </script>
