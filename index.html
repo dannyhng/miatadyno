@@ -231,8 +231,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 @media(max-width:480px){.ft-grid{grid-template-columns:1fr;}}
 
 .prog-wrap{display:flex;align-items:stretch;background:var(--s1);border-bottom:1px solid var(--b1);padding:18px 28px;gap:0;}
-.prog-step{display:flex;align-items:center;gap:12px;flex:1;padding:8px 16px;transition:opacity .25s;opacity:.4;}
-.prog-step.active,.prog-step.done{opacity:1;}
+.prog-step{display:flex;align-items:center;gap:12px;flex:1;padding:8px 16px;transition:all .25s;opacity:1;}
 .prog-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:16px;font-weight:700;border:1.5px solid var(--b2);color:var(--dim);background:var(--s2);transition:all .3s;flex-shrink:0;}
 .prog-step.active .prog-num{border-color:var(--amber);color:var(--amber);background:var(--adim);box-shadow:0 0 16px rgba(232,160,32,.25);}
 .prog-step.done .prog-num{border-color:var(--green);color:var(--green);background:rgba(0,184,148,.10);}
@@ -387,14 +386,37 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 
       <div class="fl">
         <label class="lbl">Wheel Weight per Corner</label>
-        <select id="whlWt" onchange="calcW()"></select>
+        <select id="whlWt" onchange="checkCustomWheel();calcW()"></select>
         <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;" id="whl-note">Weigh one wheel on a bathroom scale for the most accurate number.</p>
+      </div>
+
+      <div class="fl" id="customWheelRow" style="display:none;">
+        <label class="lbl">Custom Wheel Weight per Corner (lbs)</label>
+        <input type="number" id="whlCustom" value="15" min="6" max="35" step="0.1" onchange="calcW()">
       </div>
 
       <div class="fl">
         <label class="lbl">Tire Size</label>
         <select id="tireSel" onchange="checkCustomTire();calcW()"></select>
         <p style="font-size:10px;color:var(--dim);margin-top:5px;">Stock NC1: 195/50R16 · Stock NC2/3: 205/45R17</p>
+      </div>
+
+      <div class="fl" id="customTireRow" style="display:none;">
+        <label class="lbl">Custom Tire Size</label>
+        <div class="g3">
+          <div>
+            <label class="lbl" style="font-size:9px;">Width</label>
+            <input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:9px;">Aspect</label>
+            <input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:9px;">Rim</label>
+            <input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()">
+          </div>
+        </div>
       </div>
 
       <div class="fl" id="customTireRow" style="display:none;">
@@ -463,82 +485,93 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
   </div>
 
   <!-- EXHAUST (estimate path only) -->
-  <div class="sec" id="sec-exhaust" style="display:none;">
-    <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-t">Exhaust</span><span class="sec-c">▸</span>
-    </div>
-    <div class="sec-bd">
-      <div class="exh-comp">
-        <div class="exh-lbl">Cat-Back / Muffler <span class="exh-d" id="d-cb">+/- 0 lbs</span></div>
-        <select id="catback" onchange="exhDelta('catback','d-cb');calcW()">
-          <option value="0">Stock OEM</option>
-          <option value="-13.8">Flyin' Miata Cat-Back (-13.8 lbs)</option>
-          <option value="-16.0">Racing Beat Power Pulse (-16.0 lbs)</option>
-          <option value="-14.5">GoodWin Racing Cat-Back (-14.5 lbs)</option>
-          <option value="-12.5">Borla ATAK (-12.5 lbs)</option>
-          <option value="-17.0">Cobalt SS (-17.0 lbs)</option>
-          <option value="-12.0">Race Single Muffler (-12.0 lbs)</option>
-          <option value="-13.0">HKS Hi-Power (-13.0 lbs)</option>
-          <option value="-14.0">Megan Racing OE-RS (-14.0 lbs)</option>
-        </select>
-      </div>
-      <div class="exh-comp">
-        <div class="exh-lbl">Midpipe <span class="exh-d" id="d-mp">+/- 0 lbs</span></div>
-        <select id="midpipe" onchange="exhDelta('midpipe','d-mp');calcW()">
-          <option value="0">Stock OEM Midpipe</option>
-          <option value="-4.5">Flyin' Miata High-Flow Cat (-4.5 lbs)</option>
-          <option value="-4.0">Racing Beat High-Flow Cat (-4.0 lbs)</option>
-          <option value="-8.0">Test Pipe / Straight Pipe (-8.0 lbs)</option>
-        </select>
-      </div>
-      <div class="exh-comp">
-        <div class="exh-lbl">Headers <span class="exh-d" id="d-hd">+/- 0 lbs</span></div>
-        <select id="headers" onchange="exhDelta('headers','d-hd');calcW()">
-          <option value="0">Stock OEM Manifold</option>
-          <option value="-8.5">Flyin' Miata Long Tube (-8.5 lbs)</option>
-          <option value="-8.0">Racing Beat Header (-8.0 lbs)</option>
-          <option value="-9.0">GoodWin Racing (-9.0 lbs)</option>
-        </select>
-      </div>
-    </div>
+  <div class="sec" id="sec-exhaust">
+  <div class="sec-hd" onclick="toggleSec(this)">
+    <span class="sec-t">Exhaust System</span><span class="sec-c">▸</span>
   </div>
+  <div class="sec-bd">
+    
+    <div class="exh-comp">
+      <div class="exh-lbl">Cat-Back / Muffler <span class="exh-d" id="d-cb">±0 lbs</span></div>
+      <select id="catback" onchange="exhDelta('catback','d-cb');checkCustomExh('catback');calcW()">
+        <option value="0">Stock OEM</option>
+        <option value="-13.8">Flyin' Miata Cat-Back (−13.8 lbs)</option>
+        <option value="-16.0">Racing Beat Power Pulse (−16.0 lbs)</option>
+        <option value="-14.5">GoodWin Racing Cat-Back (−14.5 lbs)</option>
+        <option value="-12.5">Borla ATAK (−12.5 lbs)</option>
+        <option value="-17.0">Cobalt SS (−17.0 lbs)</option>
+        <option value="custom">Custom (enter weight below)</option>
+      </select>
+      <input type="number" id="catbackCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
+    </div>
+
+    <div class="exh-comp" style="margin-top:10px;">
+      <div class="exh-lbl">Midpipe <span class="exh-d" id="d-mp">±0 lbs</span></div>
+      <select id="midpipe" onchange="exhDelta('midpipe','d-mp');checkCustomExh('midpipe');calcW()">
+        <option value="0">Stock OEM Midpipe</option>
+        <option value="-4.5">Flyin' Miata High-Flow Cat (−4.5 lbs)</option>
+        <option value="-4.0">Racing Beat High-Flow Cat (−4.0 lbs)</option>
+        <option value="-8.0">Test Pipe (−8.0 lbs)</option>
+        <option value="custom">Custom (enter weight below)</option>
+      </select>
+      <input type="number" id="midpipeCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
+    </div>
+
+    <div class="exh-comp" style="margin-top:10px;">
+      <div class="exh-lbl">Headers <span class="exh-d" id="d-hd">±0 lbs</span></div>
+      <select id="headers" onchange="exhDelta('headers','d-hd');checkCustomExh('headers');calcW()">
+        <option value="0">Stock OEM Manifold</option>
+        <option value="-8.5">Flyin' Miata Long Tube (−8.5 lbs)</option>
+        <option value="-8.0">Racing Beat Header (−8.0 lbs)</option>
+        <option value="-9.0">GoodWin Racing Header (−9.0 lbs)</option>
+        <option value="custom">Custom (enter weight below)</option>
+      </select>
+      <input type="number" id="headersCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
+    </div>
+
+  </div>
+</div>
 
   <!-- OTHER MODS (estimate path only) -->
   <div class="sec" id="sec-other" style="display:none;">
-    <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-t">Other Mods</span><span class="sec-c">▸</span>
-    </div>
-    <div class="sec-bd">
-      <div class="fl">
-        <label class="lbl">AC System</label>
-        <div class="trow" id="tAC">
-          <div class="tbtn on" data-v="0" onclick="setT('tAC',this);calcW()">Stock</div>
-          <div class="tbtn" data-v="-28" onclick="setT('tAC',this);calcW()">Deleted (-28 lbs)</div>
+        <div class="sec-hd" onclick="toggleSec(this)">
+          <span class="sec-t">Other Mods</span><span class="sec-c">▸</span>
+        </div>
+        <div class="sec-bd">
+          <div class="fl">
+            <label class="lbl">AC System</label>
+            <div class="trow" id="tAC">
+              <div class="tbtn on" data-v="0" onclick="setT('tAC',this);calcW()">Stock</div>
+              <div class="tbtn" data-v="-28" onclick="setT('tAC',this);calcW()">Deleted (-28 lbs)</div>
+            </div>
+          </div>
+          <div class="fl">
+            <label class="lbl">Roll Bar / Cage</label>
+            <select id="rollbar" onchange="checkCustomExh('rollbar');calcW()">
+              <option value="0">None (stock)</option>
+              <option value="22">Hard Dog M2 (+22 lbs)</option>
+              <option value="28">Hard Dog M3 (+28 lbs)</option>
+              <option value="65">Full tube cage (+65 lbs)</option>
+              <option value="custom">Custom (+/- lbs)</option>
+            </select>
+            <input type="number" id="rollbarCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
+          </div>
+          <div class="fl">
+            <label class="lbl">Forced Induction</label>
+            <select id="forced" onchange="checkCustomExh('forced');calcW()">
+              <option value="0">None (naturally aspirated)</option>
+              <option value="45">FM Supercharger Kit (+45 lbs)</option>
+              <option value="38">Other supercharger (+38 lbs)</option>
+              <option value="custom">Custom (+/- lbs)</option>
+            </select>
+            <input type="number" id="forcedCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
+          </div>
+          <div class="fl">
+            <label class="lbl">Custom Weight Adjustment (lbs)</label>
+            <input type="number" id="xDelta" value="0" step="1" placeholder="+/- lbs" onchange="calcW()">
+          </div>
         </div>
       </div>
-      <div class="fl">
-        <label class="lbl">Roll Bar / Cage</label>
-        <select id="rollbar" onchange="calcW()">
-          <option value="0">None (stock)</option>
-          <option value="22">Hard Dog M2 (+22 lbs)</option>
-          <option value="28">Hard Dog M3 (+28 lbs)</option>
-          <option value="65">Full tube cage (+65 lbs)</option>
-        </select>
-      </div>
-      <div class="fl">
-        <label class="lbl">Forced Induction</label>
-        <select id="forced" onchange="calcW()">
-          <option value="0">None (naturally aspirated)</option>
-          <option value="45">FM Supercharger Kit (+45 lbs)</option>
-          <option value="38">Other supercharger (+38 lbs)</option>
-        </select>
-      </div>
-      <div class="fl">
-        <label class="lbl">Custom Weight Adjustment (lbs)</label>
-        <input type="number" id="xDelta" value="0" step="1" placeholder="+/- lbs" onchange="calcW()">
-      </div>
-    </div>
-  </div>
 
   <!-- MOD DESCRIPTION -->
   <div class="sec">
@@ -616,8 +649,14 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div>
         <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">01</div>
         <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Capture</p>
-        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your pull. Required PIDs: RPM, Vehicle Speed, Throttle Position. Recommended: Barometric Pressure and IAT.</p>
+        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your pull.</p>
+      <div style="margin-top:10px;padding:10px 12px;background:rgba(232,160,32,.08);border-left:2px solid var(--amber);">
+        <p style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Required PIDs</p>
+        <p style="font-size:11px;color:var(--text);line-height:1.6;">RPM · Vehicle Speed · Throttle Position</p>
+        <p style="font-size:10px;color:var(--mid);margin-top:8px;letter-spacing:.04em;"><strong style="color:var(--text);">Recommended:</strong> Barometric Pressure, Intake Air Temperature</p>
       </div>
+      </div>
+      
       <div>
         <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">02</div>
         <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Analyze</p>
@@ -863,18 +902,19 @@ function setWeightMode(mode){
 
 function setRim(size){
   const whlSel = document.getElementById('whlWt');
-  whlSel.innerHTML = WHEEL_OPTIONS[size].map(o=>`<option value="${o.wt}">${o.label}</option>`).join('');
+  const opts = WHEEL_OPTIONS[size].map(o=>`<option value="${o.wt}">${o.label}</option>`).join('');
+  whlSel.innerHTML = opts + '<option value="custom">Custom weight (enter below)</option>';
 
   const tireSel = document.getElementById('tireSel');
   tireSel.innerHTML = TIRE_OPTIONS[size].map(o=>
     `<option value="${o.wt}" data-w="${o.w}" data-a="${o.a}" data-r="${o.r}">${o.label}</option>`
   ).join('');
 
-  // Auto-select likely stock options
   if(size===16){ tireSel.value = 19.0; }
   else if(size===17){ tireSel.value = 17.5; whlSel.value = 19.0; }
 
   checkCustomTire();
+  checkCustomWheel();
 
   const note = document.getElementById('whl-note');
   if(size===18){
@@ -887,11 +927,22 @@ function setRim(size){
   calcW();
 }
 
+function checkCustomWheel(){
+  const sel = document.getElementById('whlWt');
+  const row = document.getElementById('customWheelRow');
+  if(row) row.style.display = sel?.value === 'custom' ? 'block' : 'none';
+}
+
 function checkCustomTire(){
   const sel = document.getElementById('tireSel');
-  const custom = sel?.value === 'custom';
   const row = document.getElementById('customTireRow');
-  if(row) row.style.display = custom ? 'block' : 'none';
+  if(row) row.style.display = sel?.value === 'custom' ? 'block' : 'none';
+}
+
+function checkCustomExh(id){
+  const sel = document.getElementById(id);
+  const inp = document.getElementById(id + 'Custom');
+  if(inp) inp.style.display = sel?.value === 'custom' ? 'block' : 'none';
 }
 
 function initWheelSelectors(){
@@ -938,18 +989,32 @@ function calcW(){
     const modDelta = parseFloat(document.getElementById('modWt').value) || 0;
     vehicleWeight = base.wt + modDelta;
   } else {
-    // Estimate path: build from mods
-    const exh = ['catback','midpipe','headers'].reduce((s,id)=>{
-      const el = document.getElementById(id);
-      return s + (el ? (parseFloat(el.value)||0) : 0);
-    }, 0);
+    // Helper to handle custom vs preset dropdowns
+    const getVal = (id) => {
+      const sel = document.getElementById(id);
+      if(!sel) return 0;
+      if(sel.value === 'custom'){
+        return parseFloat(document.getElementById(id + 'Custom')?.value) || 0;
+      }
+      return parseFloat(sel.value) || 0;
+    };
 
+    // Wheel weight (handles custom)
     const whlEl = document.getElementById('whlWt');
-    const whlVal = whlEl && whlEl.value ? parseFloat(whlEl.value) : base.swl;
+    let whlVal;
+    if(whlEl?.value === 'custom'){
+      whlVal = parseFloat(document.getElementById('whlCustom')?.value) || base.swl;
+    } else {
+      whlVal = whlEl ? parseFloat(whlEl.value) : base.swl;
+    }
     const wheels = 4 * (whlVal - base.swl);
 
-    const others = (parseFloat(document.getElementById('rollbar')?.value)||0) +
-                   (parseFloat(document.getElementById('forced')?.value)||0) +
+    // Exhaust (handles custom for each component)
+    const exh = getVal('catback') + getVal('midpipe') + getVal('headers');
+
+    // Others (handles custom rollbar/forced induction)
+    const others = getVal('rollbar') + 
+                   getVal('forced') + 
                    (parseFloat(document.getElementById('xDelta')?.value)||0) +
                    (parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v)||0);
 
