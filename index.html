@@ -281,6 +281,16 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 .limit-tier p{margin:0;font-size:11px;color:var(--mid);}
 .limit-counter{display:inline-block;padding:3px 8px;background:var(--adim);border:1px solid var(--amber);color:var(--amber);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:10px;font-weight:700;}
 
+.amode-btn{flex:1;padding:14px 18px;background:var(--s2);cursor:pointer;border-right:1px solid var(--b2);transition:all .15s;}
+.amode-btn:last-child{border-right:none;}
+.amode-btn:hover{background:var(--s3);}
+.amode-btn.on{background:var(--adim);border-color:var(--amber);}
+.amode-btn strong{display:block;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mid);margin-bottom:4px;}
+.amode-btn.on strong{color:var(--amber);}
+.amode-btn span{display:block;font-size:11px;color:var(--dim);line-height:1.4;}
+.pull-item.isel{border-left:3px solid var(--amber);background:var(--adim);}
+.pnum.isel{color:var(--amber);}
+
 </style>
 </head>
 <body>
@@ -683,9 +693,21 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
   </div>
 
   <div class="cpanel">
-    <div class="plabel">Detected Pulls</div>
-    <div class="ptitle">Select Before &amp; After</div>
-    <p style="font-size:11px;color:var(--mid);">Tap once for BEFORE (red). Tap again for AFTER (blue). Tap again to deselect.</p>
+    <div class="plabel">Analysis Mode</div>
+    <div style="display:flex;gap:0;margin-bottom:18px;border:1px solid var(--b2);">
+      <div class="amode-btn on" data-mode="same" onclick="setAnalysisMode('same')">
+        <strong>Same Setup</strong>
+        <span>Multiple pulls, same car. See your best run + consistency.</span>
+      </div>
+      <div class="amode-btn" data-mode="compare" onclick="setAnalysisMode('compare')">
+        <strong>Before vs After</strong>
+        <span>Compare a pull from before a mod vs after.</span>
+      </div>
+    </div>
+    <div class="ptitle" id="modeTitle">Select Pulls to Analyze</div>
+    <p style="font-size:11px;color:var(--mid);" id="modeHelp">
+      Tap pulls to include them. We'll average all selected pulls and show your best individual run.
+    </p>
   </div>
 
   <div class="cpanel full" id="pullSec">
@@ -697,11 +719,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
   </div>
 
   <div id="results">
-    <div class="stats-g">
-      <div class="sbox"><div class="slbl">Before WHP</div><div class="sval" id="sBefore">.</div><div class="sunit">wheel hp</div></div>
-      <div class="sbox"><div class="slbl">After WHP</div><div class="sval" id="sAfter">.</div><div class="sunit">wheel hp</div></div>
-      <div class="sbox hl"><div class="slbl">Gain WHP</div><div class="sval a" id="sGain">.</div><div class="sunit">wheel hp</div></div>
-      <div class="sbox"><div class="slbl">Gain WTQ</div><div class="sval" id="sTqGain">.</div><div class="sunit">lb-ft torque</div></div>
+    <div class="stats-g" id="statsLabels">
+      <div class="sbox"><div class="slbl">WHP</div><div class="sval">.</div><div class="sunit">wheel hp</div></div>
     </div>
     <div class="chart-w">
       <div class="plabel" style="margin-bottom:16px;">Power Curve</div>
@@ -909,6 +928,31 @@ const TIRE_OPTIONS = {
 // ═══ UI HELPERS ═══
 function toggleSec(h){h.closest('.sec').classList.toggle('coll');}
 function setT(id,btn){document.getElementById(id).querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+
+function setAnalysisMode(mode){
+  analysisMode = mode;
+  document.querySelectorAll('.amode-btn').forEach(b=>b.classList.toggle('on', b.dataset.mode === mode));
+
+  const title = document.getElementById('modeTitle');
+  const help  = document.getElementById('modeHelp');
+
+  if(mode === 'same'){
+    title.textContent = 'Select Pulls to Average';
+    help.innerHTML = 'Tap pulls to include them. We\'ll show your best run + average + consistency. <strong>Recommended for single-session uploads.</strong>';
+  } else {
+    title.textContent = 'Select Before & After';
+    help.innerHTML = 'Tap once for BEFORE (red). Tap again for AFTER (blue). Tap again to deselect. <strong>Use when comparing pulls from different mod stages.</strong>';
+  }
+
+  // Clear selections when switching modes
+  selPulls = [];
+  selB = null;
+  selA = null;
+  renderPulls();
+  checkReady();
+  updateProgress();
+}
+
 function exhDelta(sid,lid){
   const v=parseFloat(document.getElementById(sid).value)||0;
   const el=document.getElementById(lid);
@@ -1077,6 +1121,8 @@ function calcW(){
 const G=9.81, RDA=287.058;
 let baro=99.9, iat_k=298, rho=1.225;
 let rows=[], pulls=[], selB=null, selA=null;
+let analysisMode = 'same';   // 'same' or 'compare'
+let selPulls = [];           // array of selected pull indices for 'same' mode
 
 function savgol(a,w){
   const ww=Math.max(7, w%2===0 ? w+1 : w), h=Math.floor(ww/2);
@@ -1361,21 +1407,46 @@ function renderPulls(){
     div.addEventListener('click', () => selPull(i, div));
     sec.appendChild(div);
   });
+  // Auto-select all pulls in same-setup mode, or first 2 in compare mode
+if(analysisMode === 'same'){
+  pulls.forEach((_, i) => selPull(i, sec.children[i]));
+} else {
   if(pulls.length>=1) selPull(0, sec.children[0]);
   if(pulls.length>=2) selPull(1, sec.children[1]);
 }
+}
 
 function selPull(idx, el){
-  if(selB===idx){ selB=null; el.classList.remove('ib'); document.getElementById('pt'+idx).innerHTML=''; }
-  else if(selA===idx){ selA=null; el.classList.remove('ia'); document.getElementById('pt'+idx).innerHTML=''; }
-  else if(selB===null){ selB=idx; el.classList.add('ib'); document.getElementById('pt'+idx).innerHTML='<div class="ptag b">Before</div>'; }
-  else if(selA===null){ selA=idx; el.classList.add('ia'); document.getElementById('pt'+idx).innerHTML='<div class="ptag a">After</div>'; }
+  if(analysisMode === 'compare'){
+    // Original before/after logic
+    if(selB===idx){ selB=null; el.classList.remove('ib'); document.getElementById('pt'+idx).innerHTML=''; }
+    else if(selA===idx){ selA=null; el.classList.remove('ia'); document.getElementById('pt'+idx).innerHTML=''; }
+    else if(selB===null){ selB=idx; el.classList.add('ib'); document.getElementById('pt'+idx).innerHTML='<div class="ptag b">Before</div>'; }
+    else if(selA===null){ selA=idx; el.classList.add('ia'); document.getElementById('pt'+idx).innerHTML='<div class="ptag a">After</div>'; }
+  } else {
+    // Same-setup mode: toggle selection
+    const i = selPulls.indexOf(idx);
+    if(i >= 0){
+      selPulls.splice(i, 1);
+      el.classList.remove('isel');
+      document.getElementById('pt'+idx).innerHTML='';
+    } else {
+      selPulls.push(idx);
+      el.classList.add('isel');
+      const order = selPulls.length;
+      document.getElementById('pt'+idx).innerHTML=`<div class="ptag" style="color:var(--amber);border-color:var(--amber);background:var(--adim);">Pull ${order}</div>`;
+    }
+  }
   checkReady();
   updateProgress();
 }
 
 function checkReady(){
-  document.getElementById('goBtn').disabled = selB===null || selA===null;
+  if(analysisMode === 'compare'){
+    document.getElementById('goBtn').disabled = selB===null || selA===null;
+  } else {
+    document.getElementById('goBtn').disabled = selPulls.length < 1;
+  }
 }
 
 // ═══ ANALYSIS ═══
@@ -1393,47 +1464,46 @@ document.getElementById('goBtn').addEventListener('click', () => {
 });
 
 function runAnalysis(){
-  // GUARD: ensure pulls are actually selected
-  if(selB === null || selA === null){
-    alert('Please select both a BEFORE pull and an AFTER pull from the detected pulls list. If no pulls are visible, your CSV may not contain a full-throttle run.');
-    return;
-  }
-  if(!pulls[selB] || !pulls[selA]){
-    alert('Pull selection error. Please re-upload your CSV and try again.');
-    selB = null;
-    selA = null;
-    return;
-  }
-  if(!pulls[selB].rows || !pulls[selA].rows){
-    alert('Pull data is missing rows. The CSV may not contain enough data points for analysis.');
-    return;
-  }
-
   const w = calcW();
   const prof = {eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr};
+  const mod = document.getElementById('modDesc').value || 'Current Setup';
+  const vn = w.base.name;
+
+  if(analysisMode === 'compare'){
+    runCompareAnalysis(prof, w, mod, vn);
+  } else {
+    runSameSetupAnalysis(prof, w, mod, vn);
+  }
+
+  const res = document.getElementById('results');
+  res.classList.add('vis');
+  if(typeof incrementUsage === 'function') incrementUsage();
+  setTimeout(() => res.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+}
+
+function runCompareAnalysis(prof, w, mod, vn){
+  if(selB === null || selA === null){
+    alert('Select both a BEFORE and AFTER pull.');
+    return;
+  }
   const rB = calcHP(pulls[selB].rows, prof);
   const rA = calcHP(pulls[selA].rows, prof);
-
-  if(!rB || !rA){
-    alert('Not enough clean data points in the selected pulls. Each pull needs at least 5 valid data rows.');
-    return;
-  }
-
-  const bB = bin(rB);
-  const bA = bin(rA);
-  if(!bB.length || !bA.length){
-    alert('Not enough clean data after binning. Check run quality scores and try a different pull.');
-    return;
-  }
+  if(!rB || !rA){ alert('Not enough clean data in selected pulls.'); return; }
+  const bB = bin(rB), bA = bin(rA);
+  if(!bB.length || !bA.length){ alert('Not enough binned data.'); return; }
 
   const pB = Math.max(...bB.map(r=>r.WHP));
   const pA = Math.max(...bA.map(r=>r.WHP));
   const tB = Math.max(...bB.map(r=>r.WTQ));
   const tA = Math.max(...bA.map(r=>r.WTQ));
-  const hg = pA - pB;
-  const tg = tA - tB;
-  const mod = document.getElementById('modDesc').value || 'Modification';
-  const vn = w.base.name;
+  const hg = pA - pB, tg = tA - tB;
+
+  // Update stat boxes
+  document.getElementById('statsLabels').innerHTML = `
+    <div class="sbox"><div class="slbl">Before WHP</div><div class="sval" id="sBefore">.</div><div class="sunit">wheel hp</div></div>
+    <div class="sbox"><div class="slbl">After WHP</div><div class="sval" id="sAfter">.</div><div class="sunit">wheel hp</div></div>
+    <div class="sbox hl"><div class="slbl">Gain WHP</div><div class="sval a" id="sGain">.</div><div class="sunit">wheel hp</div></div>
+    <div class="sbox"><div class="slbl">Gain WTQ</div><div class="sval" id="sTqGain">.</div><div class="sunit">lb-ft torque</div></div>`;
 
   anim('sBefore', pB);
   anim('sAfter', pA);
@@ -1447,12 +1517,100 @@ function runAnalysis(){
   document.getElementById('cGain').textContent = (hg>=0 ? '+' : '') + hg.toFixed(1) + ' WHP';
   document.getElementById('cCond').textContent = `Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
 
-  drawChart(bB, bA);
-  genInterp(pB, pA, hg, tg, mod, vn, w.gen);
-  const res = document.getElementById('results');
-  res.classList.add('vis');
-  if(typeof incrementUsage === 'function') incrementUsage();
-  setTimeout(() => res.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+  drawCompareChart(bB, bA);
+  genCompareInterp(pB, pA, hg, tg, mod, w.gen);
+}
+
+function runSameSetupAnalysis(prof, w, mod, vn){
+  if(!selPulls.length){ alert('Select at least one pull.'); return; }
+
+  const allBinned = selPulls.map(idx => {
+    const calc = calcHP(pulls[idx].rows, prof);
+    return calc ? bin(calc) : null;
+  }).filter(b => b && b.length);
+
+  if(!allBinned.length){
+    alert('No selected pulls had enough clean data. Try different pulls or check run quality scores.');
+    return;
+  }
+
+  // Per-pull peaks
+  const peaks = allBinned.map(b => Math.max(...b.map(r=>r.WHP)));
+  const torquePeaks = allBinned.map(b => Math.max(...b.map(r=>r.WTQ)));
+
+  // Best individual pull
+  const bestIdx = peaks.indexOf(Math.max(...peaks));
+  const bestPeak = peaks[bestIdx];
+  const bestTorque = torquePeaks[bestIdx];
+
+  // Average across all pulls (interpolate to common RPM grid)
+  const rpmGrid = [];
+  for(let r = 2500; r <= 7000; r += 250) rpmGrid.push(r);
+
+  const interp = (b, x) => {
+    if(!b.length) return null;
+    if(x < b[0].rpm) return null;
+    if(x > b[b.length-1].rpm) return null;
+    for(let i = 0; i < b.length-1; i++){
+      if(b[i].rpm <= x && b[i+1].rpm >= x){
+        const f = (x - b[i].rpm) / (b[i+1].rpm - b[i].rpm);
+        return {WHP: b[i].WHP + f*(b[i+1].WHP - b[i].WHP), WTQ: b[i].WTQ + f*(b[i+1].WTQ - b[i].WTQ)};
+      }
+    }
+    return null;
+  };
+
+  const avgCurve = rpmGrid.map(rpm => {
+    const samples = allBinned.map(b => interp(b, rpm)).filter(s => s);
+    if(!samples.length) return null;
+    return {
+      rpm,
+      WHP: samples.reduce((s,v)=>s+v.WHP, 0)/samples.length,
+      WTQ: samples.reduce((s,v)=>s+v.WTQ, 0)/samples.length,
+      n: samples.length,
+      stdHP: samples.length > 1 ? Math.sqrt(samples.reduce((s,v)=>s+Math.pow(v.WHP - samples.reduce((a,b)=>a+b.WHP,0)/samples.length, 2), 0)/samples.length) : 0,
+    };
+  }).filter(v => v);
+
+  const avgPeak = avgCurve.length ? Math.max(...avgCurve.map(r=>r.WHP)) : bestPeak;
+  const avgTorque = avgCurve.length ? Math.max(...avgCurve.map(r=>r.WTQ)) : bestTorque;
+
+  // Consistency: mean ±1σ across pulls (lower = more consistent)
+  const meanStd = avgCurve.filter(r=>r.n>1).reduce((s,r)=>s+r.stdHP, 0) / Math.max(1, avgCurve.filter(r=>r.n>1).length);
+  const consistencyScore = Math.max(0, Math.min(100, 100 - meanStd * 8));
+
+  // Drivetrain loss math (15% on 6MT NC manual)
+  const DTL = 0.15;
+  const estCrankHP = avgPeak / (1 - DTL);
+  const estCrankTQ = avgTorque / (1 - DTL);
+
+  // Update stat boxes for same-setup mode
+  document.getElementById('statsLabels').innerHTML = `
+    <div class="sbox"><div class="slbl">Best WHP</div><div class="sval" id="sBest">.</div><div class="sunit">wheel hp · single best run</div></div>
+    <div class="sbox hl"><div class="slbl">Avg WHP</div><div class="sval a" id="sAvg">.</div><div class="sunit">wheel hp · ${selPulls.length} pulls</div></div>
+    <div class="sbox"><div class="slbl">Est. Crank HP</div><div class="sval" id="sCrank">.</div><div class="sunit">at the engine, ~15% DTL</div></div>
+    <div class="sbox"><div class="slbl">Consistency</div><div class="sval" id="sCons">.</div><div class="sunit">${consistencyScore >= 85 ? 'excellent' : consistencyScore >= 70 ? 'good' : 'noisy'}</div></div>`;
+
+  anim('sBest', bestPeak);
+  anim('sAvg', avgPeak);
+  anim('sCrank', estCrankHP);
+  document.getElementById('sCons').textContent = consistencyScore.toFixed(0);
+
+  // Update share card to same-setup variant
+  document.getElementById('cVeh').textContent = vn;
+  document.getElementById('cMod').textContent = mod;
+  document.getElementById('cBef').textContent = bestPeak.toFixed(1);
+  document.getElementById('cAft').textContent = avgPeak.toFixed(1);
+  document.getElementById('cGain').textContent = '~' + estCrankHP.toFixed(0) + ' Crank HP';
+  document.getElementById('cCond').textContent = `${selPulls.length} pulls · Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
+
+  // Update share card labels for same-setup
+  document.querySelectorAll('.sc-l')[0].textContent = 'Best WHP';
+  document.querySelectorAll('.sc-l')[1].textContent = 'Avg WHP';
+  document.querySelectorAll('.sc-l')[2].textContent = 'Est. Crank HP';
+
+  drawSameSetupChart(allBinned, avgCurve);
+  genSameSetupInterp(bestPeak, avgPeak, estCrankHP, consistencyScore, meanStd, w.gen, mod);
 }
 
 function anim(id, target, sign=false){
@@ -1470,7 +1628,7 @@ function anim(id, target, sign=false){
   }, step);
 }
 
-function drawChart(bef, aft){
+function drawCompareChart(bef, aft){
   if(chart) chart.destroy();
   Chart.defaults.color = '#6b7a94';
 
@@ -1610,8 +1768,122 @@ function drawChart(bef, aft){
   });
 }
 
+function drawSameSetupChart(allBinned, avgCurve){
+  if(chart) chart.destroy();
+  Chart.defaults.color = '#6b7a94';
+
+  const allVals = [...allBinned.flat(), ...avgCurve].flatMap(r=>[r.WHP, r.WTQ]).filter(v=>!isNaN(v) && v>0);
+  const yMax = Math.ceil((Math.max(...allVals)*1.15) / 20) * 20;
+
+  const gen = document.getElementById('ncGen')?.value || 'nc2';
+  const stockRef = {nc1:{lo:113, hi:123}, nc2:{lo:118, hi:128}, nc3:{lo:118, hi:128}};
+  const ref = stockRef[gen] || stockRef.nc2;
+
+  const datasets = [
+    {label: `Stock reference (${ref.lo}-${ref.hi} WHP)`, data: [{x:2000, y:ref.hi}, {x:7500, y:ref.hi}], borderColor: 'rgba(100,120,160,0.0)', backgroundColor: 'rgba(100,120,160,0.07)', borderWidth: 0, pointRadius: 0, tension: 0, fill: '+1', order: 10},
+    {label: '_stockLow', data: [{x:2000, y:ref.lo}, {x:7500, y:ref.lo}], borderColor: 'rgba(100,120,160,0.25)', backgroundColor: 'transparent', borderWidth: 1, borderDash: [4,6], pointRadius: 0, tension: 0, fill: false, order: 10},
+  ];
+
+  // Individual pulls (faded)
+  const colors = ['rgba(150,168,196,0.35)', 'rgba(180,140,90,0.35)', 'rgba(120,170,140,0.35)', 'rgba(190,120,160,0.35)'];
+  allBinned.forEach((b, i) => {
+    datasets.push({
+      label: `Pull ${i+1} WHP`,
+      data: b.map(r=>({x:r.rpm, y:r.WHP})),
+      borderColor: colors[i % colors.length],
+      borderWidth: 1.5, pointRadius: 2, tension: .35, fill: false, order: 3
+    });
+  });
+
+  // Average curve (the hero line)
+  datasets.push({
+    label: `Average WHP (${allBinned.length} pulls)`,
+    data: avgCurve.map(r=>({x:r.rpm, y:r.WHP})),
+    borderColor: '#e8a020', backgroundColor: 'rgba(232,160,32,.10)',
+    borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, tension: .35, fill: false, order: 1
+  });
+  datasets.push({
+    label: 'Average WTQ',
+    data: avgCurve.map(r=>({x:r.rpm, y:r.WTQ})),
+    borderColor: 'rgba(232,160,32,.5)', borderWidth: 1.5, borderDash:[3,3], pointRadius: 0, tension: .35, fill: false, order: 2
+  });
+
+  // ±1σ band around average
+  const stdUpper = avgCurve.filter(r=>r.n>1).map(r=>({x:r.rpm, y:r.WHP + r.stdHP}));
+  const stdLower = avgCurve.filter(r=>r.n>1).map(r=>({x:r.rpm, y:r.WHP - r.stdHP}));
+  if(stdUpper.length){
+    datasets.push({label:'_stdUpper', data:stdUpper, borderColor:'rgba(232,160,32,0)', backgroundColor:'rgba(232,160,32,0.10)', borderWidth:0, pointRadius:0, tension:.35, fill:'+1', order:5});
+    datasets.push({label:'_stdLower', data:stdLower, borderColor:'rgba(232,160,32,0)', backgroundColor:'transparent', borderWidth:0, pointRadius:0, tension:.35, fill:false, order:5});
+  }
+
+  chart = new Chart(document.getElementById('dynoChart').getContext('2d'), {
+    type: 'line',
+    data: {datasets},
+    options: {
+      responsive: true,
+      animation: {duration:900, easing:'easeOutQuart'},
+      interaction: {mode:'index', intersect:false},
+      plugins: {
+        legend: {labels: {color: '#6b7a94', font: {family:'JetBrains Mono', size:11}, boxWidth: 18, filter: (item) => !item.text.startsWith('_')}},
+        tooltip: {
+          backgroundColor: '#0d1018', borderColor: '#2a3347', borderWidth: 1,
+          titleColor: '#eaf0fc', bodyColor: '#96a8c4', padding: 12,
+          callbacks: {
+            title: i => `${i[0].raw.x.toFixed(0)} RPM`,
+            label: i => i.dataset.label.startsWith('_') ? null : `${i.dataset.label}: ${i.raw.y.toFixed(1)}`,
+          }
+        },
+      },
+      scales: {
+        x: {type: 'linear', min: 2000, max: 7500, title: {display:true, text:'Engine RPM', color:'#6478a0'}, ticks: {color:'#6478a0', stepSize:500}, grid: {color:'rgba(30,37,53,0.8)'}},
+        y: {suggestedMin: 0, suggestedMax: yMax, beginAtZero: true, title: {display:true, text:'WHP / WTQ (lb-ft)', color:'#6478a0'}, ticks: {color:'#6478a0'}, grid: {color:'rgba(30,37,53,0.5)'}}
+      }
+    }
+  });
+}
+
+function genSameSetupInterp(bestPeak, avgPeak, estCrankHP, consistencyScore, meanStd, gen, mod){
+  const el = document.getElementById('interp');
+  el.className = 'interp-txt';
+  const refRange = gen === 'nc1' ? {low:113, high:123, label:'NC1'} : {low:118, high:128, label:'NC2/NC3'};
+  const crankRef = gen === 'nc1' ? '170' : '167-170';
+
+  let parts = [];
+
+  // Power summary with WHP vs HP explanation
+  parts.push(`<strong>What you're seeing:</strong> Your average peak across ${selPulls.length} pull${selPulls.length > 1 ? 's' : ''} was ${avgPeak.toFixed(1)} WHP (wheel horsepower). Your best individual run hit ${bestPeak.toFixed(1)} WHP.`);
+
+  // The big WHP vs HP explanation
+  parts.push(`<strong>Why this isn't 170:</strong> Mazda's 170 hp number is measured at the engine crankshaft on a lab dyno. By the time power reaches the wheels, the drivetrain (transmission, differential, axles, tire scrub) eats roughly 15% of it. So a stock NC making 170 crank hp delivers about ${(170*0.85).toFixed(0)} WHP at the wheels. <strong>Your estimated crank HP is ${estCrankHP.toFixed(0)}</strong> based on a ${(0.15*100).toFixed(0)}% drivetrain loss assumption, which lines up with stock NC2/3 spec (${crankRef} hp).`);
+
+  // Reference comparison
+  if(avgPeak < refRange.low - 5){
+    parts.push(`<strong>Your number vs reference:</strong> ${avgPeak.toFixed(1)} WHP is below the typical stock ${refRange.label} dyno range (${refRange.low}-${refRange.high} WHP). Most likely cause: you lifted before peak power. The NC's peak is at 6,700-7,000 RPM, so if you shifted at 6,500 you cut off the top of your curve. Pull harder next time.`);
+  } else if(avgPeak <= refRange.high + 3){
+    parts.push(`<strong>Your number vs reference:</strong> ${avgPeak.toFixed(1)} WHP is right inside the typical ${refRange.label} stock range (${refRange.low}-${refRange.high} WHP measured on a Dynojet). The math checks out — your car is making expected stock power.`);
+  } else {
+    parts.push(`<strong>Your number vs reference:</strong> ${avgPeak.toFixed(1)} WHP is ${(avgPeak - refRange.high).toFixed(1)} WHP above the typical ${refRange.label} stock range (${refRange.low}-${refRange.high} WHP). Either your mods are working or one of your inputs (weight, tire size) is off.`);
+  }
+
+  // Consistency
+  if(consistencyScore >= 85){
+    parts.push(`<strong>Consistency:</strong> Excellent (${consistencyScore.toFixed(0)}/100). Run-to-run variance is only ±${meanStd.toFixed(1)} WHP, which means the data is trustworthy. Your pulls are repeatable and there's no major heat soak or driver inconsistency showing.`);
+  } else if(consistencyScore >= 70){
+    parts.push(`<strong>Consistency:</strong> Good (${consistencyScore.toFixed(0)}/100). Run-to-run variance is ±${meanStd.toFixed(1)} WHP. Reasonable but not perfect. Could be small differences in throttle application, engine temp, or wind.`);
+  } else {
+    parts.push(`<strong>Consistency:</strong> Noisy (${consistencyScore.toFixed(0)}/100). Run-to-run variance is ±${meanStd.toFixed(1)} WHP, which is high. Possible causes: heat soak between pulls, wind gusts, road grade, inconsistent throttle, or wheel slip. Look at the chart — if individual pull lines are spread out, that's your noise floor.`);
+  }
+
+  // Practical advice
+  if(mod === 'Current Setup' || mod === 'Modification'){
+    parts.push(`<strong>Next step:</strong> Save this number. When you install your next mod, do another pull on the same road in similar conditions and switch to "Before vs After" mode to measure the actual gain.`);
+  }
+
+  el.innerHTML = parts.map(p => `<p style="margin-bottom:14px;">${p}</p>`).join('');
+}
+
 // ═══ INTERPRETATION ═══
-function genInterp(pB, pA, hg, tg, mod, vn, gen){
+function genCompareInterp(pB, pA, hg, tg, mod, vn, gen){
   const el = document.getElementById('interp');
   el.className = 'interp-txt';
   const refRange = gen === 'nc1'
@@ -1642,11 +1914,46 @@ function fallback(hg, mod, pA, tg){
 
 // ═══ DOWNLOAD ═══
 async function dlCard(){
-  const c = await html2canvas(document.getElementById('shareCard'), {backgroundColor:'#07090c', scale:2, useCORS:true});
-  const a = document.createElement('a');
-  a.download = 'miatadyno-result.png';
-  a.href = c.toDataURL('image/png');
-  a.click();
+  // Build a temporary container with both the share card AND the chart
+  const card = document.getElementById('shareCard');
+  const chartCanvas = document.getElementById('dynoChart');
+
+  // Create a temporary wrapper
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'background:#07090c;padding:24px;width:760px;position:fixed;top:-9999px;left:-9999px;font-family:JetBrains Mono,monospace;';
+
+  const cardClone = card.cloneNode(true);
+  cardClone.style.cssText = 'background:#07090c;border:1px solid #2a3347;padding:26px 30px;margin-bottom:18px;width:100%;max-width:none;';
+
+  // Convert chart to image
+  const chartImg = document.createElement('img');
+  chartImg.src = chartCanvas.toDataURL('image/png');
+  chartImg.style.cssText = 'width:100%;background:#0d1018;border:1px solid #2a3347;padding:16px;box-sizing:border-box;';
+
+  const footer = document.createElement('div');
+  footer.style.cssText = 'margin-top:14px;text-align:center;font-size:11px;color:#6478a0;letter-spacing:.05em;';
+  footer.textContent = 'dannyhng.github.io/miatadyno · Virtual Dyno for NC Miata';
+
+  wrap.appendChild(cardClone);
+  wrap.appendChild(chartImg);
+  wrap.appendChild(footer);
+  document.body.appendChild(wrap);
+
+  // Wait for image to load
+  await new Promise(r => chartImg.complete ? r() : (chartImg.onload = r));
+
+  try {
+    const c = await html2canvas(wrap, {backgroundColor:'#07090c', scale:2, useCORS:true, logging:false});
+    const a = document.createElement('a');
+    a.download = 'miatadyno-result.png';
+    a.href = c.toDataURL('image/png');
+    a.click();
+  } catch(err){
+    console.error('Download failed:', err);
+    alert('Download failed. Check console for details.');
+  } finally {
+    document.body.removeChild(wrap);
+  }
 }
 
 // ═══ USAGE LIMITS ═══
