@@ -268,10 +268,10 @@ footer a:hover{color:var(--amber);}
 <!-- ═══════════ SIDEBAR ═══════════ -->
 <div class="sidebar">
 
-  <!-- 01 UPLOAD -->
+  <!-- LOG FILE -->
   <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-n">01</span><span class="sec-t">Log File</span><span class="sec-c">▸</span>
+      <span class="sec-t">Log File</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd" style="padding:0;">
       <div class="upzone" id="upzone">
@@ -285,116 +285,61 @@ footer a:hover{color:var(--amber);}
     </div>
   </div>
 
-  <!-- 02 VEHICLE WEIGHT -->
+  <!-- YOUR CAR (fundamentals — always shown) -->
   <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-n">02</span><span class="sec-t">Vehicle Weight</span><span class="sec-c">▸</span>
+      <span class="sec-t">Your Car</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
 
       <div class="fl">
-        <label class="lbl">Do you know your car's current weight?</label>
-        <div class="trow" id="tWtMode">
-          <div class="tbtn on" data-v="know" onclick="setT('tWtMode',this);setWeightMode('know')">I know it</div>
-          <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate it for me</div>
+        <label class="lbl">Miata Generation</label>
+        <select id="ncGen" onchange="calcW()">
+          <option value="nc1">NC1 — 2006–2008</option>
+          <option value="nc2" selected>NC2 — 2009–2012</option>
+          <option value="nc3">NC3 — 2013–2015</option>
+        </select>
+      </div>
+
+      <div class="fl">
+        <label class="lbl">Top Type</label>
+        <div class="trow" id="tTop">
+          <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
+          <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT</div>
         </div>
-        <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.5;">
-          Your door jamb sticker shows curb weight. Add your body weight on top.
-          If you've weighed your car on a scale, use that number.
+      </div>
+
+      <div class="fl">
+        <label class="lbl">Top Position During Pull</label>
+        <div class="trow" id="tPos">
+          <div class="tbtn on" data-v="up" onclick="setT('tPos',this);calcW()">Top Up</div>
+          <div class="tbtn" data-v="down" onclick="setT('tPos',this);calcW()">Top Down</div>
+        </div>
+        <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">
+          Top down adds ~22% drag.
         </p>
       </div>
 
-      <!-- PATH A: I KNOW MY WEIGHT -->
-      <div id="path-know">
-        <div class="fl">
-          <label class="lbl">Total weight — car + you + passengers (lbs)</label>
-          <input type="number" id="knownWt" value="2700" min="2000" max="4000" step="10" onchange="calcW()">
-        </div>
-        <div class="fl">
-          <label class="lbl">Generation (for aero values only)</label>
-          <select id="ncGenK" onchange="calcW()">
-            <option value="nc1">NC1 — 2006–2008</option>
-            <option value="nc2" selected>NC2 — 2009–2012</option>
-            <option value="nc3">NC3 — 2013–2015</option>
-          </select>
-        </div>
-        <div class="fl">
-          <label class="lbl">Top position during the pull</label>
-          <div class="trow" id="tPosK">
-            <div class="tbtn on" data-v="up" onclick="setT('tPosK',this);calcW()">Top Up</div>
-            <div class="tbtn" data-v="down" onclick="setT('tPosK',this);calcW()">Top Down (+22% drag)</div>
-          </div>
-        </div>
-        <div class="wsum" style="margin-top:12px;">
-          <div class="wsrow"><span>Weight entered</span><span class="wv n" id="ws-known-tot">—</span></div>
-          <div class="wsrow"><span>Cd (aero)</span><span class="wv n" id="ws-known-cd">0.36</span></div>
-        </div>
-      </div>
-
-      <!-- PATH B: ESTIMATE -->
-      <div id="path-estimate" style="display:none;">
-        <div class="fl">
-          <label class="lbl">Generation</label>
-          <select id="ncGen" onchange="calcW()">
-            <option value="nc1">NC1 — 2006–2008</option>
-            <option value="nc2" selected>NC2 — 2009–2012</option>
-            <option value="nc3">NC3 — 2013–2015</option>
-          </select>
-        </div>
-        <div class="fl">
-          <label class="lbl">Top Type</label>
-          <div class="trow" id="tTop">
-            <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
-            <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT</div>
-          </div>
-        </div>
-        <div class="fl">
-          <label class="lbl">Transmission</label>
-          <div class="trow" id="tTrans">
-            <div class="tbtn on" data-v="manual" onclick="setT('tTrans',this);toggleAutoNote()">Manual</div>
-            <div class="tbtn" data-v="auto" onclick="setT('tTrans',this);toggleAutoNote()">Automatic</div>
-          </div>
-          <p class="note" id="autoNote">Use Sport/manual mode and hold one gear. DSG/Tiptronic compatible. CVT is not compatible.</p>
-        </div>
-        <div class="fl">
-          <label class="lbl">Top position during pull</label>
-          <div class="trow" id="tPos">
-            <div class="tbtn on" data-v="up" onclick="setT('tPos',this);calcW()">Top Up</div>
-            <div class="tbtn" data-v="down" onclick="setT('tPos',this);calcW()">Top Down (+22% drag)</div>
-          </div>
-        </div>
-        <div class="g2">
-          <div class="fl">
-            <label class="lbl">Fuel Level</label>
-            <select id="fuelLvl" onchange="calcW()">
-              <option value="0.1">Nearly Empty</option>
-              <option value="0.25">Quarter</option>
-              <option value="0.5" selected>Half</option>
-              <option value="0.75">Three Quarter</option>
-              <option value="1.0">Full</option>
-            </select>
-          </div>
-          <div class="fl">
-            <label class="lbl">Driver Wt (lbs)</label>
-            <input type="number" id="drvWt" value="165" min="100" max="350" onchange="calcW()">
-          </div>
-        </div>
+      <div class="fl">
+        <label class="lbl">Driver Weight (lbs)</label>
+        <input type="number" id="drvWt" value="170" min="100" max="350" onchange="calcW()">
+        <p style="font-size:10px;color:var(--amber);margin-top:6px;line-height:1.5;">
+          ⚠ <strong>Solo runs only.</strong> Passengers reduce data accuracy. Run alone for the cleanest result.
+        </p>
       </div>
 
     </div>
   </div>
 
-  <!-- 03 WHEELS & TIRES (estimate path only) -->
-  <div class="sec path-only-estimate" id="sec-wheels">
+  <!-- WHEELS & TIRES (fundamentals — always shown, affects speed reading) -->
+  <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-n">03</span><span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span>
+      <span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
 
       <p style="font-size:11px;color:var(--dim);margin-bottom:14px;line-height:1.6;">
-        NC curb weight already includes stock wheels and tires.
-        Only enter this if you changed from stock. We compare your
-        full corner assembly (wheel + tire) against stock.
+        Tire size affects how the OBD reads your speed. Get this right or your numbers will be off.
       </p>
 
       <div class="fl">
@@ -402,57 +347,89 @@ footer a:hover{color:var(--amber);}
         <div class="trow" id="tRim">
           <div class="tbtn" data-v="15" onclick="setT('tRim',this);setRim(15)">15"</div>
           <div class="tbtn" data-v="16" onclick="setT('tRim',this);setRim(16)">16"</div>
-          <div class="tbtn on" data-v="17" onclick="setT('tRim',this);setRim(17)">17" (stock)</div>
+          <div class="tbtn on" data-v="17" onclick="setT('tRim',this);setRim(17)">17"</div>
           <div class="tbtn" data-v="18" onclick="setT('tRim',this);setRim(18)">18"</div>
         </div>
       </div>
 
       <div class="fl">
         <label class="lbl">Wheel Weight per Corner</label>
-        <select id="whlWt" onchange="calcW()">
-          <!-- Populated by setRim() -->
-        </select>
+        <select id="whlWt" onchange="calcW()"></select>
         <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;" id="whl-note">
           Weigh one wheel on a bathroom scale for the most accurate number.
         </p>
       </div>
 
       <div class="fl">
-        <label class="lbl">Tire Size &amp; Weight</label>
-        <select id="tireSel" onchange="calcW()">
-          <!-- Populated by setRim() -->
-        </select>
+        <label class="lbl">Tire Size</label>
+        <select id="tireSel" onchange="calcW()"></select>
         <p style="font-size:10px;color:var(--dim);margin-top:5px;">
-          Check your sidewall for your current size.
-          Stock NC1 = 195/50R16. Stock NC2/3 = 205/45R17.
+          Stock NC1: 195/50R16 · Stock NC2/3: 205/45R17
         </p>
       </div>
 
       <div class="fl" id="customTireRow" style="display:none;">
-        <label class="lbl">Tire Width (mm)</label>
+        <label class="lbl">Custom Tire Size</label>
         <div class="g3">
-          <div>
-            <label class="lbl" style="font-size:9px;">Width</label>
-            <input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()">
-          </div>
-          <div>
-            <label class="lbl" style="font-size:9px;">Aspect</label>
-            <input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()">
-          </div>
-          <div>
-            <label class="lbl" style="font-size:9px;">Rim</label>
-            <input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()">
-          </div>
+          <div><label class="lbl" style="font-size:9px;">Width</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
+          <div><label class="lbl" style="font-size:9px;">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
+          <div><label class="lbl" style="font-size:9px;">Rim</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- 04 EXHAUST -->
+  <!-- CAR WEIGHT (the actual fork) -->
   <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-n">04</span><span class="sec-t">Exhaust System</span><span class="sec-c">▸</span>
+      <span class="sec-t">Car Weight</span><span class="sec-c">▸</span>
+    </div>
+    <div class="sec-bd">
+
+      <div class="fl">
+        <label class="lbl">How do you want to provide weight?</label>
+        <div class="trow" id="tWtMode">
+          <div class="tbtn on" data-v="know" onclick="setT('tWtMode',this);setWeightMode('know')">I know it</div>
+          <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate it</div>
+        </div>
+      </div>
+
+      <!-- KNOWN WEIGHT PATH -->
+      <div id="path-know" style="margin-top:14px;">
+        <div class="fl">
+          <label class="lbl">Car Weight (lbs)</label>
+          <input type="number" id="knownWt" value="2509" min="2000" max="3500" step="10" onchange="calcW()">
+          <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">
+            For people who already know their car's weight including all aftermarket parts (e.g. you've put it on a scale, or you've added up your mods to your stock curb weight). Don't include yourself or fuel — we add those automatically.
+          </p>
+        </div>
+      </div>
+
+      <!-- ESTIMATE PATH -->
+      <div id="path-estimate" style="display:none;margin-top:14px;">
+        <p style="font-size:11px;color:var(--mid);line-height:1.7;">
+          We'll start with stock curb weight and add/subtract weight based on your mods. Configure exhaust and other mods in the sections below.
+        </p>
+      </div>
+
+      <div class="wsum" style="margin-top:14px;">
+        <div class="wsrow tot">
+          <span>Total weight</span>
+          <span class="wv n" id="ws-tot">—</span>
+        </div>
+        <p style="font-size:9px;color:var(--dim);margin-top:4px;text-align:right;">
+          (Car + Half tank fuel + Driver)
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EXHAUST (estimate path only) -->
+  <div class="sec path-only-estimate" id="sec-exhaust">
+    <div class="sec-hd" onclick="toggleSec(this)">
+      <span class="sec-t">Exhaust</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
       <div class="exh-comp">
@@ -464,7 +441,7 @@ footer a:hover{color:var(--amber);}
           <option value="-14.5">GoodWin Racing Cat-Back (−14.5 lbs)</option>
           <option value="-12.5">Borla ATAK (−12.5 lbs)</option>
           <option value="-17.0">Cobalt SS (−17.0 lbs)</option>
-          <option value="-12.0">MagnaFlow Street (−12.0 lbs)</option>
+          <option value="-12.0">Race Single Muffler (−12.0 lbs)</option>
           <option value="-13.0">HKS Hi-Power (−13.0 lbs)</option>
           <option value="-14.0">Megan Racing OE-RS (−14.0 lbs)</option>
         </select>
@@ -475,40 +452,40 @@ footer a:hover{color:var(--amber);}
           <option value="0">Stock OEM Midpipe (with cat)</option>
           <option value="-4.5">Flyin' Miata High-Flow Cat (−4.5 lbs)</option>
           <option value="-4.0">Racing Beat High-Flow Cat (−4.0 lbs)</option>
-          <option value="-8.0">Test Pipe / Straight Pipe (−8.0 lbs, off-road only)</option>
+          <option value="-8.0">Test Pipe / Straight Pipe (−8.0 lbs)</option>
         </select>
       </div>
       <div class="exh-comp">
-        <div class="exh-lbl">Headers / Manifold <span class="exh-d" id="d-hd">±0 lbs</span></div>
+        <div class="exh-lbl">Headers <span class="exh-d" id="d-hd">±0 lbs</span></div>
         <select id="headers" onchange="exhDelta('headers','d-hd');calcW()">
-          <option value="0">Stock OEM Manifold (cast iron)</option>
-          <option value="-8.5">Flyin' Miata Long Tube Headers (−8.5 lbs)</option>
+          <option value="0">Stock OEM Manifold</option>
+          <option value="-8.5">Flyin' Miata Long Tube (−8.5 lbs)</option>
           <option value="-8.0">Racing Beat Header (−8.0 lbs)</option>
-          <option value="-9.0">GoodWin Racing Headers (−9.0 lbs)</option>
+          <option value="-9.0">GoodWin Racing (−9.0 lbs)</option>
         </select>
       </div>
     </div>
   </div>
 
-  <!-- 05 OTHER (estimate path only) -->
+  <!-- OTHER MODS (estimate path only) -->
   <div class="sec path-only-estimate" id="sec-other">
     <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-n">05</span><span class="sec-t">Other Mods</span><span class="sec-c">▸</span>
+      <span class="sec-t">Other Mods</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
       <div class="fl">
         <label class="lbl">AC System</label>
         <div class="trow" id="tAC">
-          <div class="tbtn on" data-v="0" onclick="setT('tAC',this);calcW()">Stock (AC installed)</div>
-          <div class="tbtn" data-v="-28" onclick="setT('tAC',this);calcW()">AC Deleted (−28 lbs)</div>
+          <div class="tbtn on" data-v="0" onclick="setT('tAC',this);calcW()">Stock</div>
+          <div class="tbtn" data-v="-28" onclick="setT('tAC',this);calcW()">Deleted (−28 lbs)</div>
         </div>
       </div>
       <div class="fl">
         <label class="lbl">Roll Bar / Cage</label>
         <select id="rollbar" onchange="calcW()">
           <option value="0">None (stock)</option>
-          <option value="22">Hard Dog M2 Roll Bar (+22 lbs)</option>
-          <option value="28">Hard Dog M3 Roll Bar (+28 lbs)</option>
+          <option value="22">Hard Dog M2 (+22 lbs)</option>
+          <option value="28">Hard Dog M3 (+28 lbs)</option>
           <option value="65">Full tube cage (+65 lbs)</option>
         </select>
       </div>
@@ -516,42 +493,31 @@ footer a:hover{color:var(--amber);}
         <label class="lbl">Forced Induction</label>
         <select id="forced" onchange="calcW()">
           <option value="0">None — naturally aspirated</option>
-          <option value="45">Flyin' Miata Supercharger Kit (+45 lbs)</option>
-          <option value="38">Other supercharger kit (+38 lbs est.)</option>
+          <option value="45">FM Supercharger Kit (+45 lbs)</option>
+          <option value="38">Other supercharger (+38 lbs)</option>
         </select>
       </div>
       <div class="fl">
-        <label class="lbl">Additional Delta (lbs, +/−)</label>
-        <input type="number" id="xDelta" value="0" step="1" placeholder="Custom weight change" onchange="calcW()">
-      </div>
-
-      <div class="wsum">
-        <div class="wsrow"><span>Stock curb weight</span><span class="wv n" id="ws-base">2,509 lbs</span></div>
-        <div class="wsrow"><span>Wheels (4×)</span><span class="wv" id="ws-whl">±0 lbs</span></div>
-        <div class="wsrow"><span>Exhaust system</span><span class="wv" id="ws-exh">±0 lbs</span></div>
-        <div class="wsrow"><span>Top type</span><span class="wv" id="ws-top">±0 lbs</span></div>
-        <div class="wsrow"><span>Other mods</span><span class="wv" id="ws-oth">±0 lbs</span></div>
-        <div class="wsrow"><span>Fuel + driver</span><span class="wv n" id="ws-occ">—</span></div>
-        <div class="wsrow tot"><span>Total weight</span><span class="wv n" id="ws-tot">—</span></div>
-        <div class="wsrow"><span>Tire diameter</span><span class="wv n" id="ws-tire">—</span></div>
+        <label class="lbl">Custom Weight Adjustment (lbs)</label>
+        <input type="number" id="xDelta" value="0" step="1" placeholder="+/− lbs" onchange="calcW()">
       </div>
     </div>
   </div>
 
-  <!-- 06 MOD LABEL -->
+  <!-- MOD DESCRIPTION -->
   <div class="sec">
     <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-n">06</span><span class="sec-t">Mod Description</span><span class="sec-c">▸</span>
+      <span class="sec-t">Mod Description</span><span class="sec-c">▸</span>
     </div>
     <div class="sec-bd">
       <div class="fl">
-        <label class="lbl">What did you do? (appears on shareable card)</label>
-        <input type="text" id="modDesc" placeholder="e.g. VersaTuner Stage 1 + FM cat-back">
+        <label class="lbl">What did you do? (shows on result card)</label>
+        <input type="text" id="modDesc" placeholder="e.g. Race muffler + 16x8 wheels">
       </div>
     </div>
   </div>
 
-  <button class="btn-go" id="goBtn" disabled>⚡ Run Analysis</button>
+  <button class="btn-go" id="goBtn" disabled>Run Analysis</button>
 </div>
 
 <!-- ═══════════ CONTENT ═══════════ -->
@@ -771,13 +737,20 @@ function exhDelta(sid,lid){
 }
 
 function setWeightMode(mode){
-  document.getElementById('path-know').style.display     = mode==='know'     ? 'block':'none';
-  document.getElementById('path-estimate').style.display = mode==='estimate' ? 'block':'none';
-  // Show/hide sections 03-05 depending on mode
-  ['sec-wheels','sec-exhaust','sec-other'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.style.display = mode==='estimate' ? 'block':'none';
+  const isEstimate = mode === 'estimate';
+  
+  // Toggle Path Displays
+  document.getElementById('path-know').style.display     = isEstimate ? 'none' : 'block';
+  document.getElementById('path-estimate').style.display = isEstimate ? 'block' : 'none';
+
+  // Toggle the Build Sections (03, 04, 05)
+  // Ensure your Wheel, Exhaust, and Other sections have these IDs
+  const modSections = ['sec-exhaust', 'sec-other'];
+  modSections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isEstimate ? 'block' : 'none';
   });
+
   calcW();
 }
 
@@ -830,121 +803,70 @@ function initWheelSelectors(){
 // ═══ WEIGHT CALC ═══
 function calcW(){
   const mode = document.querySelector('#tWtMode .tbtn.on')?.dataset.v || 'know';
+  const gen  = document.getElementById('ncGen').value;
+  const base = NCP[gen];
+  
+  // Shared Data
+  const drvWeight = parseFloat(document.getElementById('drvWt').value) || 0;
+  const topPos    = document.querySelector('#tPos .tbtn.on')?.dataset.v || 'up';
+  
+  // Tire diameter calculation helper
+  const tireDia = (w,a,r) => (r + 2 * (w * (a/100) * 0.0393701)) * 0.0254;
 
-  // Tire diameter calculation
-  function tireDia(w,a,r){
-    const sw_in = w*(a/100)*0.0393701;
-    return (r + 2*sw_in) * 0.0254; // meters
-  }
+  // Set Aero Cd logic (NC PRHT is slightly more aerodynamic than soft top)
+  const Cd = topPos === 'down' ? CD_MAP.down : (base.name.includes('PRHT') ? CD_MAP.up_prht : CD_MAP.up_soft);
 
-  let tot, tot_kg, eff, Cd, dia_m;
+  let vehicleWeight = 0;
+  let dia_m = tireDia(205, 45, 17); // Default stock diameter
 
-  if(mode === 'know'){
-    const gen    = document.getElementById('ncGenK').value;
-    const base   = NCP[gen];
-    tot          = parseFloat(document.getElementById('knownWt').value)||2700;
-    tot_kg       = tot * 0.453592;
-    eff          = tot_kg * (1 + base.rot);
-    const pos    = document.querySelector('#tPosK .tbtn.on')?.dataset.v || 'up';
-    Cd           = pos==='down' ? CD_MAP.down : CD_MAP.up_soft;
-    dia_m        = tireDia(205,45,17); // assume stock unless we know otherwise
-
-    if(document.getElementById('ws-known-tot'))
-      document.getElementById('ws-known-tot').textContent = tot.toFixed(0)+' lbs';
-    if(document.getElementById('ws-known-cd'))
-      document.getElementById('ws-known-cd').textContent = Cd.toFixed(2);
-
-    return {gen, base, tot, tot_kg, eff, dia_m, Cd};
-
+  if (mode === 'know') {
+    // PATH A: User provides the "Car + Mods" weight
+    vehicleWeight = parseFloat(document.getElementById('knownWt').value) || 2500;
   } else {
-    const gen    = document.getElementById('ncGen').value;
-    const base   = NCP[gen];
-    const fl     = parseFloat(document.getElementById('fuelLvl').value);
-    const drv    = parseFloat(document.getElementById('drvWt').value)||165;
-    const topT   = document.querySelector('#tTop .tbtn.on')?.dataset.v||'soft';
-    const pos    = document.querySelector('#tPos .tbtn.on')?.dataset.v||'up';
-    Cd           = pos==='down' ? CD_MAP.down : (topT==='prht'?CD_MAP.up_prht:CD_MAP.up_soft);
+    // PATH B: App calculates weight from mods list
+    const exh = ['catback','midpipe','headers'].reduce((s,id)=>s+(parseFloat(document.getElementById(id)?.value)||0),0);
+    const wheels = 4 * (parseFloat(document.getElementById('whlWt')?.value || base.swl) - base.swl);
+    const others = parseFloat(document.getElementById('rollbar')?.value || 0) + 
+                   parseFloat(document.getElementById('forced')?.value || 0) + 
+                   parseFloat(document.getElementById('xDelta')?.value || 0) +
+                   parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v || 0);
+    
+    vehicleWeight = base.wt + exh + wheels + others;
 
-    // Exhaust
-    const exh = ['catback','midpipe','headers'].reduce((s,id)=>{
-      const el=document.getElementById(id);
-      return s + (el ? parseFloat(el.value)||0 : 0);
-    },0);
-
-    // Other mods
-    const rb  = parseFloat(document.getElementById('rollbar')?.value)||0;
-    const fi  = parseFloat(document.getElementById('forced')?.value)||0;
-    const xd  = parseFloat(document.getElementById('xDelta')?.value)||0;
-    const ac  = parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v||0);
-
-    // WHEEL + TIRE corner assembly delta vs stock
-    // Stock corner = base.swl (wheel) + base.stl (tire)
-    const stockCorner = base.swl + base.stl;
-
-    const whlWtEl = document.getElementById('whlWt');
+    // Update diameter based on tire selections
     const tireSelEl = document.getElementById('tireSel');
-
-    let newWheelWt = base.swl; // default to stock
-    let newTireWt  = base.stl; // default to stock
-    let newW=205, newA=45, newR=17;
-
-    if(whlWtEl && whlWtEl.value !== 'custom'){
-      newWheelWt = parseFloat(whlWtEl.value) || base.swl;
+    if(tireSelEl && tireSelEl.value !== 'custom') {
+      const opt = tireSelEl.options[tireSelEl.selectedIndex];
+      dia_m = tireDia(parseFloat(opt.dataset.w), parseFloat(opt.dataset.a), parseFloat(opt.dataset.r));
+    } else if (document.getElementById('tW')) {
+      dia_m = tireDia(parseFloat(document.getElementById('tW').value), parseFloat(document.getElementById('tA').value), parseFloat(document.getElementById('tR').value));
     }
-
-    if(tireSelEl){
-      if(tireSelEl.value === 'custom'){
-        newTireWt = base.stl; // use stock weight if custom (size still changes diameter)
-        newW = parseFloat(document.getElementById('tW')?.value)||205;
-        newA = parseFloat(document.getElementById('tA')?.value)||45;
-        newR = parseFloat(document.getElementById('tR')?.value)||17;
-      } else {
-        newTireWt = parseFloat(tireSelEl.value) || base.stl;
-        const opt = tireSelEl.options[tireSelEl.selectedIndex];
-        newW = parseFloat(opt?.dataset.w)||205;
-        newA = parseFloat(opt?.dataset.a)||45;
-        newR = parseFloat(opt?.dataset.r)||17;
-      }
-    }
-
-    const newCorner = newWheelWt + newTireWt;
-    const cornerDelta = 4 * (newCorner - stockCorner); // total delta all 4 corners
-    dia_m = tireDia(newW, newA, newR);
-
-    const fuel  = fl * base.fg * 6.1;
-    const oth   = rb + fi + xd + ac;
-    tot         = base.wt + cornerDelta + exh + oth + fuel + drv;
-    tot_kg      = tot * 0.453592;
-    eff         = tot_kg * (1 + base.rot);
-
-    const dia_in = dia_m / 0.0254;
-    const fmt=(v)=>{if(v===0)return '±0 lbs';return (v>0?'+':'')+v.toFixed(0)+' lbs';};
-    const cls=(v)=>v<0?'wv neg':v>0?'wv pos':'wv n';
-
-    if(document.getElementById('ws-base'))
-      document.getElementById('ws-base').textContent = base.wt.toLocaleString()+' lbs';
-
-    [['ws-whl',cornerDelta],['ws-exh',exh],['ws-oth',oth]].forEach(([id,v])=>{
-      const el=document.getElementById(id);if(!el)return;
-      el.textContent=fmt(v);el.className=cls(v);
-    });
-
-    if(document.getElementById('ws-occ'))
-      document.getElementById('ws-occ').textContent = '+'+(fuel+drv).toFixed(0)+' lbs';
-    if(document.getElementById('ws-tot'))
-      document.getElementById('ws-tot').textContent = tot.toFixed(0)+' lbs';
-    if(document.getElementById('ws-tire'))
-      document.getElementById('ws-tire').textContent = dia_in.toFixed(2)+'" ('+dia_m.toFixed(3)+' m)';
-
-    return {gen, base, tot, tot_kg, eff, dia_m, Cd};
   }
+
+  // Calculate final combined physics (Half-tank fuel (~38lbs) is standard)
+  const fuelWeight = 0.5 * 12.7 * 6.1; 
+  const totalWeightLbs = vehicleWeight + fuelWeight + drvWeight;
+  
+  // Update the summary display at the bottom of the section
+  if(document.getElementById('ws-tot')) {
+    document.getElementById('ws-tot').textContent = Math.round(totalWeightLbs) + ' lbs';
+  }
+
+  // Return formatted object for the physics engine
+  return {
+    tot: totalWeightLbs,
+    tot_kg: totalWeightLbs * 0.453592,
+    eff: (totalWeightLbs * 0.453592) * (1 + base.rot),
+    base: base,
+    Cd: Cd,
+    dia_m: dia_m
+  };
 }
 
-// Initialize
+// Run initializers
 initWheelSelectors();
-setWeightMode('know');  // start in "know" mode, sections 03-05 hidden
+setWeightMode('know');  // ← force initial state on load, hides exhaust/other
 calcW();
-
 
 // ═══ PHYSICS ═══
 const G=9.81,RDA=287.058;
@@ -1114,26 +1036,159 @@ function anim(id,target,sign=false){
 function drawChart(bef,aft){
   if(chart)chart.destroy();
   Chart.defaults.color='#6b7a94';
+
+  // Calculate Y axis bounds — give headroom above peak, floor at 0
+  const allVals=[...bef,...aft].flatMap(r=>[r.WHP,r.WTQ]).filter(v=>!isNaN(v)&&v>0);
+  const yMax=Math.ceil((Math.max(...allVals)*1.15)/20)*20;
+  const yMin=0;
+
+  // Stock reference band for this generation
+  const gen=document.getElementById('ncGen')?.value||'nc2';
+  const stockRef={nc1:{lo:113,hi:123},nc2:{lo:118,hi:128},nc3:{lo:118,hi:128}};
+  const ref=stockRef[gen]||stockRef.nc2;
+
   chart=new Chart(document.getElementById('dynoChart').getContext('2d'),{
     type:'line',
     data:{datasets:[
-      {label:'Before — WHP',data:bef.map(r=>({x:r.rpm,y:r.WHP})),borderColor:'#d63031',backgroundColor:'rgba(214,48,49,.06)',borderWidth:2.5,borderDash:[6,4],pointRadius:3,tension:.35,fill:false},
-      {label:'After — WHP', data:aft.map(r=>({x:r.rpm,y:r.WHP})),borderColor:'#e8a020',backgroundColor:'rgba(232,160,32,.06)',borderWidth:2.5,pointRadius:3,tension:.35,fill:false},
-      {label:'Before — WTQ',data:bef.map(r=>({x:r.rpm,y:r.WTQ})),borderColor:'rgba(214,48,49,.35)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.35,fill:false},
-      {label:'After — WTQ', data:aft.map(r=>({x:r.rpm,y:r.WTQ})),borderColor:'rgba(232,160,32,.35)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.35,fill:false},
+      // Stock reference band (invisible line + fill)
+      {
+        label:`Stock reference (${ref.lo}–${ref.hi} WHP)`,
+        data:[{x:2000,y:ref.hi},{x:7500,y:ref.hi}],
+        borderColor:'rgba(100,120,160,0.0)',
+        backgroundColor:'rgba(100,120,160,0.07)',
+        borderWidth:0,pointRadius:0,tension:0,fill:'+1',
+        order:10,
+      },
+      {
+        label:`_stockLow`,
+        data:[{x:2000,y:ref.lo},{x:7500,y:ref.lo}],
+        borderColor:'rgba(100,120,160,0.25)',
+        backgroundColor:'transparent',
+        borderWidth:1,borderDash:[4,6],pointRadius:0,tension:0,fill:false,
+        order:10,
+      },
+      // Before/after WHP
+      {label:'Before — WHP',data:bef.map(r=>({x:r.rpm,y:r.WHP})),borderColor:'#d63031',backgroundColor:'rgba(214,48,49,.08)',borderWidth:2.5,borderDash:[6,4],pointRadius:3,pointHoverRadius:5,tension:.35,fill:false,order:1},
+      {label:'After — WHP', data:aft.map(r=>({x:r.rpm,y:r.WHP})),borderColor:'#e8a020',backgroundColor:'rgba(232,160,32,.08)',borderWidth:2.5,pointRadius:3,pointHoverRadius:5,tension:.35,fill:false,order:1},
+      // Before/after WTQ (dotted, lighter)
+      {label:'Before — WTQ',data:bef.map(r=>({x:r.rpm,y:r.WTQ})),borderColor:'rgba(214,48,49,.4)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.35,fill:false,order:2},
+      {label:'After — WTQ', data:aft.map(r=>({x:r.rpm,y:r.WTQ})),borderColor:'rgba(232,160,32,.4)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.35,fill:false,order:2},
     ]},
     options:{
-      responsive:true,animation:{duration:900},
+      responsive:true,
+      animation:{duration:900,easing:'easeOutQuart'},
       interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{labels:{color:'#6b7a94',font:{family:'JetBrains Mono',size:11},boxWidth:18}},
-        tooltip:{backgroundColor:'#0d1018',borderColor:'#1e2535',borderWidth:1,titleFont:{family:'JetBrains Mono',size:11},bodyFont:{family:'JetBrains Mono',size:11},titleColor:'#d4dce8',bodyColor:'#6b7a94',callbacks:{title:i=>`${i[0].raw.x.toFixed(0)} RPM`,label:i=>`${i.dataset.label}: ${i.raw.y.toFixed(1)}`}}
+        legend:{
+          labels:{
+            color:'#6b7a94',
+            font:{family:'JetBrains Mono',size:11},
+            boxWidth:18,
+            filter:(item)=>!item.text.startsWith('_'), // hide internal datasets
+          }
+        },
+        tooltip:{
+          backgroundColor:'#0d1018',
+          borderColor:'#2a3347',
+          borderWidth:1,
+          titleFont:{family:'JetBrains Mono',size:11},
+          bodyFont:{family:'JetBrains Mono',size:11},
+          titleColor:'#eaf0fc',
+          bodyColor:'#96a8c4',
+          padding:12,
+          callbacks:{
+            title:i=>`${i[0].raw.x.toFixed(0)} RPM`,
+            label:i=>{
+              if(i.dataset.label.startsWith('_')||i.dataset.label.includes('reference'))return null;
+              return `${i.dataset.label}: ${i.raw.y.toFixed(1)}`;
+            },
+            afterBody:items=>{
+              // Show delta between before/after at this RPM point
+              const whpItems=items.filter(i=>i.dataset.label.includes('WHP')&&!i.dataset.label.includes('reference'));
+              if(whpItems.length===2){
+                const delta=(whpItems[1].raw.y-whpItems[0].raw.y).toFixed(1);
+                const sign=delta>=0?'+':'';
+                return [`──────────`,`Delta: ${sign}${delta} WHP`];
+              }
+              return [];
+            }
+          }
+        },
+        // 5252 RPM annotation + peak markers via afterDraw plugin
+        annotation:undefined,
       },
       scales:{
-        x:{type:'linear',title:{display:true,text:'Engine RPM',color:'#6478a0',font:{family:'JetBrains Mono',size:11}},ticks:{color:'#6478a0',font:{family:'JetBrains Mono',size:11}},grid:{color:'#0d1018'}},
-y:{title:{display:true,text:'WHP / WTQ (lb-ft)',color:'#6478a0',font:{family:'JetBrains Mono',size:11}},ticks:{color:'#6478a0',font:{family:'JetBrains Mono',size:11}},grid:{color:'#131820'}}
+        x:{
+          type:'linear',
+          min:2000,max:7500,
+          title:{display:true,text:'Engine RPM',color:'#6478a0',font:{family:'JetBrains Mono',size:11}},
+          ticks:{color:'#6478a0',font:{family:'JetBrains Mono',size:11},stepSize:500},
+          grid:{color:'rgba(30,37,53,0.8)'},
+        },
+        y:{
+          suggestedMin:yMin,
+          suggestedMax:yMax,
+          beginAtZero:true,
+          title:{display:true,text:'WHP / WTQ (lb-ft)',color:'#6478a0',font:{family:'JetBrains Mono',size:11}},
+          ticks:{color:'#6478a0',font:{family:'JetBrains Mono',size:11}},
+          grid:{color:'rgba(30,37,53,0.5)'},
+        }
       }
-    }
+    },
+    plugins:[{
+      // Custom plugin: draws 5252 RPM reference line + peak labels
+      id:'miataDynoOverlay',
+      afterDraw(chart){
+        const {ctx,chartArea:{left,right,top,bottom},scales:{x,y}}=chart;
+        ctx.save();
+
+        // 5252 RPM vertical line
+        const x5252=x.getPixelForValue(5252);
+        if(x5252>=left&&x5252<=right){
+          ctx.beginPath();
+          ctx.strokeStyle='rgba(100,120,160,0.3)';
+          ctx.lineWidth=1;
+          ctx.setLineDash([4,4]);
+          ctx.moveTo(x5252,top);
+          ctx.lineTo(x5252,bottom);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle='rgba(100,120,160,0.5)';
+          ctx.font='9px JetBrains Mono';
+          ctx.textAlign='center';
+          ctx.fillText('5252',x5252,bottom+14);
+        }
+
+        // Peak WHP marker for "After" dataset
+        const aftDataset=chart.data.datasets.find(d=>d.label==='After — WHP');
+        if(aftDataset&&aftDataset.data.length){
+          const peak=aftDataset.data.reduce((a,b)=>b.y>a.y?b:a);
+          const px=x.getPixelForValue(peak.x);
+          const py=y.getPixelForValue(peak.y);
+          if(px>=left&&px<=right){
+            // Vertical dashed line to peak
+            ctx.beginPath();
+            ctx.strokeStyle='rgba(232,160,32,0.4)';
+            ctx.lineWidth=1;
+            ctx.setLineDash([3,3]);
+            ctx.moveTo(px,py);
+            ctx.lineTo(px,bottom);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            // Peak label
+            ctx.fillStyle='#e8a020';
+            ctx.font='bold 11px JetBrains Mono';
+            ctx.textAlign='center';
+            ctx.fillText(`${peak.y.toFixed(1)} WHP`,px,py-10);
+            ctx.font='9px JetBrains Mono';
+            ctx.fillStyle='rgba(232,160,32,0.7)';
+            ctx.fillText(`@ ${peak.x.toFixed(0)} RPM`,px,py-22);
+          }
+        }
+
+        ctx.restore();
+      }
+    }]
   });
 }
 
@@ -1141,16 +1196,33 @@ y:{title:{display:true,text:'WHP / WTQ (lb-ft)',color:'#6478a0',font:{family:'Je
 function genInterp(pB,pA,hg,tg,mod,vn){
   const el=document.getElementById('interp');
   el.className='interp-txt';
-  el.textContent=fallback(hg,mod,pA,tg);
+  
+  const gen = document.getElementById('ncGen').value;
+  const refRange = gen === 'nc1' 
+    ? { low: 113, high: 123, label: 'NC1 (2006–2008)' }
+    : { low: 118, high: 128, label: 'NC2/NC3 (2009–2015)' };
+  
+  let context = '';
+  if(pA < refRange.low - 5){
+    context = ` Your peak (${pA.toFixed(1)} WHP) is below the typical stock range for ${refRange.label} (${refRange.low}–${refRange.high} WHP). This usually means you lifted before redline — peak power on the NC happens around 6,200–6,500 RPM. Hold the throttle to redline next time.`;
+  } else if(pA <= refRange.high + 3){
+    context = ` Your peak (${pA.toFixed(1)} WHP) is within typical stock range for ${refRange.label} (${refRange.low}–${refRange.high} WHP). The math checks out.`;
+  } else {
+    const gain = pA - refRange.high;
+    context = ` Your peak (${pA.toFixed(1)} WHP) is ${gain.toFixed(1)} WHP above stock reference for ${refRange.label} (${refRange.low}–${refRange.high} WHP). That's consistent with mods adding power.`;
+  }
+  
+  el.textContent = fallback(hg,mod,pA,tg) + context;
 }
+
 function fallback(hg,mod,pA,tg){
   const sign=hg>=0?'+':'';
   const tsign=tg>=0?'+':'';
   if(Math.abs(hg)<4)
-    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Within measurement variance for this type of mod — do 2-3 more pulls on the same road to confirm.`;
+    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Within measurement variance — do 2-3 more pulls to confirm.`;
   if(Math.abs(hg)<12)
-    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Solid and consistent with what the NC community typically sees from this mod. You'll feel it in the mid-range where the NC spends most of its time.`;
-  return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Strong result for the NC platform. Peak at ${pA.toFixed(1)} WHP is well above stock baseline — that's a meaningful improvement.`;
+    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Solid result, consistent with what NC owners typically see from this mod.`;
+  return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Strong result — peak at ${pA.toFixed(1)} WHP is well above stock baseline.`;
 }
 
 // ═══ DOWNLOAD ═══
