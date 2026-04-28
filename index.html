@@ -269,6 +269,18 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 
 .callout{padding:10px 12px;background:rgba(232,160,32,.06);border-left:2px solid var(--amber);font-size:11px;color:var(--mid);line-height:1.6;margin-bottom:14px;}
 .callout strong{color:var(--text);}
+
+.limit-modal{display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.limit-modal.vis{display:flex;}
+.limit-box{background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:480px;width:90%;padding:36px;margin:0 16px;text-align:center;}
+.limit-icon{font-family:var(--disp);font-size:48px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:14px;}
+.limit-box h3{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;color:var(--text);}
+.limit-box p{font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:20px;}
+.limit-tier{padding:14px;background:var(--s2);border:1px solid var(--b2);margin-bottom:10px;text-align:left;}
+.limit-tier strong{display:block;font-family:var(--disp);font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.limit-tier p{margin:0;font-size:11px;color:var(--mid);}
+.limit-counter{display:inline-block;padding:3px 8px;background:var(--adim);border:1px solid var(--amber);color:var(--amber);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:10px;font-weight:700;}
+
 </style>
 </head>
 <body>
@@ -278,7 +290,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <div class="h-dot"></div>
     <div class="h-name">Miata<span>Dyno</span></div>
   </div>
-  <div class="h-meta">NC 2006-2015 · Beta</div>
+  <div class="h-meta">NC 2006-2015 · Beta <span class="limit-counter" id="usageCount">0/2</span></div>
   <nav>
     <a href="#" onclick="toggleTheme();return false;" id="themeToggle" title="Toggle theme">☀</a>
     <a href="#how-it-works">How It Works</a>
@@ -656,7 +668,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <p style="font-size:10px;color:var(--mid);margin-top:8px;letter-spacing:.04em;"><strong style="color:var(--text);">Recommended:</strong> Barometric Pressure, Intake Air Temperature</p>
       </div>
       </div>
-      
+
       <div>
         <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">02</div>
         <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Analyze</p>
@@ -808,6 +820,23 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <div id="legalContent" style="font-size:12px;color:var(--mid);line-height:1.8;"></div>
     <div class="fb-actions" style="margin-top:20px;">
       <button class="fb-btn primary" onclick="closeLegal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- USAGE LIMIT MODAL -->
+<div class="limit-modal" id="limitModal">
+  <div class="limit-box">
+    <div class="limit-icon">!</div>
+    <h3>Free Limit Reached</h3>
+    <p>You've used your 2 free analyses for this month. The Pro tier launches soon and will include unlimited analyses, saved run history, AI interpretation, and before/after comparison across mod stages.</p>
+    <div class="limit-tier">
+      <strong>Get Notified When Pro Launches</strong>
+      <p>Send me feedback or your email and you'll get a founding member discount when paid tier opens.</p>
+    </div>
+    <div class="fb-actions">
+      <button class="fb-btn cancel" onclick="closeLimitModal()">Close</button>
+      <button class="fb-btn primary" onclick="closeLimitModal();openFeedback()">Get Notified</button>
     </div>
   </div>
 </div>
@@ -1116,17 +1145,42 @@ function parseCSV(txt){
   if(txt.charCodeAt(0)===0xFEFF) txt = txt.slice(1);
   const lines = txt.split(/\r?\n/).filter(l=>l.trim());
   if(lines.length<4) return {ok:false, msg:'File too short.'};
-  const p = Papa.parse(lines.slice(2).join('\n'), {header:true, skipEmptyLines:true, dynamicTyping:true});
+
+  // Detect if there's a multi-line preamble (BlueDriver: 2 lines, others: variable)
+  // Find the line that contains "Time" or "RPM" - that's the header row
+  let headerIdx = 0;
+  for(let i = 0; i < Math.min(10, lines.length); i++){
+    const l = lines[i].toLowerCase();
+    if(l.includes('time') || l.includes('rpm') || l.includes('engine')){
+      headerIdx = i;
+      break;
+    }
+  }
+
+  const csvText = lines.slice(headerIdx).join('\n');
+  const p = Papa.parse(csvText, {
+    header: true,
+    skipEmptyLines: true,
+    dynamicTyping: true,
+    transformHeader: h => h.trim()  // trim headers as Papa parses them
+  });
+
   if(!p.data.length) return {ok:false, msg:'No data found.'};
-  const hs = p.meta.fields.map(f=>f.trim());
+
+  const hs = p.meta.fields;  // already trimmed by transformHeader
+  console.log('Detected headers:', hs);
+
   const tC = findC(hs, ['time']);
   const rC = findC(hs, ['rpm']);
   const sC = findC(hs, ['speed']);
   const thC = findC(hs, ['throttle','load']);
   const bC = findC(hs, ['baro','barometric']);
   const iC = findC(hs, ['intake air']);
+
+  console.log('Mapped columns:', {time:tC, rpm:rC, speed:sC, throttle:thC, baro:bC, iat:iC});
+
   if(!rC||!sC) return {ok:false, msg:`Missing RPM or Speed column. Found: ${hs.join(', ')}`};
-  if(!thC) return {ok:false, msg:'No Throttle Position column. Add Absolute Throttle Position PID.'};
+  if(!thC) return {ok:false, msg:`No Throttle Position column. Found columns: ${hs.join(', ')}`};
 
   const data = p.data.map(r=>({
     time: parseFloat(r[tC])||0,
@@ -1142,10 +1196,12 @@ function parseCSV(txt){
 
   if(bv.length){
     const br = bv.reduce((a,b)=>a+b)/bv.length;
+    // <50 means inHg (BlueDriver), >50 means kPa
     baro = br<50 ? br*3.38639 : br;
   }
   if(iv.length){
     const ir = iv.reduce((a,b)=>a+b)/iv.length;
+    // >60 likely Fahrenheit, <60 Celsius (assumes ambient temp)
     const ic = ir>60 ? (ir-32)*5/9 : ir;
     iat_k = ic+273.15;
   }
@@ -1201,23 +1257,91 @@ function showSt(msg, type){
   else if(type === 'err') zone.classList.add('error');
 }
 
-function handleFile(f){
+// ═══ ROBUST FILE READER ═══
+function readFileSmart(file){
+  return new Promise((resolve, reject) => {
+    const rd = new FileReader();
+    rd.onload = e => {
+      const buffer = e.target.result;
+      const bytes = new Uint8Array(buffer);
+
+      let encoding = 'utf-8';
+      let startOffset = 0;
+
+      // Detect BOM
+      if(bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xFE){
+        encoding = 'utf-16le';
+        startOffset = 2;
+      } else if(bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF){
+        encoding = 'utf-16be';
+        startOffset = 2;
+      } else if(bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF){
+        encoding = 'utf-8';
+        startOffset = 3;
+      } else {
+        // Heuristic: check for null bytes (UTF-16 without BOM)
+        let nullCount = 0;
+        const sample = Math.min(200, bytes.length);
+        for(let i = 1; i < sample; i += 2){
+          if(bytes[i] === 0) nullCount++;
+        }
+        if(nullCount > sample * 0.3){ encoding = 'utf-16le'; }
+      }
+
+      try {
+        const decoder = new TextDecoder(encoding);
+        resolve({text: decoder.decode(bytes.slice(startOffset)), encoding});
+      } catch(err){
+        reject(err);
+      }
+    };
+    rd.onerror = () => reject(new Error('File read failed'));
+    rd.readAsArrayBuffer(file);
+  });
+}
+
+// ═══ HANDLE FILE (uses smart reader) ═══
+async function handleFile(f){
   if(!f) return;
-  const rd = new FileReader();
-  rd.onload = e => {
-    const res = parseCSV(e.target.result);
-    if(!res.ok){ showSt(res.msg, 'err'); return; }
-    showSt(`${res.data.length} rows loaded · Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C`, 'ok');
+  try {
+    const {text, encoding} = await readFileSmart(f);
+    console.log('File encoding detected:', encoding);
+
+    const res = parseCSV(text);
+    if(!res.ok){
+      console.error('Parse failed:', res.msg);
+      showSt(res.msg, 'err');
+      return;
+    }
+
+    console.log('CSV parsed:', res.data.length, 'rows');
+    console.log('First 3 rows:', res.data.slice(0, 3));
+
     rows = res.data;
     pulls = detectPulls(rows);
+
+    console.log('Pulls detected:', pulls.length);
+    if(pulls.length){
+      pulls.forEach((p,i) => console.log(`  Pull ${i+1}: ${p.dur.toFixed(1)}s, ${p.maxRPM} RPM, ${p.maxThr.toFixed(0)}% throttle, q=${p.q}`));
+    } else {
+      const maxThr = rows.length ? Math.max(...rows.map(r=>r.throttle)) : 0;
+      const maxSpd = rows.length ? Math.max(...rows.map(r=>r.speed_mph)) : 0;
+      const overThr = rows.filter(r => r.throttle >= 80 && r.speed_mph >= 5).length;
+      console.warn(`No pulls. Max throttle: ${maxThr}% | Max speed: ${maxSpd}mph | Rows over threshold: ${overThr}`);
+      console.warn('Detection requires throttle >= 80% AND speed >= 5 MPH for at least 3 seconds continuous');
+    }
+
+    showSt(`${res.data.length} rows · ${pulls.length} pulls · Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C`, pulls.length ? 'ok' : 'err');
+
     selB = null;
     selA = null;
     renderPulls();
     checkReady();
     updateProgress();
-  };
-  // Try UTF-8 first; if it produces garbage characters, retry as UTF-16
-  rd.readAsText(f, 'utf-8');
+  } catch(err){
+    console.error('File handling error:', err);
+    showSt('Failed to read file: ' + err.message, 'err');
+  }
 }
 
 // ═══ PULL RENDER ═══
@@ -1257,6 +1381,10 @@ function checkReady(){
 // ═══ ANALYSIS ═══
 let chart = null;
 document.getElementById('goBtn').addEventListener('click', () => {
+  if(!checkLimit()){
+    openLimitModal();
+    return;
+  }
   if(!termsAccepted){
     document.getElementById('termsModal').style.display = 'flex';
     return;
@@ -1265,16 +1393,39 @@ document.getElementById('goBtn').addEventListener('click', () => {
 });
 
 function runAnalysis(){
+  // GUARD: ensure pulls are actually selected
+  if(selB === null || selA === null){
+    alert('Please select both a BEFORE pull and an AFTER pull from the detected pulls list. If no pulls are visible, your CSV may not contain a full-throttle run.');
+    return;
+  }
+  if(!pulls[selB] || !pulls[selA]){
+    alert('Pull selection error. Please re-upload your CSV and try again.');
+    selB = null;
+    selA = null;
+    return;
+  }
+  if(!pulls[selB].rows || !pulls[selA].rows){
+    alert('Pull data is missing rows. The CSV may not contain enough data points for analysis.');
+    return;
+  }
+
   const w = calcW();
   const prof = {eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr};
   const rB = calcHP(pulls[selB].rows, prof);
   const rA = calcHP(pulls[selA].rows, prof);
+
+  if(!rB || !rA){
+    alert('Not enough clean data points in the selected pulls. Each pull needs at least 5 valid data rows.');
+    return;
+  }
+
   const bB = bin(rB);
   const bA = bin(rA);
   if(!bB.length || !bA.length){
-    alert('Not enough clean data. Check run quality scores.');
+    alert('Not enough clean data after binning. Check run quality scores and try a different pull.');
     return;
   }
+
   const pB = Math.max(...bB.map(r=>r.WHP));
   const pA = Math.max(...bA.map(r=>r.WHP));
   const tB = Math.max(...bB.map(r=>r.WTQ));
@@ -1300,6 +1451,7 @@ function runAnalysis(){
   genInterp(pB, pA, hg, tg, mod, vn, w.gen);
   const res = document.getElementById('results');
   res.classList.add('vis');
+  if(typeof incrementUsage === 'function') incrementUsage();
   setTimeout(() => res.scrollIntoView({behavior:'smooth', block:'start'}), 100);
 }
 
@@ -1496,6 +1648,62 @@ async function dlCard(){
   a.href = c.toDataURL('image/png');
   a.click();
 }
+
+// ═══ USAGE LIMITS ═══
+const FREE_LIMIT = 2;
+const RESET_DAYS = 30; // resets every 30 days
+
+function getUsage(){
+  try {
+    const data = JSON.parse(localStorage.getItem('miatadyno_usage') || '{}');
+    const now = Date.now();
+    if(!data.firstUse || (now - data.firstUse) > RESET_DAYS * 24 * 60 * 60 * 1000){
+      // Reset window
+      return {count: 0, firstUse: now};
+    }
+    return {count: data.count || 0, firstUse: data.firstUse};
+  } catch(e){
+    return {count: 0, firstUse: Date.now()};
+  }
+}
+
+function incrementUsage(){
+  const usage = getUsage();
+  usage.count += 1;
+  try {
+    localStorage.setItem('miatadyno_usage', JSON.stringify(usage));
+  } catch(e){}
+  updateUsageDisplay();
+}
+
+function updateUsageDisplay(){
+  const usage = getUsage();
+  const el = document.getElementById('usageCount');
+  if(el){
+    el.textContent = `${usage.count}/${FREE_LIMIT}`;
+    if(usage.count >= FREE_LIMIT){
+      el.style.color = 'var(--red2)';
+      el.style.borderColor = 'var(--red2)';
+      el.style.background = 'var(--rdim)';
+    }
+  }
+}
+
+function checkLimit(){
+  const usage = getUsage();
+  return usage.count < FREE_LIMIT;
+}
+
+function openLimitModal(){
+  document.getElementById('limitModal').classList.add('vis');
+}
+
+function closeLimitModal(){
+  document.getElementById('limitModal').classList.remove('vis');
+}
+
+// Initialize on load
+updateUsageDisplay();
 
 // ═══ TERMS ═══
 let termsAccepted = false;
