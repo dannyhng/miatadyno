@@ -441,15 +441,6 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         </div>
       </div>
 
-      <div class="fl" id="customTireRow" style="display:none;">
-        <label class="lbl">Custom Tire Size</label>
-        <div class="g3">
-          <div><label class="lbl" style="font-size:9px;">Width</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
-          <div><label class="lbl" style="font-size:9px;">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
-          <div><label class="lbl" style="font-size:9px;">Rim</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -1518,7 +1509,7 @@ function runCompareAnalysis(prof, w, mod, vn){
   document.getElementById('cCond').textContent = `Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
 
   drawCompareChart(bB, bA);
-  genCompareInterp(pB, pA, hg, tg, mod, w.gen);
+  genCompareInterp(pB, pA, hg, tg, mod, vn, w.gen);
 }
 
 function runSameSetupAnalysis(prof, w, mod, vn){
@@ -2034,7 +2025,9 @@ function acceptTerms(){
 // ═══ PROGRESS ═══
 function updateProgress(){
   const fileLoaded = rows.length > 0;
-  const pullsSelected = selB !== null && selA !== null;
+  const pullsSelected = analysisMode === 'compare'
+    ? (selB !== null && selA !== null)
+    : (selPulls.length > 0);
   const s1 = document.getElementById('step-1');
   const s2 = document.getElementById('step-2');
   const s3 = document.getElementById('step-3');
@@ -2126,6 +2119,7 @@ function closeLegal(){ document.getElementById('legalModal').classList.remove('v
 // ═══ INITIALIZE ═══
 initWheelSelectors();
 setWeightMode('total');
+setAnalysisMode('same');
 calcW();
 updateProgress();
 
