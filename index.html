@@ -19,24 +19,87 @@
   --mono:'JetBrains Mono',monospace;
   --disp:'Barlow Condensed',sans-serif;
 }
+/* Replace your existing body.light section with this */
 body.light {
-  --bg:#f5f7fb; --s1:#ffffff; --s2:#f0f3f8; --s3:#e7ecf3;
-  --b1:#d8dde6; --b2:#bfc7d4;
-  --amber:#c47800; --adim:rgba(196,120,0,0.10);
-  --red:#c0282a; --red2:#d63031; --rdim:rgba(214,48,49,0.08);
-  --blue:#2c5fd1; --green:#008a6f;
-  --text:#0f1420; --mid:#4a5568; --dim:#6b7488;
+  --bg:#f5f7fb;
+  --s1:#ffffff;
+  --s2:#eef2f7;
+  --s3:#dde4ee;
+  --b1:#c8d0dd;
+  --b2:#9aa5b8;
+
+  /* Darker amber for proper contrast on light backgrounds */
+  --amber:#9c5c00;
+  --adim:rgba(156,92,0,0.12);
+
+  --red:#a01e21;
+  --red2:#c0282a;
+  --rdim:rgba(192,40,42,0.10);
+  --blue:#1d4ed8;
+  --green:#006b56;
+
+  --text:#0a0e18;
+  --mid:#384156;     /* darker for body copy contrast */
+  --dim:#5a6478;     /* still subtle but readable */
 }
-body.light::before{background-image:linear-gradient(rgba(196,120,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(196,120,0,0.04) 1px,transparent 1px);}
-body.light::after{background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px);}
-body.light header{background:rgba(255,255,255,.96);}
-body.light .btn-go{color:#ffffff;}
-body.light .btn-go:disabled{color:var(--dim);}
-body.light #shareCard{background:#ffffff;}
-body.light #shareCard::before{color:rgba(0,0,0,.025);}
+
+body.light::before{background-image:linear-gradient(rgba(156,92,0,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(156,92,0,0.05) 1px,transparent 1px);}
+body.light::after{background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.012) 2px,rgba(0,0,0,0.012) 4px);}
+
+body.light header{background:rgba(255,255,255,.96);border-bottom-color:var(--b1);}
+body.light .h-dot{box-shadow:0 0 8px rgba(156,92,0,0.6);}
+
+body.light .btn-go{color:#ffffff;background:var(--amber);}
+body.light .btn-go:hover:not(:disabled){background:#7a4800;}
+body.light .btn-go:disabled{background:var(--s3);color:var(--dim);}
+
+body.light .upzone{border-color:var(--b2);}
+body.light .upzone:hover,body.light .upzone.dov{border-color:var(--amber);background:rgba(156,92,0,0.06);}
+body.light .upzone.success{background:rgba(0,107,86,.10);border-color:var(--green);}
+body.light .upzone.error{background:rgba(192,40,42,.08);border-color:var(--red2);}
+
+body.light .tbtn.on{background:rgba(156,92,0,0.10);border-color:var(--amber);color:var(--amber);font-weight:600;}
+body.light .badge.on{border-color:var(--amber);color:var(--amber);background:rgba(156,92,0,0.08);}
+
+body.light .pull-item{background:var(--s1);}
+body.light .pull-item:hover{background:var(--s2);}
+body.light .pull-item.ib{background:rgba(192,40,42,0.05);}
+body.light .pull-item.ia{background:rgba(29,78,216,0.05);}
+body.light .pull-item.isel{background:rgba(156,92,0,0.06);}
+
+body.light .sval.a{text-shadow:none;color:#7a4800;}
+
+body.light .sec-hd{background:var(--s1);}
+body.light .sec-hd:hover{background:var(--s2);}
+
+body.light .amode-btn.on{background:rgba(156,92,0,0.08);}
+body.light .amode-btn.on strong{color:var(--amber);}
+
+/* Share card stays dark in both themes for share consistency */
+body.light #shareCard{background:#0d1018;border-color:#2a3347;}
+body.light #shareCard .sc-logo,body.light #shareCard .sc-v{color:#eaf0fc;}
+body.light #shareCard .sc-v.g{color:#e8a020;}
+body.light #shareCard .sc-veh,body.light #shareCard .sc-mod{color:#96a8c4;}
+body.light #shareCard .sc-l,body.light #shareCard .sc-ft{color:#6478a0;}
+body.light #shareCard .sc-top,body.light #shareCard .sc-nums,body.light #shareCard .sc-n{border-color:#1e2535;}
+body.light #shareCard::before{color:rgba(255,255,255,.02);}
+
 body.light .hero-wrap::before{color:rgba(0,0,0,.025);}
-body.light .upzone.success{background:rgba(0,138,111,.10);}
-body.light .upzone.error{background:rgba(214,48,49,.10);}
+
+body.light .limit-counter{background:rgba(156,92,0,0.10);border-color:var(--amber);color:var(--amber);}
+
+body.light .callout{background:rgba(156,92,0,0.08);}
+
+/* Modals and overlays */
+body.light .fb-modal,body.light .limit-modal,body.light #termsModal{background:rgba(40,50,70,.55);}
+
+/* Chart canvas needs light theme support too */
+body.light .chart-w{background:var(--s1);}
+
+/* Footer */
+body.light .ft-link{color:var(--mid);}
+body.light .ft-link:hover{color:var(--amber);}
+body.light .ft-text{color:var(--dim);}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -852,6 +915,40 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 </div>
 
 <script>
+
+// ═══ INVITE CODE GATE ═══
+const VALID_CODES = [
+  'MD-NC-FOUNDER',     // give to first 5 testers
+  'MD-NC-X7K2',        // give to next batch
+  'MD-NC-9PQR',
+  'MD-NC-J3LM',
+  'MD-NC-AB42',
+  'MD-NC-WX91',
+];
+
+function checkAccessCode(){
+  // Check if user has already entered a valid code (saved in localStorage)
+  try {
+    const saved = localStorage.getItem('miatadyno_access');
+    if(saved && VALID_CODES.includes(saved)) return true;
+  } catch(e){}
+  return false;
+}
+
+function promptAccessCode(){
+  const code = prompt('MiataDyno is in private beta. Enter your access code:\n\n(If you don\'t have one, send feedback to request access.)');
+  if(!code) return false;
+  const trimmed = code.trim().toUpperCase();
+  if(VALID_CODES.includes(trimmed)){
+    try { localStorage.setItem('miatadyno_access', trimmed); } catch(e){}
+    alert('Access granted. Welcome to the MiataDyno beta.');
+    return true;
+  } else {
+    alert('Invalid code. Send feedback to request access.');
+    return false;
+  }
+}
+
 // ═══ VEHICLE DB ═══
 const NCP = {
   nc1:{name:'NC1 MX-5 (2006-2008)',wt:2480,swl:15.0,stl:19.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
@@ -1443,6 +1540,9 @@ function checkReady(){
 // ═══ ANALYSIS ═══
 let chart = null;
 document.getElementById('goBtn').addEventListener('click', () => {
+  if(!checkAccessCode()){
+    if(!promptAccessCode()) return;
+  }
   if(!checkLimit()){
     openLimitModal();
     return;
@@ -1621,7 +1721,15 @@ function anim(id, target, sign=false){
 
 function drawCompareChart(bef, aft){
   if(chart) chart.destroy();
-  Chart.defaults.color = '#6b7a94';
+  const isLight = document.body.classList.contains('light');
+  Chart.defaults.color = isLight ? '#384156' : '#6b7a94';
+  const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(30,37,53,0.8)';
+  const subGridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(30,37,53,0.5)';
+  const tooltipBg = isLight ? '#ffffff' : '#0d1018';
+  const tooltipBorder = isLight ? '#c8d0dd' : '#2a3347';
+  const tooltipTitle = isLight ? '#0a0e18' : '#eaf0fc';
+  const tooltipBody = isLight ? '#384156' : '#96a8c4';
+  const axisColor = isLight ? '#5a6478' : '#6478a0';
 
   const allVals = [...bef, ...aft].flatMap(r=>[r.WHP, r.WTQ]).filter(v=>!isNaN(v) && v>0);
   const yMax = Math.ceil((Math.max(...allVals)*1.15) / 20) * 20;
@@ -1761,7 +1869,15 @@ function drawCompareChart(bef, aft){
 
 function drawSameSetupChart(allBinned, avgCurve){
   if(chart) chart.destroy();
-  Chart.defaults.color = '#6b7a94';
+  const isLight = document.body.classList.contains('light');
+  Chart.defaults.color = isLight ? '#384156' : '#6b7a94';
+  const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(30,37,53,0.8)';
+  const subGridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(30,37,53,0.5)';
+  const tooltipBg = isLight ? '#ffffff' : '#0d1018';
+  const tooltipBorder = isLight ? '#c8d0dd' : '#2a3347';
+  const tooltipTitle = isLight ? '#0a0e18' : '#eaf0fc';
+  const tooltipBody = isLight ? '#384156' : '#96a8c4';
+  const axisColor = isLight ? '#5a6478' : '#6478a0';
 
   const allVals = [...allBinned.flat(), ...avgCurve].flatMap(r=>[r.WHP, r.WTQ]).filter(v=>!isNaN(v) && v>0);
   const yMax = Math.ceil((Math.max(...allVals)*1.15) / 20) * 20;
