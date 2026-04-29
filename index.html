@@ -137,11 +137,15 @@ header nav a:hover{color:var(--amber);background:var(--adim);}
 .badge.on{border-color:var(--amber);color:var(--amber);background:var(--adim);}
 
 .layout{display:grid;grid-template-columns:370px 1fr;}
+
+/* ═══ MOBILE & RESPONSIVE ═══ */
+
+/* Tablet and below */
 @media(max-width:860px){
   .layout{grid-template-columns:1fr;}
   .hero-wrap{padding:36px 24px 28px;}
   .hero-wrap::before{display:none;}
-  .hero-wrap h1{font-size:clamp(36px,10vw,60px);}
+  .hero-wrap h1{font-size:clamp(32px,8.5vw,52px);}
   .hero-sub{font-size:13px;}
   .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--b1);}
   .cpanel{padding:24px 20px;}
@@ -150,15 +154,135 @@ header nav a:hover{color:var(--amber);background:var(--adim);}
   .chart-w{padding:20px 16px;}
   .interp-w{padding:20px 16px;}
   .card-w{padding:20px 16px;}
-  .pull-item{grid-template-columns:40px 1fr auto;gap:10px;padding:12px 16px;}
+  .pull-item{grid-template-columns:36px 1fr auto;gap:10px;padding:12px 14px;}
   .ptag-w{display:none;}
-  #shareCard{padding:20px;}
+  .pq-num{font-size:24px;}
+  .pq-lbl{font-size:8px;}
+  #shareCard{padding:20px;max-width:100%;}
+  .amode-btn{padding:12px 14px;}
+  .amode-btn strong{font-size:13px;}
+  .amode-btn span{font-size:10px;}
 }
-@media(max-width:480px){
-  .stats-g{grid-template-columns:1fr 1fr;}
-  .sval{font-size:32px;}
-  header nav a{padding:16px 12px;font-size:10px;}
+
+/* Phone */
+@media(max-width:600px){
+  /* Header */
+  .h-logo{padding:12px 16px;gap:10px;}
+  .h-name{font-size:16px;letter-spacing:.08em;}
+  .h-meta{padding:0 12px;font-size:9px;}
+  header nav a{padding:14px 10px;font-size:9px;}
+  #themeToggle{padding:14px 12px;}
+
+  /* Hero */
+  .hero-wrap{padding:28px 18px 24px;}
+  .hero-wrap h1{font-size:36px;line-height:1;margin-bottom:18px;}
+  .hero-wrap h1 br{display:none;}
+  .hero-sub{font-size:12px;line-height:1.6;margin-bottom:16px;}
+  .h-tag{font-size:9px;margin-bottom:10px;}
+  .badges{gap:5px;}
+  .badge{font-size:9px;padding:3px 7px;}
+
+  /* Sidebar sections */
   .sec-bd{padding:14px 16px;}
+  .sec-hd{padding:11px 16px;}
+  .sec-t{font-size:13px;}
+
+  /* Form controls — 14px prevents iOS zoom on focus */
+  select,input[type=number],input[type=text],input[type=email]{font-size:14px;padding:11px 12px;}
+  .tbtn{font-size:10px;padding:10px 4px;}
+  .lbl{font-size:10px;}
+  #tWtMode .tbtn{font-size:10px;padding:10px 2px;}
+  #tRim .tbtn{font-size:11px;padding:10px 2px;}
+
+  /* Run Analysis button */
+  .btn-go{padding:16px;font-size:16px;}
+
+  /* Progress indicator */
+  .prog-wrap{padding:12px 14px;}
+  .prog-step{padding:6px 4px;gap:8px;}
+  .prog-num{width:28px;height:28px;font-size:13px;}
+  .prog-step.done .prog-num::before{font-size:15px;}
+  .prog-title{font-size:10px;}
+  .prog-sub{display:none;}
+  .prog-line{flex:0 0 14px;}
+
+  /* Content panels */
+  .cpanel{padding:20px 16px;}
+  .ptitle{font-size:18px;}
+  .plabel{font-size:9px;}
+
+  /* Analysis mode buttons */
+  .amode-btn{padding:11px 12px;}
+  .amode-btn strong{font-size:12px;letter-spacing:.04em;margin-bottom:3px;}
+  .amode-btn span{font-size:10px;line-height:1.35;}
+
+  /* Stats grid */
+  .stats-g{grid-template-columns:1fr 1fr;}
+  .sbox{padding:18px 14px;}
+  .sval{font-size:32px;}
+  .slbl{font-size:8px;}
+  .sunit{font-size:10px;}
+
+  /* Chart - cap height on phone */
+  .chart-w{padding:14px 10px;}
+  #dynoChart{height:280px !important;max-height:280px;}
+
+  /* Interp text */
+  .interp-w{padding:18px 14px;gap:12px;}
+  .interp-bar{font-size:9px;}
+  .interp-txt{font-size:12px;line-height:1.7;}
+
+  /* Card */
+  .card-w{padding:18px 14px;}
+  #shareCard{padding:18px 14px;}
+  .sc-v{font-size:26px;}
+  .sc-l{font-size:8px;}
+  .sc-veh,.sc-mod{font-size:9px;}
+
+  /* Pull list */
+  .pull-item{grid-template-columns:32px 1fr 60px;gap:8px;padding:11px 12px;}
+  .pnum{font-size:24px;}
+  .pdata strong{font-size:12px;}
+  .pdata span{font-size:10px;line-height:1.4;}
+
+  /* Modals */
+  .fb-box,.limit-box{width:94%;padding:22px 18px;margin:0 8px;max-height:88vh;overflow-y:auto;}
+  .fb-box h3,.limit-box h3{font-size:16px;}
+  .fb-box p,.limit-box p{font-size:12px;}
+  .fb-btn{font-size:12px;padding:11px;}
+  #termsModal > div{width:94%;padding:22px 18px;}
+  #termsModal p{font-size:12px;}
+
+  /* Footer */
+  .ft-grid{padding:24px 16px 16px;gap:18px;}
+  .ft-bottom{padding:12px 16px;font-size:9px;}
+  .ft-title{font-size:10px;}
+  .ft-link{font-size:10px;}
+  .ft-text{font-size:10px;}
+
+  /* Stack 3-column grids on phone */
+  .cpanel #how-it-works > div,
+  div[style*="grid-template-columns:repeat(3,1fr)"]{
+    grid-template-columns:1fr !important;
+  }
+
+  /* Stack 2-column grids on phone */
+  div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* Very small phones (iPhone SE, narrow Androids) */
+@media(max-width:380px){
+  .h-name{font-size:14px;}
+  .h-meta{display:none;}
+  .limit-counter{margin-left:0;}
+  .hero-wrap h1{font-size:32px;}
+  .badges{display:none;}
+  .sval{font-size:28px;}
+  .stats-g{grid-template-columns:1fr;}
+  .sbox{border-right:none;border-bottom:1px solid var(--b1);}
+  .sbox:last-child{border-bottom:none;}
 }
 
 .sidebar{border-right:1px solid var(--b1);position:sticky;top:61px;height:calc(100vh - 61px);overflow-y:auto;display:flex;flex-direction:column;}
@@ -377,11 +501,11 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
   <h1>Did your mod<br>actually do<em>anything?</em></h1>
   <p class="hero-sub">Upload a CSV file. Configure your build. Get a before/after wheel horsepower comparison without a dyno visit.</p>
   <div class="badges">
-    <span class="badge on">Road Load Physics</span>
-    <span class="badge on">SAE J1349 Correction</span>
-    <span class="badge on">Mod Weight Aware</span>
-    <span class="badge on">Run Quality Scoring</span>
-    <span class="badge">GPS Grade (soon)</span>
+    <span class="badge on">No Dyno Required</span>
+    <span class="badge on">Stock vs Modded</span>
+    <span class="badge on">Multi-Run Averaging</span>
+    <span class="badge on">Free in Beta</span>
+    <span class="badge">Pro Tier (coming)</span>
   </div>
 </div>
 
@@ -773,6 +897,10 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
   </div>
 
   <div id="results">
+    <div id="resultBanner" style="display:none;padding:14px 30px;background:rgba(232,160,32,.08);border-bottom:1px solid var(--b1);border-left:3px solid var(--amber);">
+      <p id="resultBannerTitle" style="font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;"></p>
+      <p id="resultBannerBody" style="font-size:12px;color:var(--mid);line-height:1.6;"></p>
+    </div>
     <div class="stats-g" id="statsLabels">
       <div class="sbox"><div class="slbl">WHP</div><div class="sval">.</div><div class="sunit">wheel hp</div></div>
     </div>
@@ -1608,6 +1736,26 @@ function runCompareAnalysis(prof, w, mod, vn){
   document.getElementById('cGain').textContent = (hg>=0 ? '+' : '') + hg.toFixed(1) + ' WHP';
   document.getElementById('cCond').textContent = `Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
 
+  // Show context banner explaining the result vs Mazda's HP rating
+  const banner = document.getElementById('resultBanner');
+  const bTitle = document.getElementById('resultBannerTitle');
+  const bBody = document.getElementById('resultBannerBody');
+  const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
+
+  if(avgPeak >= ref.lo && avgPeak <= ref.hi){
+    bTitle.textContent = `Healthy stock NC2/3 power`;
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for a stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 18-20% on its way to the wheels, which is why a healthy stock NC reads in the 120s on a chassis dyno, not 170.`;
+    banner.style.display = 'block';
+  } else if(avgPeak < ref.lo){
+    bTitle.textContent = `Below typical stock range`;
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is below the typical NC2/3 range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (which is around 6,700-7,000 RPM) or the road wasn't flat. <strong>This isn't a comparison to Mazda's 170 hp rating</strong> — that's at the crankshaft, while this number is at the wheels after drivetrain losses.`;
+    banner.style.display = 'block';
+  } else {
+    bTitle.textContent = `Above typical stock`;
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is above the typical NC2/3 stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off and inflating the number.`;
+    banner.style.display = 'block';
+  }
+
   drawCompareChart(bB, bA);
   genCompareInterp(pB, pA, hg, tg, mod, vn, w.gen);
 }
@@ -1686,6 +1834,26 @@ function runSameSetupAnalysis(prof, w, mod, vn){
   anim('sAvg', avgPeak);
   anim('sCrank', estCrankHP);
   document.getElementById('sCons').textContent = consistencyScore.toFixed(0);
+
+  // Show context banner explaining the result vs Mazda's HP rating
+  const banner = document.getElementById('resultBanner');
+  const bTitle = document.getElementById('resultBannerTitle');
+  const bBody = document.getElementById('resultBannerBody');
+  const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
+
+  if(avgPeak >= ref.lo && avgPeak <= ref.hi){
+    bTitle.textContent = `Healthy stock NC2/3 power`;
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for a stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 18-20% on its way to the wheels, which is why a healthy stock NC reads in the 120s on a chassis dyno, not 170.`;
+    banner.style.display = 'block';
+  } else if(avgPeak < ref.lo){
+    bTitle.textContent = `Below typical stock range`;
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is below the typical NC2/3 range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (which is around 6,700-7,000 RPM) or the road wasn't flat. <strong>This isn't a comparison to Mazda's 170 hp rating</strong> — that's at the crankshaft, while this number is at the wheels after drivetrain losses.`;
+    banner.style.display = 'block';
+  } else {
+    bTitle.textContent = `Above typical stock`;
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is above the typical NC2/3 stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off and inflating the number.`;
+    banner.style.display = 'block';
+  }
 
   // Update share card to same-setup variant
   document.getElementById('cVeh').textContent = vn;
