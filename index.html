@@ -479,6 +479,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 .pnum.isel{color:var(--amber);}
 
 </style>
+<script data-goatcounter="https://miatadyno.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 
@@ -1582,6 +1584,10 @@ async function handleFile(f){
     rows = res.data;
     pulls = detectPulls(rows);
 
+    if(window.goatcounter){
+      window.goatcounter.count({path: '/event/csv-uploaded', event: true});
+    }
+
     console.log('Pulls detected:', pulls.length);
     if(pulls.length){
       pulls.forEach((p,i) => console.log(`  Pull ${i+1}: ${p.dur.toFixed(1)}s, ${p.maxRPM} RPM, ${p.maxThr.toFixed(0)}% throttle, q=${p.q}`));
@@ -1672,6 +1678,9 @@ document.getElementById('goBtn').addEventListener('click', () => {
     if(!promptAccessCode()) return;
   }
   if(!checkLimit()){
+    if(window.goatcounter) {
+      window.goatcounter.count({path: '/event/limit-reached', event: true});
+    }
     openLimitModal();
     return;
   }
@@ -1698,6 +1707,10 @@ function runAnalysis(){
   res.classList.add('vis');
   if(typeof incrementUsage === 'function') incrementUsage();
   setTimeout(() => res.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+
+  if(window.goatcounter) {
+    window.goatcounter.count({path: '/event/analysis-completed', event: true});
+  }
 }
 
 function runCompareAnalysis(prof, w, mod, vn){
@@ -2189,6 +2202,9 @@ function fallback(hg, mod, pA, tg){
 
 // ═══ DOWNLOAD ═══
 async function dlCard(){
+  if(window.goatcounter) {
+    window.goatcounter.count({path: '/event/png-downloaded', event: true});
+  }
   // Build a temporary container with both the share card AND the chart
   const card = document.getElementById('shareCard');
   const chartCanvas = document.getElementById('dynoChart');
@@ -2379,7 +2395,7 @@ const LEGAL_CONTENT = {
     body: `<p><strong>What We Collect.</strong> MiataDyno currently runs entirely in your browser. CSV files you upload are processed locally and not sent to any server.</p>
 <p><strong>Weather API.</strong> If you provide GPS coordinates for atmospheric correction, those coordinates are sent to Open-Meteo to retrieve current weather. We do not store them.</p>
 <p><strong>Feedback.</strong> If you submit feedback, your message is sent via your email client to thuvhoang19@gmail.com. We do not collect through any third party.</p>
-<p><strong>Cookies.</strong> We do not use cookies, analytics, or tracking pixels.</p>
+<p><strong>Analytics.</strong> We use GoatCounter (or Plausible, depending which you pick) for basic page-view counts. No cookies, no personal data, no tracking across sites. We see total visits and where users came from. We do not see individual users.</p>
 <p><strong>Local Storage.</strong> We use browser localStorage only to remember your light/dark theme preference.</p>
 <p><strong>Future Changes.</strong> When user accounts launch, this policy will be updated. You will be notified before any change.</p>
 <p><strong>Last updated:</strong> April 28, 2026</p>`
