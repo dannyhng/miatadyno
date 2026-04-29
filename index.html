@@ -1665,26 +1665,66 @@ function parseCSV(txt){
 }
 
 function detectPulls(data){
-  const THRESH = 80, MIN_D = 3, MIN_S = 5;
+  // ADAPTIVE WOT detection — different OBD scanners report differently:
+  //   BlueDriver "Absolute Throttle Position": maxes around 85-92%
+  //   "Accelerator Pedal Position": goes to 100%+
+  // So we compute WOT relative to the file's own peak throttle value.
+  //
+  // Filters:
+  //   THRESH_RATIO: pulls must be at 90% of file's peak throttle (real floored runs)
+  //   MIN_D: pull must last at least 3 seconds
+  //   MIN_S: must be moving
+  //   MIN_RPM_SPAN: must cover at least 2,500 RPM (rejects highway cruise bursts)
+  //   MIN_PEAK_RPM: must reach at least 5,500 RPM (real pulls stretch to redline)
+  const THRESH_RATIO = 0.90;
+  const MIN_D = 3;
+  const MIN_S = 5;
+  const MIN_RPM_SPAN = 2500;
+  const MIN_PEAK_RPM = 5500;
+
+  // Find this file's peak throttle (excluding obviously bogus values)
+  const validThrottles = data.map(r => r.throttle).filter(t => t > 10 && t < 110);
+  if(!validThrottles.length) return [];
+  const peakThrottle = Math.max(...validThrottles);
+
+  // Threshold for "WOT" in this specific file
+  const THRESH = Math.max(75, peakThrottle * THRESH_RATIO);
+
+  // Stash for diagnostic display
+  window.__lastDetectInfo = {
+    peakThrottle: peakThrottle.toFixed(1),
+    wotThreshold: THRESH.toFixed(1),
+  };
+
   const out = [];
   let inp = false, st = null, stt = null;
-  data.forEach((r,i) => {
-    if(r.throttle>=THRESH && r.speed_mph>=MIN_S){
+  data.forEach((r, i) => {
+    if(r.throttle >= THRESH && r.speed_mph >= MIN_S){
       if(!inp){ inp = true; st = i; stt = r.time; }
     } else if(inp){
-      const dur = r.time-stt;
-      if(dur>=MIN_D){
+      const dur = r.time - stt;
+      if(dur >= MIN_D){
         const seg = data.slice(st, i);
-        let drops = 0;
-        for(let j=1; j<seg.length; j++) if(seg[j].speed_mph < seg[j-1].speed_mph - 2) drops++;
-        out.push({
-          si:st, ei:i-1, st:stt, dur,
-          maxRPM: Math.max(...seg.map(r=>r.rpm)),
-          maxSpd: Math.max(...seg.map(r=>r.speed_mph)),
-          maxThr: Math.max(...seg.map(r=>r.throttle)),
-          q: Math.max(0, Math.min(100, 100-drops*15)),
-          rows: seg
-        });
+        const rpmList = seg.map(r => r.rpm);
+        const rpmMin = Math.min(...rpmList);
+        const rpmMax = Math.max(...rpmList);
+        const rpmSpan = rpmMax - rpmMin;
+
+        // Filter: must be a real pull, not a partial-throttle cruise burst
+        if(rpmSpan >= MIN_RPM_SPAN && rpmMax >= MIN_PEAK_RPM){
+          let drops = 0;
+          for(let j = 1; j < seg.length; j++){
+            if(seg[j].speed_mph < seg[j-1].speed_mph - 2) drops++;
+          }
+          out.push({
+            si: st, ei: i-1, st: stt, dur,
+            maxRPM: rpmMax,
+            maxSpd: Math.max(...seg.map(r => r.speed_mph)),
+            maxThr: Math.max(...seg.map(r => r.throttle)),
+            q: Math.max(0, Math.min(100, 100 - drops*15)),
+            rows: seg
+          });
+        }
       }
       inp = false;
     }
@@ -1765,10 +1805,13 @@ async function handleFile(f){
     pulls = detectPulls(rows);
     if(window.goatcounter) window.goatcounter.count({path:'/event/csv-uploaded', event:true});
     const info = window.__lastParseInfo || {};
-    const baroNote = info.baroSource && info.baroSource !== 'kpa sensor' && info.baroSource !== 'inhg sensor' && info.baroSource !== 'auto sensor'
+    const detect = window.__lastDetectInfo || {};
+    const baroNote = info.baroSource && !['kpa sensor','inhg sensor','auto sensor'].includes(info.baroSource)
       ? ` (${info.baroSource})` : '';
-    showSt(`${res.data.length} rows · ${pulls.length} pulls · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C`, pulls.length ? 'ok' : 'err');
+    const thrNote = detect.peakThrottle ? ` · WOT @ ${detect.wotThreshold}%+` : '';
+    showSt(`${res.data.length} rows · ${pulls.length} pulls${thrNote} · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C`, pulls.length ? 'ok' : 'err');
     console.log('[MiataDyno parse]', info);
+    console.log('[MiataDyno detect]', detect);
     selB = null; selA = null; selPulls = [];
     renderPulls();
     checkReady();
