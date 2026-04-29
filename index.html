@@ -400,8 +400,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .vc-title{font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.04em;color:var(--text);margin-bottom:6px;}
 .vc-row{font-size:12px;color:var(--mid);margin-bottom:3px;}
 .vc-row strong{color:var(--text);font-weight:500;}
-.vc-edit{display:inline-block;margin-top:14px;padding:9px 16px;border:1px solid var(--b2);color:var(--mid);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .15s;}
-.vc-edit:hover{border-color:var(--amber);color:var(--amber);background:var(--adim);}
+.vc-edit{display:block;width:100%;margin-top:16px;padding:14px;border:1px solid var(--amber);color:var(--amber);font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:var(--adim);transition:all .15s;}
+.vc-edit:hover,.vc-edit:active{background:var(--amber);color:#07090c;}
 .vc-num{font-family:var(--disp);font-size:24px;font-weight:700;color:var(--amber);margin:8px 0 4px;}
 .vc-num small{font-size:11px;color:var(--mid);font-weight:400;font-family:var(--mono);letter-spacing:.04em;}
 
@@ -747,13 +747,17 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 
     <!-- MOBILE-ONLY: VEHICLE CARD (visible in configure state) -->
     <div id="mobile-vehicle-card">
+      <div style="padding:0 18px;margin-top:18px;">
+        <p style="font-size:11px;color:var(--amber);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;font-weight:700;">Step 2 · Configure Your Car</p>
+        <p style="font-size:12px;color:var(--mid);line-height:1.6;margin-bottom:14px;">The accuracy depends on your car's actual setup. Tap below to set generation, wheels, tires, weight, and other mods.</p>
+      </div>
       <div class="vehicle-card">
-        <div class="vc-label">Vehicle Profile</div>
+        <div class="vc-label">Current Configuration</div>
         <div class="vc-title" id="vcTitle">NC2 Soft Top</div>
         <div class="vc-row" id="vcWheels">17" wheels · 205/45R17</div>
         <div class="vc-row" id="vcDriver">170 lb driver · solo · top up</div>
         <div class="vc-num" id="vcWeight">2,679 <small>lbs total</small></div>
-        <button class="vc-edit" onclick="openVehicleEdit()">Edit Vehicle</button>
+        <button class="vc-edit" onclick="openVehicleEdit()">Edit Vehicle Settings →</button>
       </div>
     </div>
 
@@ -1170,12 +1174,19 @@ function resetToDrop(){
 // ═══════════════════════════════════════════════════════════════
 function openVehicleEdit(){
   const host = document.getElementById('modal-sections-host');
-  // Move all .sec elements from sidebar to modal (they keep their state)
   const sidebar = document.querySelector('.sidebar');
   const sections = sidebar.querySelectorAll('.sec');
-  sections.forEach(s => host.appendChild(s));
+  sections.forEach(s => {
+    // Skip the Log File section — that's the upload zone, not vehicle config
+    const title = s.querySelector('.sec-t')?.textContent || '';
+    if(title.toLowerCase().includes('log file')) return;
+    // Auto-expand all sections so user can see everything
+    s.classList.remove('coll');
+    host.appendChild(s);
+  });
   document.getElementById('vehicleModal').classList.add('vis');
 }
+
 function closeVehicleEdit(){
   // Move sections BACK to sidebar (in case user resizes back to desktop)
   const host = document.getElementById('modal-sections-host');
@@ -1330,6 +1341,13 @@ function calcW(){
   if(wsTot) wsTot.textContent = Math.round(totalWeightLbs) + ' lbs';
 
   if(isMobile()) updateMobileVehicleCard();
+
+  // Update mobile vehicle card whenever any form input changes
+  document.addEventListener('change', (e) => {
+    if(e.target.matches('input,select') && isMobile()){
+      setTimeout(updateMobileVehicleCard, 50);
+    }
+  });
 
   return {
     tot: totalWeightLbs,
