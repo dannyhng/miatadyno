@@ -239,6 +239,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 .chart-w{padding:30px;background:var(--s1);border-bottom:1px solid var(--b1);}
 .chart-w canvas{max-height:400px !important;}
+@media(max-width:600px){
+  .chart-w canvas{max-height:280px !important;}
+}
 .interp-w{padding:26px 30px;border-bottom:1px solid var(--b1);display:flex;gap:18px;align-items:flex-start;}
 .interp-bar{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;padding:0 4px;border-right:2px solid var(--amber);margin-right:4px;}
 .interp-txt{font-size:13px;color:var(--mid);line-height:1.85;flex:1;}
@@ -606,7 +609,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
           <div class="fl">
             <label class="lbl">Total Car Weight (lbs)</label>
             <input type="number" id="totalWt" value="2509" min="2000" max="3500" step="10" onchange="calcW()">
-            <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">Scale weight including aftermarket parts. Don't include yourself or fuel.</p>
+            <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">Your scale weight (CAT scale, vehicle inspection, etc.) including any aftermarket parts. Don't add yourself or fuel — we handle those automatically.</p>
           </div>
         </div>
         <div id="path-mods" style="display:none;margin-top:14px;">
@@ -1833,8 +1836,8 @@ function drawCompareChart(bef, aft){
   chart = new Chart(document.getElementById('dynoChart').getContext('2d'), {
     type: 'line',
     data: {datasets:[
-      {label:'Before WHP', data:bef.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#d63031', borderWidth:2.5, borderDash:[6,4], pointRadius:3, tension:.35, fill:false},
-      {label:'After WHP', data:aft.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:2.5, pointRadius:3, tension:.35, fill:false},
+      {label:'Before WHP', data:bef.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#d63031', borderWidth:2.5, borderDash:[6,4], pointRadius:isMobile()?1.5:3, tension:.35, fill:false},
+      {label:'After WHP', data:aft.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:2.5, pointRadius:isMobile()?1.5:3, tension:.35, fill:false},
       {label:'Before WTQ', data:bef.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(214,48,49,.4)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false},
       {label:'After WTQ', data:aft.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(232,160,32,.4)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false},
     ]},
@@ -1863,9 +1866,9 @@ function drawSameSetupChart(allBinned, avgCurve){
   const colors = ['rgba(150,168,196,0.35)','rgba(180,140,90,0.35)','rgba(120,170,140,0.35)','rgba(190,120,160,0.35)'];
   const datasets = [];
   allBinned.forEach((b, i) => {
-    datasets.push({label:`Pull ${i+1}`, data:b.map(r=>({x:r.rpm, y:r.WHP})), borderColor:colors[i%colors.length], borderWidth:1.5, pointRadius:2, tension:.35, fill:false});
+    datasets.push({label:`Pull ${i+1}`, data:b.map(r=>({x:r.rpm, y:r.WHP})), borderColor:colors[i%colors.length], borderWidth:1.5, pointRadius:isMobile()?1:2, tension:.35, fill:false});
   });
-  datasets.push({label:`Average WHP (${allBinned.length} pulls)`, data:avgCurve.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:3, pointRadius:4, tension:.35, fill:false});
+  datasets.push({label:`Average WHP (${allBinned.length} pulls)`, data:avgCurve.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:isMobile()?2.5:3, pointRadius:isMobile()?2:4, tension:.35, fill:false});
   datasets.push({label:'Average WTQ', data:avgCurve.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(232,160,32,.5)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false});
   chart = new Chart(document.getElementById('dynoChart').getContext('2d'), {
     type:'line', data:{datasets},
