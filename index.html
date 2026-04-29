@@ -1453,48 +1453,214 @@ function bin(data, bs=500){
 // ═══════════════════════════════════════════════════════════════
 // CSV PARSE
 // ═══════════════════════════════════════════════════════════════
-function findC(hs, kws){ return hs.find(h => kws.some(k => h.toLowerCase().includes(k.toLowerCase()))); }
+// Smarter column finder — searches by priority and avoids false matches
+function findC(hs, patterns){
+  // patterns = array of {match: [...keywords], avoid: [...keywords], priority: N}
+  // Returns the column header that best matches
+  if(Array.isArray(patterns) && typeof patterns[0] === 'string'){
+    // Backwards compat: if called with simple keyword array
+    return hs.find(h => patterns.some(k => h.toLowerCase().includes(k.toLowerCase())));
+  }
+  let best = null;
+  let bestPri = -1;
+  for(const h of hs){
+    const lh = h.toLowerCase();
+    for(const p of patterns){
+      const hasMatch = p.match.some(k => lh.includes(k.toLowerCase()));
+      const hasAvoid = (p.avoid || []).some(k => lh.includes(k.toLowerCase()));
+      if(hasMatch && !hasAvoid && (p.priority || 1) > bestPri){
+        best = h;
+        bestPri = p.priority || 1;
+      }
+    }
+  }
+  return best;
+}
+
+// Detect what unit a column header indicates (mph, km/h, °F, °C, etc.)
+function detectUnit(header){
+  const h = header.toLowerCase();
+  // Speed
+  if(/\b(mph|miles\/h|miles per hour)\b/.test(h)) return 'mph';
+  if(/\b(km\/h|kph|kmh|km\s*per\s*hour|kilometers?\/h)\b/.test(h)) return 'kph';
+  // Temperature
+  if(/°\s*f\b|\(\s*f\s*\)|deg\s*f|fahrenheit/.test(h)) return 'fahrenheit';
+  if(/°\s*c\b|\(\s*c\s*\)|deg\s*c|celsius/.test(h)) return 'celsius';
+  // Pressure
+  if(/\binhg\b/.test(h)) return 'inhg';
+  if(/\bkpa\b/.test(h)) return 'kpa';
+  if(/\bbar\b/.test(h)) return 'bar';
+  if(/\bpsi\b/.test(h)) return 'psi';
+  if(/\bhpa\b|\bmbar\b/.test(h)) return 'hpa';
+  return null;
+}
 function parseCSV(txt){
   if(txt.charCodeAt(0)===0xFEFF) txt = txt.slice(1);
-  const lines = txt.split(/\r?\n/).filter(l=>l.trim());
-  if(lines.length<4) return {ok:false, msg:'File too short.'};
+  const lines = txt.split(/\r?\n/).filter(l => l.trim());
+  if(lines.length < 4) return {ok:false, msg:'File too short.'};
+
+  // Skip preamble lines (BlueDriver has 2, ProECU has 8, etc.)
+  // Find the first line containing a recognizable column header
   let headerIdx = 0;
-  for(let i=0; i<Math.min(10, lines.length); i++){
+  for(let i = 0; i < Math.min(15, lines.length); i++){
     const l = lines[i].toLowerCase();
-    if(l.includes('time') || l.includes('rpm') || l.includes('engine')){ headerIdx = i; break; }
+    if((l.includes('time') || l.includes('rpm') || l.includes('engine speed')) &&
+       l.includes(',')){
+      headerIdx = i;
+      break;
+    }
   }
+
   const csvText = lines.slice(headerIdx).join('\n');
-  const p = Papa.parse(csvText, {header:true, skipEmptyLines:true, dynamicTyping:true, transformHeader: h => h.trim()});
+  const p = Papa.parse(csvText, {
+    header: true,
+    skipEmptyLines: true,
+    dynamicTyping: true,
+    transformHeader: h => h.trim().replace(/^#/, '')  // also strip # prefix from ProECU
+  });
   if(!p.data.length) return {ok:false, msg:'No data found.'};
+
   const hs = p.meta.fields;
-  const tC = findC(hs, ['time']);
-  const rC = findC(hs, ['rpm']);
-  const sC = findC(hs, ['speed']);
-  const thC = findC(hs, ['throttle','load']);
-  const bC = findC(hs, ['baro','barometric']);
-  const iC = findC(hs, ['intake air']);
-  if(!rC||!sC) return {ok:false, msg:`Missing RPM or Speed column.`};
-  if(!thC) return {ok:false, msg:`No Throttle Position column.`};
-  const data = p.data.map(r => ({
-    time: parseFloat(r[tC])||0,
-    rpm: parseFloat(r[rC])||0,
-    speed_mph: parseFloat(r[sC])||0,
-    throttle: parseFloat(r[thC])||0,
-    baro_r: bC ? parseFloat(r[bC]) : null,
-    iat_r: iC ? parseFloat(r[iC]) : null,
-  })).filter(r => !isNaN(r.time));
-  const bv = data.map(r=>r.baro_r).filter(v => v && v>0);
-  const iv = data.map(r=>r.iat_r).filter(v => v && v>0);
+
+  // Smart column matching with priorities
+  const tC = findC(hs, [
+    {match:['time'], priority:2},
+  ]);
+
+  const rC = findC(hs, [
+    {match:['engine speed'], priority:3},        // ProECU
+    {match:['engine rpm'], priority:3},          // BlueDriver
+    {match:['rpm'], priority:2},                 // generic
+  ]);
+
+  const sC = findC(hs, [
+    {match:['vehicle speed'], priority:3},
+    {match:['gps speed'], priority:2},
+    {match:['speed'], avoid:['fan','engine'], priority:1},
+  ]);
+
+  // CRITICAL: throttle takes priority over load.
+  const thC = findC(hs, [
+    {match:['accelerator pedal'], priority:5},   // most accurate WOT indicator
+    {match:['absolute throttle position'], priority:5},
+    {match:['relative throttle position'], priority:4},
+    {match:['throttle position'], priority:4},
+    {match:['throttle angle'], priority:3},
+    {match:['throttle'], avoid:['actual'], priority:2},
+    {match:['absolute load'], priority:1},        // fallback only
+    {match:['engine load'], priority:1},          // fallback only
+  ]);
+
+  const bC = findC(hs, [
+    {match:['barometric pressure'], priority:5},
+    {match:['atmospheric pressure'], priority:5},
+    {match:['ambient pressure'], priority:4},
+    {match:['baro'], priority:3},
+  ]);
+
+  const iC = findC(hs, [
+    {match:['intake air temperature'], priority:5},
+    {match:['intake air temp'], priority:4},
+    {match:['intake temp'], priority:3},
+  ]);
+
+  // Manifold pressure — fallback for missing baro
+  const mapC = findC(hs, [
+    {match:['manifold absolute pressure'], priority:3},
+    {match:['intake manifold absolute pressure'], priority:3},
+    {match:['map'], avoid:['gps','google'], priority:2},
+  ]);
+
+  if(!rC || !sC) return {ok:false, msg:`Missing RPM or Speed column. Found: ${hs.slice(0,5).join(', ')}...`};
+  if(!thC) return {ok:false, msg:`No throttle/pedal column found. Found: ${hs.slice(0,5).join(', ')}...`};
+
+  // Detect units from headers
+  const speedUnit = detectUnit(sC);   // 'mph' or 'kph' or null
+  const tempUnit = iC ? detectUnit(iC) : null;
+  const presUnit = bC ? detectUnit(bC) : null;
+  const mapUnit = mapC ? detectUnit(mapC) : 'kpa';  // assume kPa if MAP exists
+
+  // Parse rows with unit conversion
+  const data = p.data.map(r => {
+    const rawSpeed = parseFloat(r[sC]) || 0;
+    const rawThrottle = parseFloat(r[thC]) || 0;
+    const rawIAT = iC ? parseFloat(r[iC]) : null;
+    const rawBaro = bC ? parseFloat(r[bC]) : null;
+    const rawMAP = mapC ? parseFloat(r[mapC]) : null;
+
+    // Speed → MPH (internal standard)
+    let speed_mph;
+    if(speedUnit === 'kph') speed_mph = rawSpeed * 0.621371;
+    else if(speedUnit === 'mph') speed_mph = rawSpeed;
+    else {
+      // Heuristic: if values >> typical MPH on road, probably km/h
+      speed_mph = rawSpeed > 130 ? rawSpeed * 0.621371 : rawSpeed;
+    }
+
+    return {
+      time: parseFloat(r[tC]) || 0,
+      rpm: parseFloat(r[rC]) || 0,
+      speed_mph,
+      throttle: rawThrottle,
+      iat_r: rawIAT,
+      baro_r: rawBaro,
+      map_r: rawMAP,
+    };
+  }).filter(r => !isNaN(r.time));
+
+  // ATMOSPHERIC: try baro column first, then estimate from MAP, then fallback
+  let baroSource = 'default';
+  const bv = data.map(r => r.baro_r).filter(v => v && v > 0);
   if(bv.length){
-    const br = bv.reduce((a,b)=>a+b)/bv.length;
-    baro = br<50 ? br*3.38639 : br;
+    const br = bv.reduce((a,b) => a+b) / bv.length;
+    if(presUnit === 'inhg') baro = br * 3.38639;
+    else if(presUnit === 'bar') baro = br * 100;
+    else if(presUnit === 'psi') baro = br * 6.895;
+    else if(presUnit === 'hpa') baro = br / 10;
+    else if(presUnit === 'kpa') baro = br;
+    else baro = br < 50 ? br * 3.38639 : br;  // heuristic: inHg vs kPa
+    baroSource = `${presUnit||'auto'} sensor`;
+  } else if(mapC){
+    // Estimate baro from MAP at idle (closed throttle, low RPM)
+    // At idle, MAP ≈ atmospheric - vacuum offset (~30-60 kPa vacuum)
+    // BETTER: at WOT, MAP ≈ atmospheric (NA engine) since manifold is wide open
+    const wot = data.filter(r => r.throttle >= 80 && r.rpm > 2000 && r.map_r);
+    if(wot.length > 5){
+      // At WOT in NA car, peak MAP ~= atmospheric (within a few kPa)
+      const peakMap = Math.max(...wot.map(r => r.map_r));
+      baro = peakMap;
+      baroSource = 'estimated from MAP at WOT';
+    } else {
+      baro = 99.9;
+      baroSource = 'default 99.9 kPa (no baro data)';
+    }
+  } else {
+    baro = 99.9;
+    baroSource = 'default 99.9 kPa (no baro data)';
   }
+
+  // IAT
+  const iv = data.map(r => r.iat_r).filter(v => v !== null && !isNaN(v));
   if(iv.length){
-    const ir = iv.reduce((a,b)=>a+b)/iv.length;
-    const ic = ir>60 ? (ir-32)*5/9 : ir;
-    iat_k = ic+273.15;
+    const ir = iv.reduce((a,b) => a+b) / iv.length;
+    let ic;
+    if(tempUnit === 'fahrenheit') ic = (ir - 32) * 5/9;
+    else if(tempUnit === 'celsius') ic = ir;
+    else ic = ir > 60 ? (ir - 32) * 5/9 : ir;  // heuristic: F if >60
+    iat_k = ic + 273.15;
   }
-  rho = (baro*1000)/(RDA*iat_k);
+
+  rho = (baro * 1000) / (RDA * iat_k);
+
+  // Stash diagnostic info for the user
+  window.__lastParseInfo = {
+    columns: {time:tC, rpm:rC, speed:sC, throttle:thC, baro:bC, iat:iC, map:mapC},
+    units: {speed:speedUnit, temp:tempUnit, pressure:presUnit, map:mapUnit},
+    baroSource,
+    headerCount: hs.length,
+    rowCount: data.length,
+  };
+
   return {ok:true, data};
 }
 
@@ -1598,7 +1764,11 @@ async function handleFile(f){
     rows = res.data;
     pulls = detectPulls(rows);
     if(window.goatcounter) window.goatcounter.count({path:'/event/csv-uploaded', event:true});
-    showSt(`${res.data.length} rows · ${pulls.length} pulls · Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C`, pulls.length ? 'ok' : 'err');
+    const info = window.__lastParseInfo || {};
+    const baroNote = info.baroSource && info.baroSource !== 'kpa sensor' && info.baroSource !== 'inhg sensor' && info.baroSource !== 'auto sensor'
+      ? ` (${info.baroSource})` : '';
+    showSt(`${res.data.length} rows · ${pulls.length} pulls · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C`, pulls.length ? 'ok' : 'err');
+    console.log('[MiataDyno parse]', info);
     selB = null; selA = null; selPulls = [];
     renderPulls();
     checkReady();
