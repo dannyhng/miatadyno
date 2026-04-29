@@ -1679,8 +1679,7 @@ function detectPulls(data){
   const THRESH_RATIO = 0.90;
   const MIN_D = 3;
   const MIN_S = 5;
-  const MIN_RPM_SPAN = 2500;
-  const MIN_PEAK_RPM = 5500;
+  const MIN_RPM_SPAN = 2000;  // real pulls span at least 2,000 RPM (cruise bursts span <500)
 
   // Find this file's peak throttle (excluding obviously bogus values)
   const validThrottles = data.map(r => r.throttle).filter(t => t > 10 && t < 110);
@@ -1711,7 +1710,7 @@ function detectPulls(data){
         const rpmSpan = rpmMax - rpmMin;
 
         // Filter: must be a real pull, not a partial-throttle cruise burst
-        if(rpmSpan >= MIN_RPM_SPAN && rpmMax >= MIN_PEAK_RPM){
+        if(rpmSpan >= MIN_RPM_SPAN){
           let drops = 0;
           for(let j = 1; j < seg.length; j++){
             if(seg[j].speed_mph < seg[j-1].speed_mph - 2) drops++;
