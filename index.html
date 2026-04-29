@@ -1715,12 +1715,21 @@ function detectPulls(data){
           for(let j = 1; j < seg.length; j++){
             if(seg[j].speed_mph < seg[j-1].speed_mph - 2) drops++;
           }
+          // Compute IAT for this pull (avg of samples that have IAT data)
+          const iats = seg.map(r => r.iat_r).filter(v => v !== null && !isNaN(v));
+          let pullIAT_C = null;
+          if(iats.length){
+            const iat_avg = iats.reduce((a,b) => a+b) / iats.length;
+            // If avg is > 60, assume Fahrenheit; otherwise Celsius
+            pullIAT_C = iat_avg > 60 ? (iat_avg - 32) * 5/9 : iat_avg;
+          }
           out.push({
             si: st, ei: i-1, st: stt, dur,
             maxRPM: rpmMax,
             maxSpd: Math.max(...seg.map(r => r.speed_mph)),
             maxThr: Math.max(...seg.map(r => r.throttle)),
             q: Math.max(0, Math.min(100, 100 - drops*15)),
+            iat_c: pullIAT_C,
             rows: seg
           });
         }
@@ -1833,18 +1842,44 @@ function renderPulls(){
     sec.innerHTML = '<div class="empty-st"><span class="big">!</span>No full-throttle pulls detected.<br>Ensure Throttle Position PID is logged and you did a WOT run.</div>';
     return;
   }
+
+  // Heat soak detection: any pull's IAT is 5°C+ above first pull's IAT
+  const firstIAT = pulls[0].iat_c;
+  const heatSoaked = pulls.map(p => {
+    if(firstIAT === null || p.iat_c === null) return false;
+    return (p.iat_c - firstIAT) >= 5;
+  });
+
   sec.innerHTML = '';
   pulls.forEach((p,i) => {
     const qc = p.q>=80 ? 'var(--green)' : p.q>=50 ? 'var(--amber)' : 'var(--red2)';
+    const iatStr = p.iat_c !== null ? `IAT ${p.iat_c.toFixed(1)}°C` : 'IAT n/a';
+    const heatBadge = heatSoaked[i]
+      ? ` <span style="color:var(--red2);font-weight:600;">· heat soaked +${(p.iat_c - firstIAT).toFixed(1)}°C</span>`
+      : '';
     const div = document.createElement('div');
     div.className = 'pull-item';
     div.dataset.idx = i;
-    div.innerHTML = `<div class="pnum">${i+1}</div><div class="pdata"><strong>${p.maxRPM.toFixed(0)} RPM · ${p.maxSpd.toFixed(0)} MPH · ${p.dur.toFixed(1)}s</strong><span>From ${p.st.toFixed(1)}s · Max throttle ${p.maxThr.toFixed(0)}%</span></div><div><div class="pq-num" style="color:${qc}">${p.q}</div><div class="pq-lbl">/ 100 quality</div></div><div class="ptag-w" id="pt${i}"></div>`;
+    div.innerHTML = `<div class="pnum">${i+1}</div><div class="pdata"><strong>${p.maxRPM.toFixed(0)} RPM · ${p.maxSpd.toFixed(0)} MPH · ${p.dur.toFixed(1)}s</strong><span>From ${p.st.toFixed(1)}s · Max throttle ${p.maxThr.toFixed(0)}% · ${iatStr}${heatBadge}</span></div><div><div class="pq-num" style="color:${qc}">${p.q}</div><div class="pq-lbl">/ 100 quality</div></div><div class="ptag-w" id="pt${i}"></div>`;
     div.addEventListener('click', () => selPull(i, div));
     sec.appendChild(div);
   });
+
+  // Heat soak banner if any pull is heat-soaked
+  const numHeatSoaked = heatSoaked.filter(x => x).length;
+  if(numHeatSoaked > 0){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'padding:14px 18px;background:rgba(214,48,49,.08);border-left:3px solid var(--red);margin-bottom:14px;font-size:12px;color:var(--mid);line-height:1.6;';
+    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">Heat soak detected</strong>${numHeatSoaked} pull${numHeatSoaked>1?'s':''} had intake air temps 5°C+ above your first pull. Hot air is less dense, so the engine makes less power on heat-soaked pulls. Real dynos blow fans at the intake to prevent this — on the street you need to wait between pulls. <strong style="color:var(--text);">For accurate results, use only your cooler pulls.</strong>`;
+    sec.parentNode.insertBefore(banner, sec);
+  }
+
   if(analysisMode === 'same'){
-    pulls.forEach((_, i) => selPull(i, sec.children[i]));
+    // Auto-select: in same setup mode, prefer non-heat-soaked pulls
+    pulls.forEach((_, i) => {
+      if(numHeatSoaked > 0 && heatSoaked[i]) return;  // skip heat-soaked
+      selPull(i, sec.children[i]);
+    });
   } else {
     if(pulls.length>=1) selPull(0, sec.children[0]);
     if(pulls.length>=2) selPull(1, sec.children[1]);
@@ -1951,17 +1986,42 @@ function runCompareAnalysis(prof, w, mod, vn){
 
 function runSameSetupAnalysis(prof, w, mod, vn){
   if(!selPulls.length){ alert('Select at least one pull.'); return; }
-  const allBinned = selPulls.map(idx => {
+  const allBinnedRaw = selPulls.map(idx => {
     const calc = calcHP(pulls[idx].rows, prof);
     return calc ? bin(calc) : null;
   }).filter(b => b && b.length);
-  if(!allBinned.length){ alert('No selected pulls had enough clean data.'); return; }
+  if(!allBinnedRaw.length){ alert('No selected pulls had enough clean data.'); return; }
+
+  // Outlier rejection: drop pulls more than 10 WHP from the median peak.
+  // Catches partial-throttle bursts, headwind/uphill pulls, mid-pull lifts.
+  const OUTLIER_THRESHOLD = 10.0;
+  const peaksRaw = allBinnedRaw.map(b => Math.max(...b.map(r => r.WHP)));
+  const sorted = [...peaksRaw].sort((a,b) => a-b);
+  const median = sorted.length % 2
+    ? sorted[(sorted.length-1)/2]
+    : (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
+  const keepMask = peaksRaw.map(p => Math.abs(p - median) <= OUTLIER_THRESHOLD);
+  const numRejected = keepMask.filter(k => !k).length;
+
+  let allBinned, rejectedNote = '';
+  if(allBinnedRaw.length > 1 && numRejected > 0 && numRejected < allBinnedRaw.length){
+    allBinned = allBinnedRaw.filter((_, i) => keepMask[i]);
+    rejectedNote = `${numRejected} pull${numRejected>1?'s':''} rejected as outlier${numRejected>1?'s':''}`;
+  } else {
+    allBinned = allBinnedRaw;
+  }
 
   const peaks = allBinned.map(b => Math.max(...b.map(r=>r.WHP)));
   const torquePeaks = allBinned.map(b => Math.max(...b.map(r=>r.WTQ)));
   const bestIdx = peaks.indexOf(Math.max(...peaks));
   const bestPeak = peaks[bestIdx];
   const bestTorque = torquePeaks[bestIdx];
+
+  window.__lastAnalysis = {
+    pullsSelected: selPulls.length,
+    pullsAfterReject: allBinned.length,
+    peaksRaw, median, rejectedNote
+  };
 
   const rpmGrid = [];
   for(let r=2500; r<=7000; r+=250) rpmGrid.push(r);
@@ -1993,43 +2053,59 @@ function runSameSetupAnalysis(prof, w, mod, vn){
   const meanStd = avgCurve.filter(r=>r.n>1).reduce((s,r)=>s+r.stdHP, 0) / Math.max(1, avgCurve.filter(r=>r.n>1).length);
   const consistencyScore = Math.max(0, Math.min(100, 100 - meanStd*8));
   const DTL = 0.15;
-  const estCrankHP = avgPeak/(1-DTL);
+  const bestCrankHP = bestPeak / (1 - DTL);
+
+  // Stat cards: Best WHP is the headline (highlighted), Avg is secondary
+  const avgCellHtml = allBinned.length > 1
+    ? `<div class="sbox"><div class="slbl">Avg WHP</div><div class="sval">${avgPeak.toFixed(1)}</div><div class="sunit">${allBinned.length} pulls averaged</div></div>`
+    : `<div class="sbox"><div class="slbl">Best WTQ</div><div class="sval">${bestTorque.toFixed(1)}</div><div class="sunit">lb-ft torque</div></div>`;
+
+  const consistencyHtml = allBinned.length > 1
+    ? `<div class="sbox"><div class="slbl">Consistency</div><div class="sval">${consistencyScore.toFixed(0)}</div><div class="sunit">${consistencyScore>=85?'excellent':consistencyScore>=70?'good':'noisy'}</div></div>`
+    : `<div class="sbox"><div class="slbl">Consistency</div><div class="sval">N/A</div><div class="sunit">single pull</div></div>`;
 
   document.getElementById('statsLabels').innerHTML = `
-    <div class="sbox"><div class="slbl">Best WHP</div><div class="sval">${bestPeak.toFixed(1)}</div><div class="sunit">single best run</div></div>
-    <div class="sbox hl"><div class="slbl">Avg WHP</div><div class="sval a">${avgPeak.toFixed(1)}</div><div class="sunit">${selPulls.length} pulls</div></div>
-    <div class="sbox"><div class="slbl">Est. Crank HP</div><div class="sval">${estCrankHP.toFixed(0)}</div><div class="sunit">at engine, ~15% DTL</div></div>
-    <div class="sbox"><div class="slbl">Consistency</div><div class="sval">${consistencyScore.toFixed(0)}</div><div class="sunit">${consistencyScore>=85?'excellent':consistencyScore>=70?'good':'noisy'}</div></div>`;
+    <div class="sbox hl"><div class="slbl">Best WHP</div><div class="sval a">${bestPeak.toFixed(1)}</div><div class="sunit">peak from your best run</div></div>
+    ${avgCellHtml}
+    <div class="sbox"><div class="slbl">Est. Crank HP</div><div class="sval">${bestCrankHP.toFixed(0)}</div><div class="sunit">at engine, ~15% DTL</div></div>
+    ${consistencyHtml}`;
 
+  // Share card: WHP / WTQ / Crank HP — all from best pull
   document.getElementById('cVeh').textContent = vn;
   document.getElementById('cMod').textContent = mod;
   document.getElementById('cBef').textContent = bestPeak.toFixed(1);
-  document.getElementById('cAft').textContent = avgPeak.toFixed(1);
-  document.getElementById('cGain').textContent = '~' + estCrankHP.toFixed(0);
-  document.getElementById('cBefL').textContent = 'Best WHP';
-  document.getElementById('cAftL').textContent = 'Avg WHP';
+  document.getElementById('cAft').textContent = bestTorque.toFixed(1);
+  document.getElementById('cGain').textContent = '~' + bestCrankHP.toFixed(0);
+  document.getElementById('cBefL').textContent = 'WHP';
+  document.getElementById('cAftL').textContent = 'WTQ';
   document.getElementById('cGainL').textContent = 'Crank HP';
-  document.getElementById('cCond').textContent = `${selPulls.length} pulls · Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
+  const condBits = [`${allBinned.length} pull${allBinned.length>1?'s':''} kept`];
+  if(numRejected > 0 && rejectedNote) condBits.push(`${numRejected} rejected`);
+  condBits.push(`Baro ${baro.toFixed(1)} kPa`);
+  condBits.push(`${(iat_k-273.15).toFixed(0)}C`);
+  document.getElementById('cCond').textContent = condBits.join(' · ');
 
+  // Banner uses BEST not AVG
   const banner = document.getElementById('resBanner');
   const bTitle = document.getElementById('resBannerT');
   const bBody = document.getElementById('resBannerB');
   const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
-  if(avgPeak >= ref.lo && avgPeak <= ref.hi){
+  if(bestPeak >= ref.lo && bestPeak <= ref.hi){
     bTitle.textContent = 'Healthy stock NC2/3 power';
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 15-18% on its way to the wheels.`;
+    bBody.innerHTML = `Your best pull at <strong>${bestPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 15-18% on its way to the wheels.`;
     banner.classList.add('vis');
-  } else if(avgPeak < ref.lo){
+  } else if(bestPeak < ref.lo){
     bTitle.textContent = 'Below typical stock range';
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is below the NC range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (around 6,700-7,000 RPM).`;
+    bBody.innerHTML = `Your best pull at <strong>${bestPeak.toFixed(0)} WHP</strong> is below the NC range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (around 6,700-7,000 RPM) or were on an uphill grade.`;
     banner.classList.add('vis');
   } else {
     bTitle.textContent = 'Above typical stock';
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is above stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off.`;
+    bBody.innerHTML = `Your best pull at <strong>${bestPeak.toFixed(0)} WHP</strong> is above stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off.`;
     banner.classList.add('vis');
   }
+
   drawSameSetupChart(allBinned, avgCurve);
-  genSameSetupInterp(bestPeak, avgPeak, estCrankHP, consistencyScore, meanStd, w.gen, mod);
+  genSameSetupInterp(bestPeak, avgPeak, bestCrankHP, consistencyScore, meanStd, w.gen, mod);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2100,28 +2176,36 @@ function drawSameSetupChart(allBinned, avgCurve){
 // ═══════════════════════════════════════════════════════════════
 // INTERPRETATION
 // ═══════════════════════════════════════════════════════════════
-function genSameSetupInterp(bestPeak, avgPeak, estCrankHP, consistencyScore, meanStd, gen, mod){
+function genSameSetupInterp(bestPeak, avgPeak, bestCrankHP, consistencyScore, meanStd, gen, mod){
   const el = document.getElementById('interp');
   el.className = 'interp-txt';
   const refRange = gen === 'nc1' ? {low:113, high:123, label:'NC1'} : {low:118, high:128, label:'NC2/NC3'};
   const crankRef = gen === 'nc1' ? '170' : '167-170';
+  const info = window.__lastAnalysis || {};
+  const numKept = info.pullsAfterReject || selPulls.length;
+  const numRej = (info.pullsSelected || selPulls.length) - numKept;
   const parts = [];
-  parts.push(`<strong>What you're seeing:</strong> Your average peak across ${selPulls.length} pull${selPulls.length>1?'s':''} was ${avgPeak.toFixed(1)} WHP. Your best run hit ${bestPeak.toFixed(1)} WHP.`);
-  parts.push(`<strong>Why this isn't 170:</strong> Mazda's 170 hp is at the crankshaft, not the wheels. After ~15% drivetrain loss, a stock NC delivers about ${(170*0.85).toFixed(0)} WHP. Your estimated crank HP is ${estCrankHP.toFixed(0)}, lining up with stock NC2/3 spec (${crankRef} hp).`);
-  if(avgPeak < refRange.low - 5){
-    parts.push(`<strong>Reference:</strong> ${avgPeak.toFixed(1)} WHP is below typical stock ${refRange.label} range. Most likely you lifted before peak power (6,700-7,000 RPM).`);
-  } else if(avgPeak <= refRange.high+3){
-    parts.push(`<strong>Reference:</strong> ${avgPeak.toFixed(1)} WHP is right inside typical ${refRange.label} stock range (${refRange.low}-${refRange.high} WHP). Math checks out.`);
-  } else {
-    parts.push(`<strong>Reference:</strong> ${avgPeak.toFixed(1)} WHP is ${(avgPeak-refRange.high).toFixed(1)} WHP above stock. Mods working, or weight/tire input is off.`);
+
+  parts.push(`<strong>Your best pull:</strong> ${bestPeak.toFixed(1)} WHP at the wheels. That's roughly ${bestCrankHP.toFixed(0)} crank HP after typical 15% drivetrain loss.`);
+
+  if(numRej > 0){
+    parts.push(`<strong>Outlier rejection:</strong> ${numRej} pull${numRej>1?"s were":" was"} dropped because ${numRej>1?"they":"it"} fell more than 10 WHP from the median. Common causes: slight uphill grade, headwind, mid-pull throttle lift, or wheel slip. The rejected pull${numRej>1?"s aren't":" isn't a"} reflection of your engine's actual power.`);
   }
-  if(consistencyScore >= 85){
-    parts.push(`<strong>Consistency:</strong> Excellent (${consistencyScore.toFixed(0)}/100). Run-to-run variance only ±${meanStd.toFixed(1)} WHP.`);
-  } else if(consistencyScore >= 70){
-    parts.push(`<strong>Consistency:</strong> Good (${consistencyScore.toFixed(0)}/100). Variance ±${meanStd.toFixed(1)} WHP.`);
-  } else {
-    parts.push(`<strong>Consistency:</strong> Noisy (${consistencyScore.toFixed(0)}/100). ±${meanStd.toFixed(1)} WHP variance is high.`);
+
+  if(numKept > 1){
+    parts.push(`<strong>Across ${numKept} kept pulls:</strong> average peak ${avgPeak.toFixed(1)} WHP, ±${meanStd.toFixed(1)} WHP run-to-run. ${consistencyScore >= 85 ? 'Excellent consistency — your data is trustworthy.' : consistencyScore >= 70 ? 'Good consistency.' : 'Noisy data — try logging on flatter, calmer roads.'}`);
   }
+
+  parts.push(`<strong>Why this isn't 170 HP:</strong> Mazda's 170 HP figure is at the crankshaft. After drivetrain loss, a stock NC delivers about ${(170*0.85).toFixed(0)} WHP. Your estimated crank HP is ${bestCrankHP.toFixed(0)}, which lines up with stock NC2/3 spec (${crankRef} HP).`);
+
+  if(bestPeak < refRange.low - 5){
+    parts.push(`<strong>Reference:</strong> ${bestPeak.toFixed(1)} WHP is below typical ${refRange.label} range (${refRange.low}-${refRange.high} WHP). Most likely you lifted before 6,700 RPM, or your tire/weight settings are off.`);
+  } else if(bestPeak <= refRange.high+3){
+    parts.push(`<strong>Reference:</strong> ${bestPeak.toFixed(1)} WHP sits inside typical ${refRange.label} stock range (${refRange.low}-${refRange.high} WHP). Math checks out.`);
+  } else {
+    parts.push(`<strong>Reference:</strong> ${bestPeak.toFixed(1)} WHP is ${(bestPeak-refRange.high).toFixed(1)} WHP above stock. Mods working, or weight/tire input is too low.`);
+  }
+
   el.innerHTML = parts.map(p => `<p>${p}</p>`).join('');
 }
 
