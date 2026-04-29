@@ -23,13 +23,16 @@
 }
 
 body.light {
-  --bg:#f5f7fb; --s1:#ffffff; --s2:#eef2f7; --s3:#dde4ee;
-  --b1:#c8d0dd; --b2:#9aa5b8;
-  --amber:#9c5c00; --adim:rgba(156,92,0,0.12);
-  --red:#a01e21; --red2:#c0282a; --rdim:rgba(192,40,42,0.10);
-  --blue:#1d4ed8; --green:#006b56;
-  --text:#0a0e18; --mid:#384156; --dim:#5a6478;
+  --bg:#fafbfd; --s1:#ffffff; --s2:#f3f5f9; --s3:#e6eaf1;
+  --b1:#d4dae5; --b2:#a8b1c0;
+  --amber:#8a4e00; --adim:rgba(138,78,0,0.10);
+  --red:#931c1f; --red2:#b32426; --rdim:rgba(179,36,38,0.08);
+  --blue:#1746b8; --green:#055f4c;
+  --text:#0a0e18; --mid:#2d3548; --dim:#4f586c;
 }
+
+body.light::before{display:none;}
+body.light::after{display:none;}
 
 body.light header{background:rgba(255,255,255,.96);}
 body.light .h-dot{box-shadow:0 0 8px rgba(156,92,0,0.6);}
@@ -235,6 +238,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .sunit{font-size:11px;color:var(--dim);letter-spacing:.05em;margin-top:2px;}
 
 .chart-w{padding:30px;background:var(--s1);border-bottom:1px solid var(--b1);}
+.chart-w canvas{max-height:400px !important;}
 .interp-w{padding:26px 30px;border-bottom:1px solid var(--b1);display:flex;gap:18px;align-items:flex-start;}
 .interp-bar{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;padding:0 4px;border-right:2px solid var(--amber);margin-right:4px;}
 .interp-txt{font-size:13px;color:var(--mid);line-height:1.85;flex:1;}
@@ -755,6 +759,17 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 
     <!-- MOBILE-ONLY: UPLOAD SECTION (visible in drop state) -->
     <div id="upload-section">
+      <div class="cpanel" style="background:var(--s1);padding:24px 18px;">
+        <div class="plabel">Step 1 · Upload Your Log</div>
+        <div class="upzone" id="upzoneMobile" style="margin-top:6px;">
+          <span class="up-icon">CSV</span>
+          <p><strong>Drop your OBD log here</strong></p>
+          <p>or tap to browse</p>
+          <small>BlueDriver · OBD Fusion · Torque Pro</small>
+        </div>
+        <div class="upst" id="upstMobile"></div>
+      </div>
+
       <div class="cpanel" id="how-it-works" style="background:var(--s1);">
         <div class="plabel">How It Works</div>
         <div class="howitworks-grid">
@@ -853,7 +868,9 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       </div>
       <div class="chart-w">
         <div class="plabel" style="margin-bottom:16px;">Power Curve</div>
-        <canvas id="dynoChart" height="340"></canvas>
+        <div style="position:relative;height:380px;">
+          <canvas id="dynoChart"></canvas>
+        </div>
       </div>
       <div class="interp-w">
         <div class="interp-bar">Analysis</div>
@@ -1492,19 +1509,36 @@ function detectPulls(data){
 // FILE UPLOAD
 // ═══════════════════════════════════════════════════════════════
 const upz = document.getElementById('upzone');
+const upzMobile = document.getElementById('upzoneMobile');
 document.getElementById('fileIn').addEventListener('change', e => handleFile(e.target.files[0]));
+
+// Desktop upzone (already has the file input inside it)
 upz.addEventListener('dragover', e => { e.preventDefault(); upz.classList.add('dov'); });
 upz.addEventListener('dragleave', () => upz.classList.remove('dov'));
 upz.addEventListener('drop', e => { e.preventDefault(); upz.classList.remove('dov'); handleFile(e.dataTransfer.files[0]); });
 
+// Mobile upzone — clicking it triggers the same hidden file input
+if(upzMobile){
+  upzMobile.addEventListener('click', () => document.getElementById('fileIn').click());
+  upzMobile.addEventListener('dragover', e => { e.preventDefault(); upzMobile.classList.add('dov'); });
+  upzMobile.addEventListener('dragleave', () => upzMobile.classList.remove('dov'));
+  upzMobile.addEventListener('drop', e => { e.preventDefault(); upzMobile.classList.remove('dov'); handleFile(e.dataTransfer.files[0]); });
+}
+
 function showSt(msg, type){
-  const el = document.getElementById('upst');
-  el.textContent = msg;
-  el.className = 'upst vis ' + type;
-  const zone = document.getElementById('upzone');
-  zone.classList.remove('success','error');
-  if(type === 'ok') zone.classList.add('success');
-  else if(type === 'err') zone.classList.add('error');
+  ['upst','upstMobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = msg;
+    el.className = 'upst vis ' + type;
+  });
+  ['upzone','upzoneMobile'].forEach(id => {
+    const z = document.getElementById(id);
+    if(!z) return;
+    z.classList.remove('success','error');
+    if(type === 'ok') z.classList.add('success');
+    else if(type === 'err') z.classList.add('error');
+  });
 }
 
 function readFileSmart(file){
