@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MiataDyno - Measure Your Mods</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -18,88 +18,39 @@
   --text:#eaf0fc; --mid:#96a8c4; --dim:#6478a0;
   --mono:'JetBrains Mono',monospace;
   --disp:'Barlow Condensed',sans-serif;
+  --bar-h: env(safe-area-inset-bottom, 0px);
+  --MOBILE-BP: 880px;
 }
-/* Replace your existing body.light section with this */
+
 body.light {
-  --bg:#f5f7fb;
-  --s1:#ffffff;
-  --s2:#eef2f7;
-  --s3:#dde4ee;
-  --b1:#c8d0dd;
-  --b2:#9aa5b8;
-
-  /* Darker amber for proper contrast on light backgrounds */
-  --amber:#9c5c00;
-  --adim:rgba(156,92,0,0.12);
-
-  --red:#a01e21;
-  --red2:#c0282a;
-  --rdim:rgba(192,40,42,0.10);
-  --blue:#1d4ed8;
-  --green:#006b56;
-
-  --text:#0a0e18;
-  --mid:#384156;     /* darker for body copy contrast */
-  --dim:#5a6478;     /* still subtle but readable */
+  --bg:#f5f7fb; --s1:#ffffff; --s2:#eef2f7; --s3:#dde4ee;
+  --b1:#c8d0dd; --b2:#9aa5b8;
+  --amber:#9c5c00; --adim:rgba(156,92,0,0.12);
+  --red:#a01e21; --red2:#c0282a; --rdim:rgba(192,40,42,0.10);
+  --blue:#1d4ed8; --green:#006b56;
+  --text:#0a0e18; --mid:#384156; --dim:#5a6478;
 }
 
-body.light::before{background-image:linear-gradient(rgba(156,92,0,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(156,92,0,0.05) 1px,transparent 1px);}
-body.light::after{background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.012) 2px,rgba(0,0,0,0.012) 4px);}
-
-body.light header{background:rgba(255,255,255,.96);border-bottom-color:var(--b1);}
+body.light header{background:rgba(255,255,255,.96);}
 body.light .h-dot{box-shadow:0 0 8px rgba(156,92,0,0.6);}
-
-body.light .btn-go{color:#ffffff;background:var(--amber);}
-body.light .btn-go:hover:not(:disabled){background:#7a4800;}
-body.light .btn-go:disabled{background:var(--s3);color:var(--dim);}
-
-body.light .upzone{border-color:var(--b2);}
-body.light .upzone:hover,body.light .upzone.dov{border-color:var(--amber);background:rgba(156,92,0,0.06);}
-body.light .upzone.success{background:rgba(0,107,86,.10);border-color:var(--green);}
-body.light .upzone.error{background:rgba(192,40,42,.08);border-color:var(--red2);}
-
-body.light .tbtn.on{background:rgba(156,92,0,0.10);border-color:var(--amber);color:var(--amber);font-weight:600;}
-body.light .badge.on{border-color:var(--amber);color:var(--amber);background:rgba(156,92,0,0.08);}
-
-body.light .pull-item{background:var(--s1);}
-body.light .pull-item:hover{background:var(--s2);}
-body.light .pull-item.ib{background:rgba(192,40,42,0.05);}
-body.light .pull-item.ia{background:rgba(29,78,216,0.05);}
+body.light .btn-primary{color:#ffffff;}
+body.light .btn-primary:hover:not(:disabled){background:#7a4800;}
+body.light .upzone:hover,body.light .upzone.dov{background:rgba(156,92,0,0.06);}
+body.light .upzone.success{background:rgba(0,107,86,.10);}
+body.light .upzone.error{background:rgba(192,40,42,.08);}
+body.light .tbtn.on,body.light .badge.on{background:rgba(156,92,0,0.10);}
 body.light .pull-item.isel{background:rgba(156,92,0,0.06);}
-
-body.light .sval.a{text-shadow:none;color:#7a4800;}
-
-body.light .sec-hd{background:var(--s1);}
-body.light .sec-hd:hover{background:var(--s2);}
-
+body.light .sval.a{text-shadow:none;}
 body.light .amode-btn.on{background:rgba(156,92,0,0.08);}
-body.light .amode-btn.on strong{color:var(--amber);}
-
-/* Share card stays dark in both themes for share consistency */
 body.light #shareCard{background:#0d1018;border-color:#2a3347;}
 body.light #shareCard .sc-logo,body.light #shareCard .sc-v{color:#eaf0fc;}
 body.light #shareCard .sc-v.g{color:#e8a020;}
 body.light #shareCard .sc-veh,body.light #shareCard .sc-mod{color:#96a8c4;}
 body.light #shareCard .sc-l,body.light #shareCard .sc-ft{color:#6478a0;}
 body.light #shareCard .sc-top,body.light #shareCard .sc-nums,body.light #shareCard .sc-n{border-color:#1e2535;}
-body.light #shareCard::before{color:rgba(255,255,255,.02);}
-
-body.light .hero-wrap::before{color:rgba(0,0,0,.025);}
-
-body.light .limit-counter{background:rgba(156,92,0,0.10);border-color:var(--amber);color:var(--amber);}
-
-body.light .callout{background:rgba(156,92,0,0.08);}
-
-/* Modals and overlays */
-body.light .fb-modal,body.light .limit-modal,body.light #termsModal{background:rgba(40,50,70,.55);}
-
-/* Chart canvas needs light theme support too */
-body.light .chart-w{background:var(--s1);}
-
-/* Footer */
-body.light .ft-link{color:var(--mid);}
-body.light .ft-link:hover{color:var(--amber);}
-body.light .ft-text{color:var(--dim);}
+body.light .actionbar{background:rgba(255,255,255,0.96);}
+body.light .vehicle-card{background:var(--s1);}
+body.light .stat-card{background:var(--s1);}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -108,186 +59,47 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(232,160,32,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,160,32,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
 body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:1;}
 
-header,main,footer,.hero-wrap{position:relative;z-index:2;}
+header,main,footer,.actionbar{position:relative;z-index:2;}
 
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.fi{animation:fu .5s ease both;}.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}
+.fi{animation:fu .5s ease both;}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}
 
+/* ═══ HEADER ═══ */
 header{display:flex;align-items:center;border-bottom:1px solid var(--b1);background:rgba(7,9,12,.96);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100;}
 .h-logo{display:flex;align-items:center;gap:14px;padding:16px 28px;border-right:1px solid var(--b1);}
-.h-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:dp 2s ease-in-out infinite;}
-@keyframes dp{0%,100%{opacity:1;box-shadow:0 0 10px var(--amber)}50%{opacity:.3;box-shadow:0 0 3px var(--amber)}}
+.h-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:dp 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.3}}
 .h-name{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
 .h-name span{color:var(--amber);}
 .h-meta{padding:0 24px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;}
 header nav{margin-left:auto;display:flex;border-left:1px solid var(--b1);}
-header nav a{display:block;padding:20px 18px;font-size:10px;color:var(--mid);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--b1);transition:color .2s,background .2s;}
+header nav a{display:block;padding:20px 18px;font-size:10px;color:var(--mid);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--b1);transition:color .2s,background .2s;cursor:pointer;}
 header nav a:hover{color:var(--amber);background:var(--adim);}
-#themeToggle{font-size:14px;}
+header nav a:last-child{border-right:none;}
+.limit-counter{display:inline-block;padding:3px 8px;background:var(--adim);border:1px solid var(--amber);color:var(--amber);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:10px;font-weight:700;}
 
-.hero-wrap{padding:56px 48px 44px;border-bottom:1px solid var(--b1);position:relative;overflow:hidden;}
-.hero-wrap::before{content:'NC';position:absolute;right:-10px;top:-24px;font-family:var(--disp);font-size:300px;font-weight:800;color:rgba(255,255,255,.012);letter-spacing:-.04em;pointer-events:none;line-height:1;}
+/* ═══════════════════════════════════════════════════════════ */
+/* DESKTOP DEFAULT: sidebar layout (>880px) */
+/* ═══════════════════════════════════════════════════════════ */
+
+/* Hero block — visible on desktop above the layout */
+.hero-wrap{padding:48px 40px 36px;border-bottom:1px solid var(--b1);position:relative;overflow:hidden;}
+.hero-wrap::before{content:'NC';position:absolute;right:-10px;top:-24px;font-family:var(--disp);font-size:280px;font-weight:800;color:rgba(255,255,255,.012);letter-spacing:-.04em;pointer-events:none;line-height:1;}
 .h-tag{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
 .h-tag::before{content:'';display:block;width:28px;height:1px;background:var(--amber);}
-.hero-wrap h1{font-family:var(--disp);font-size:clamp(40px,5.5vw,76px);font-weight:800;letter-spacing:-.01em;line-height:.95;text-transform:uppercase;margin-bottom:22px;}
+.hero-wrap h1{font-family:var(--disp);font-size:clamp(38px,5vw,64px);font-weight:800;letter-spacing:-.01em;line-height:.98;text-transform:uppercase;margin-bottom:18px;}
 .hero-wrap h1 em{font-style:normal;color:var(--amber);display:block;}
-.hero-sub{font-size:13px;color:var(--mid);max-width:480px;line-height:1.8;margin-bottom:22px;}
+.hero-sub{font-size:13px;color:var(--mid);max-width:480px;line-height:1.7;margin-bottom:18px;}
 .badges{display:flex;gap:6px;flex-wrap:wrap;}
 .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid var(--b2);color:var(--mid);background:var(--s1);}
 .badge.on{border-color:var(--amber);color:var(--amber);background:var(--adim);}
 
+/* Main layout grid: sidebar + content */
 .layout{display:grid;grid-template-columns:370px 1fr;}
 
-/* ═══ MOBILE & RESPONSIVE ═══ */
-
-/* Tablet and below */
-@media(max-width:860px){
-  .layout{grid-template-columns:1fr;}
-  .hero-wrap{padding:36px 24px 28px;}
-  .hero-wrap::before{display:none;}
-  .hero-wrap h1{font-size:clamp(32px,8.5vw,52px);}
-  .hero-sub{font-size:13px;}
-  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--b1);}
-  .cpanel{padding:24px 20px;}
-  .stats-g{grid-template-columns:1fr 1fr;}
-  .sval{font-size:38px;}
-  .chart-w{padding:20px 16px;}
-  .interp-w{padding:20px 16px;}
-  .card-w{padding:20px 16px;}
-  .pull-item{grid-template-columns:36px 1fr auto;gap:10px;padding:12px 14px;}
-  .ptag-w{display:none;}
-  .pq-num{font-size:24px;}
-  .pq-lbl{font-size:8px;}
-  #shareCard{padding:20px;max-width:100%;}
-  .amode-btn{padding:12px 14px;}
-  .amode-btn strong{font-size:13px;}
-  .amode-btn span{font-size:10px;}
-}
-
-/* Phone */
-@media(max-width:600px){
-  /* Header */
-  .h-logo{padding:12px 16px;gap:10px;}
-  .h-name{font-size:16px;letter-spacing:.08em;}
-  .h-meta{padding:0 12px;font-size:9px;}
-  header nav a{padding:14px 10px;font-size:9px;}
-  #themeToggle{padding:14px 12px;}
-
-  /* Hero */
-  .hero-wrap{padding:28px 18px 24px;}
-  .hero-wrap h1{font-size:36px;line-height:1;margin-bottom:18px;}
-  .hero-wrap h1 br{display:none;}
-  .hero-sub{font-size:12px;line-height:1.6;margin-bottom:16px;}
-  .h-tag{font-size:9px;margin-bottom:10px;}
-  .badges{gap:5px;}
-  .badge{font-size:9px;padding:3px 7px;}
-
-  /* Sidebar sections */
-  .sec-bd{padding:14px 16px;}
-  .sec-hd{padding:11px 16px;}
-  .sec-t{font-size:13px;}
-
-  /* Form controls — 14px prevents iOS zoom on focus */
-  select,input[type=number],input[type=text],input[type=email]{font-size:14px;padding:11px 12px;}
-  .tbtn{font-size:10px;padding:10px 4px;}
-  .lbl{font-size:10px;}
-  #tWtMode .tbtn{font-size:10px;padding:10px 2px;}
-  #tRim .tbtn{font-size:11px;padding:10px 2px;}
-
-  /* Run Analysis button */
-  .btn-go{padding:16px;font-size:16px;}
-
-  /* Progress indicator */
-  .prog-wrap{padding:12px 14px;}
-  .prog-step{padding:6px 4px;gap:8px;}
-  .prog-num{width:28px;height:28px;font-size:13px;}
-  .prog-step.done .prog-num::before{font-size:15px;}
-  .prog-title{font-size:10px;}
-  .prog-sub{display:none;}
-  .prog-line{flex:0 0 14px;}
-
-  /* Content panels */
-  .cpanel{padding:20px 16px;}
-  .ptitle{font-size:18px;}
-  .plabel{font-size:9px;}
-
-  /* Analysis mode buttons */
-  .amode-btn{padding:11px 12px;}
-  .amode-btn strong{font-size:12px;letter-spacing:.04em;margin-bottom:3px;}
-  .amode-btn span{font-size:10px;line-height:1.35;}
-
-  /* Stats grid */
-  .stats-g{grid-template-columns:1fr 1fr;}
-  .sbox{padding:18px 14px;}
-  .sval{font-size:32px;}
-  .slbl{font-size:8px;}
-  .sunit{font-size:10px;}
-
-  /* Chart - cap height on phone */
-  .chart-w{padding:14px 10px;}
-  #dynoChart{height:280px !important;max-height:280px;}
-
-  /* Interp text */
-  .interp-w{padding:18px 14px;gap:12px;}
-  .interp-bar{font-size:9px;}
-  .interp-txt{font-size:12px;line-height:1.7;}
-
-  /* Card */
-  .card-w{padding:18px 14px;}
-  #shareCard{padding:18px 14px;}
-  .sc-v{font-size:26px;}
-  .sc-l{font-size:8px;}
-  .sc-veh,.sc-mod{font-size:9px;}
-
-  /* Pull list */
-  .pull-item{grid-template-columns:32px 1fr 60px;gap:8px;padding:11px 12px;}
-  .pnum{font-size:24px;}
-  .pdata strong{font-size:12px;}
-  .pdata span{font-size:10px;line-height:1.4;}
-
-  /* Modals */
-  .fb-box,.limit-box{width:94%;padding:22px 18px;margin:0 8px;max-height:88vh;overflow-y:auto;}
-  .fb-box h3,.limit-box h3{font-size:16px;}
-  .fb-box p,.limit-box p{font-size:12px;}
-  .fb-btn{font-size:12px;padding:11px;}
-  #termsModal > div{width:94%;padding:22px 18px;}
-  #termsModal p{font-size:12px;}
-
-  /* Footer */
-  .ft-grid{padding:24px 16px 16px;gap:18px;}
-  .ft-bottom{padding:12px 16px;font-size:9px;}
-  .ft-title{font-size:10px;}
-  .ft-link{font-size:10px;}
-  .ft-text{font-size:10px;}
-
-  /* Stack 3-column grids on phone */
-  .cpanel #how-it-works > div,
-  div[style*="grid-template-columns:repeat(3,1fr)"]{
-    grid-template-columns:1fr !important;
-  }
-
-  /* Stack 2-column grids on phone */
-  div[style*="grid-template-columns:1fr 1fr"]{
-    grid-template-columns:1fr !important;
-  }
-}
-
-/* Very small phones (iPhone SE, narrow Androids) */
-@media(max-width:380px){
-  .h-name{font-size:14px;}
-  .h-meta{display:none;}
-  .limit-counter{margin-left:0;}
-  .hero-wrap h1{font-size:32px;}
-  .badges{display:none;}
-  .sval{font-size:28px;}
-  .stats-g{grid-template-columns:1fr;}
-  .sbox{border-right:none;border-bottom:1px solid var(--b1);}
-  .sbox:last-child{border-bottom:none;}
-}
-
+/* SIDEBAR */
 .sidebar{border-right:1px solid var(--b1);position:sticky;top:61px;height:calc(100vh - 61px);overflow-y:auto;display:flex;flex-direction:column;}
-@media(max-width:860px){.sidebar{position:static;height:auto;}}
-
 .sec{border-bottom:1px solid var(--b1);}
 .sec-hd{padding:13px 22px;display:flex;align-items:center;gap:10px;background:var(--s1);border-bottom:1px solid var(--b1);cursor:pointer;user-select:none;transition:background .15s;}
 .sec-hd:hover{background:var(--s2);}
@@ -297,10 +109,11 @@ header nav a:hover{color:var(--amber);background:var(--adim);}
 .sec.coll .sec-bd{display:none;}
 .sec-bd{padding:18px 22px;}
 
+/* Form helpers (shared between sidebar and modal) */
 .fl{margin-bottom:12px;}.fl:last-child{margin-bottom:0;}
 label.lbl{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;}
-select,input[type=number],input[type=text],input[type=email]{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 11px;appearance:none;outline:none;transition:border-color .15s,background .15s;}
-select:focus,input:focus{border-color:var(--amber);background:var(--s3);}
+select,input[type=number],input[type=text],input[type=email],textarea{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 11px;appearance:none;outline:none;transition:border-color .15s,background .15s;}
+select:focus,input:focus,textarea:focus{border-color:var(--amber);background:var(--s3);}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7a94'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
 
@@ -308,13 +121,15 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .tbtn{flex:1;padding:8px 6px;text-align:center;border:1px solid var(--b2);font-family:var(--mono);font-size:11px;color:var(--mid);cursor:pointer;transition:all .15s;background:var(--s2);margin-left:-1px;}
 .tbtn:first-child{margin-left:0;}
 .tbtn:hover{color:var(--text);background:var(--s3);}
-.tbtn.on{background:var(--adim);border-color:var(--amber);color:var(--amber);z-index:1;position:relative;}
+.tbtn.on{background:var(--adim);border-color:var(--amber);color:var(--amber);z-index:1;position:relative;font-weight:600;}
 
 .exh-comp{border:1px solid var(--b1);margin-bottom:7px;background:var(--s2);}
 .exh-lbl{padding:7px 11px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
 .exh-d{font-size:10px;font-weight:600;color:var(--green);}
 .exh-comp select{border:none;background:transparent;font-size:11px;padding:8px 11px;padding-right:28px;}
-.exh-comp select:focus{background:var(--s3);border:none;}
+
+.callout{padding:10px 12px;background:var(--adim);border-left:2px solid var(--amber);font-size:11px;color:var(--mid);line-height:1.6;margin-bottom:14px;}
+.callout strong{color:var(--text);}
 
 .wsum{margin-top:14px;padding:11px;background:var(--s3);border:1px solid var(--b2);border-left:2px solid var(--amber);}
 .wsrow{display:flex;justify-content:space-between;font-size:11px;color:var(--mid);margin-bottom:3px;}
@@ -322,23 +137,27 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .wsrow.tot{padding-top:7px;margin-top:4px;border-top:1px solid var(--b1);color:var(--text);font-weight:600;}
 .wv.n{color:var(--text);}
 
-.btn-go{width:100%;padding:19px;background:var(--amber);color:#07090c;font-family:var(--disp);font-size:18px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;transition:background .2s,box-shadow .2s;margin-top:auto;box-shadow:0 -1px 0 var(--b1);}
-.btn-go:hover:not(:disabled){background:#f0b030;box-shadow:0 0 28px rgba(232,160,32,.22),0 -1px 0 var(--b1);}
+.btn-go{width:100%;padding:19px;background:var(--amber);color:#07090c;font-family:var(--disp);font-size:18px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;transition:background .2s;margin-top:auto;box-shadow:0 -1px 0 var(--b1);}
+.btn-go:hover:not(:disabled){background:#f0b030;}
 .btn-go:disabled{background:var(--s3);color:var(--dim);cursor:not-allowed;}
 
+/* CONTENT */
 .content{overflow-y:auto;}
 .disc{padding:11px 26px;font-size:10px;color:var(--dim);border-bottom:1px solid var(--b1);letter-spacing:.04em;background:var(--s1);}
-.cpanel{padding:36px 38px;border-bottom:1px solid var(--b1);}
+.cpanel{padding:32px 36px;border-bottom:1px solid var(--b1);}
 .cpanel.full{padding:0;}
 .plabel{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
 .plabel::after{content:'';flex:1;height:1px;background:var(--b1);}
 .ptitle{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
 
+/* UPLOAD ZONE */
 .upzone{border:2px dashed var(--b2);padding:50px 36px;text-align:center;cursor:pointer;position:relative;transition:border-color .2s,background .2s;}
 .upzone:hover,.upzone.dov{border-color:var(--amber);background:var(--adim);}
 .upzone input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
 .up-icon{font-family:var(--disp);font-size:72px;font-weight:800;color:var(--dim);letter-spacing:-.04em;display:block;line-height:1;margin-bottom:14px;transition:color .25s;}
+.upzone:hover .up-icon{color:var(--amber);}
 .upzone p{font-size:13px;color:var(--mid);margin-bottom:3px;}
+.upzone strong{color:var(--text);font-weight:500;}
 .upzone small{font-size:10px;color:var(--dim);display:block;margin-top:6px;}
 .upzone.success{border-color:var(--green);border-style:solid;background:rgba(0,184,148,.08);}
 .upzone.success .up-icon{color:var(--green);}
@@ -350,14 +169,31 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .upst.ok{color:var(--green);background:rgba(0,184,148,.06);}
 .upst.err{color:var(--red2);background:var(--rdim);}
 
+/* PROGRESS */
+.prog-wrap{display:flex;align-items:stretch;background:var(--s1);border-bottom:1px solid var(--b1);padding:18px 28px;gap:0;}
+.prog-step{display:flex;align-items:center;gap:12px;flex:1;padding:8px 16px;}
+.prog-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:16px;font-weight:700;border:1.5px solid var(--b2);color:var(--dim);background:var(--s2);transition:all .3s;flex-shrink:0;}
+.prog-step.active .prog-num{border-color:var(--amber);color:var(--amber);background:var(--adim);}
+.prog-step.done .prog-num{border-color:var(--green);color:var(--green);background:rgba(0,184,148,.10);font-size:0;}
+.prog-step.done .prog-num::before{content:'\2713';font-size:18px;}
+.prog-info{display:flex;flex-direction:column;line-height:1.2;}
+.prog-title{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);}
+.prog-step:not(.active):not(.done) .prog-title{color:var(--mid);}
+.prog-sub{font-size:10px;color:var(--dim);letter-spacing:.04em;margin-top:3px;}
+.prog-line{flex:0 0 40px;align-self:center;height:1px;background:var(--b2);margin:0 4px;transition:background .3s;}
+.prog-line.done{background:var(--green);}
+
+/* PULL LIST */
 .pull-item{display:grid;grid-template-columns:40px 1fr auto 70px;align-items:center;gap:14px;padding:15px 20px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .15s;background:var(--s1);}
 .pull-item:hover{background:var(--s2);}
 .pull-item.ib{border-left:3px solid var(--red);background:rgba(214,48,49,.04);}
 .pull-item.ia{border-left:3px solid var(--blue);background:rgba(68,136,255,.04);}
+.pull-item.isel{border-left:3px solid var(--amber);background:var(--adim);}
 .pnum{font-family:var(--disp);font-size:34px;font-weight:700;color:var(--dim);line-height:1;}
 .pull-item.ib .pnum{color:var(--red);}
 .pull-item.ia .pnum{color:var(--blue);}
-.pdata strong{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:1px;}
+.pull-item.isel .pnum{color:var(--amber);}
+.pdata strong{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:1px;color:var(--text);}
 .pdata span{font-size:11px;color:var(--mid);}
 .pq-num{font-family:var(--disp);font-size:30px;font-weight:700;line-height:1;text-align:right;}
 .pq-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:right;}
@@ -365,30 +201,49 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .ptag{display:inline-block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border:1px solid;}
 .ptag.b{color:var(--red2);border-color:var(--red);background:var(--rdim);}
 .ptag.a{color:var(--blue);border-color:#1d4ed8;background:rgba(68,136,255,.08);}
+.ptag.s{color:var(--amber);border-color:var(--amber);background:var(--adim);}
 
 .empty-st{padding:48px 32px;text-align:center;font-size:12px;color:var(--dim);}
 .empty-st .big{font-family:var(--disp);font-size:52px;font-weight:700;color:var(--b2);display:block;margin-bottom:12px;}
 
+/* ANALYSIS MODE TOGGLE */
+.amode-row{display:flex;border:1px solid var(--b2);}
+.amode-btn{flex:1;padding:14px 18px;background:var(--s2);cursor:pointer;border-right:1px solid var(--b2);transition:all .15s;}
+.amode-btn:last-child{border-right:none;}
+.amode-btn:hover{background:var(--s3);}
+.amode-btn.on{background:var(--adim);}
+.amode-btn strong{display:block;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mid);margin-bottom:4px;}
+.amode-btn.on strong{color:var(--amber);}
+.amode-btn span{display:block;font-size:11px;color:var(--dim);line-height:1.4;}
+
+/* RESULTS */
 #results{display:none;}
 #results.vis{display:block;}
+.res-banner{display:none;padding:14px 30px;background:var(--adim);border-bottom:1px solid var(--b1);border-left:3px solid var(--amber);}
+.res-banner.vis{display:block;}
+.res-banner-t{font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;}
+.res-banner-b{font-size:12px;color:var(--mid);line-height:1.6;}
+
 .stats-g{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--b1);}
-@media(max-width:700px){.stats-g{grid-template-columns:1fr 1fr;}}
-.sbox{padding:26px 22px;border-right:1px solid var(--b1);position:relative;overflow:hidden;}
+.sbox{padding:26px 22px;border-right:1px solid var(--b1);position:relative;overflow:hidden;background:var(--s1);}
 .sbox:last-child{border-right:none;}
-.sbox::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--b1);transition:background .3s,box-shadow .3s;}
-.sbox.hl::after{background:var(--amber);box-shadow:0 0 10px var(--amber);}
+.sbox::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--b1);}
+.sbox.hl::after{background:var(--amber);}
 .slbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
 .sval{font-family:var(--disp);font-size:50px;font-weight:800;line-height:1;letter-spacing:-.02em;}
 .sval.a{color:var(--amber);text-shadow:0 0 30px rgba(232,160,32,.25);}
 .sunit{font-size:11px;color:var(--dim);letter-spacing:.05em;margin-top:2px;}
 
-.chart-w{padding:30px 30px;background:var(--s1);border-bottom:1px solid var(--b1);}
+.chart-w{padding:30px;background:var(--s1);border-bottom:1px solid var(--b1);}
 .interp-w{padding:26px 30px;border-bottom:1px solid var(--b1);display:flex;gap:18px;align-items:flex-start;}
 .interp-bar{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;padding:0 4px;border-right:2px solid var(--amber);margin-right:4px;}
-.interp-txt{font-size:13px;color:var(--mid);line-height:1.9;flex:1;}
+.interp-txt{font-size:13px;color:var(--mid);line-height:1.85;flex:1;}
+.interp-txt p{margin-bottom:14px;}
+.interp-txt p:last-child{margin-bottom:0;}
+.interp-txt strong{color:var(--text);}
 .interp-txt.ld{color:var(--dim);font-style:italic;}
 
-.card-w{padding:30px 30px;border-bottom:1px solid var(--b1);}
+.card-w{padding:30px;border-bottom:1px solid var(--b1);}
 #shareCard{background:#07090c;border:1px solid var(--b2);padding:26px 30px;max-width:580px;position:relative;overflow:hidden;}
 #shareCard::before{content:'MX-5';position:absolute;right:-8px;top:-18px;font-family:var(--disp);font-size:110px;font-weight:800;color:rgba(255,255,255,.02);pointer-events:none;}
 .sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--b1);}
@@ -406,83 +261,213 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .btn-dl{display:inline-block;margin-top:14px;padding:11px 18px;border:1px solid var(--b2);color:var(--mid);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .2s;}
 .btn-dl:hover{border-color:var(--amber);color:var(--amber);background:var(--adim);}
 
-footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:11px;color:var(--dim);letter-spacing:.04em;position:relative;z-index:2;}
+/* HOW IT WORKS / GOLDEN PULL */
+.golden-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:6px;}
+.golden-h{font-size:12px;color:var(--amber);font-weight:600;margin-bottom:10px;font-family:var(--disp);letter-spacing:.08em;text-transform:uppercase;}
+.golden-grid ol,.golden-grid ul{font-size:12px;color:var(--mid);line-height:1.85;padding-left:16px;}
+.golden-grid li{margin-bottom:4px;}
+.golden-grid strong{color:var(--text);}
+.safety-note{margin-top:14px;padding:10px 12px;background:var(--s2);border-left:2px solid var(--amber);}
+.safety-note p{font-size:11px;color:var(--text);font-weight:600;margin-bottom:4px;}
+.safety-note small{font-size:11px;color:var(--mid);line-height:1.6;display:block;}
+
+.howitworks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:14px;}
+.hw-step{}
+.hw-num{font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;}
+.hw-title{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;}
+.hw-text{font-size:11px;color:var(--mid);line-height:1.7;}
+.hw-pids{margin-top:10px;padding:10px 12px;background:var(--adim);border-left:2px solid var(--amber);}
+.hw-pids p{font-size:10px;color:var(--amber);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.hw-pids span{font-size:11px;color:var(--text);line-height:1.6;}
+
+/* MOBILE-ONLY ELEMENTS (hidden on desktop) */
+#mobile-vehicle-card{display:none;}
+#mobile-action-bar{display:none;}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* MOBILE LAYOUT (≤880px) */
+/* ═══════════════════════════════════════════════════════════ */
+
+@media(max-width:880px){
+  /* Hide desktop sidebar entirely */
+  .sidebar{display:none;}
+  .layout{grid-template-columns:1fr;}
+
+  /* Hide hero on mobile EXCEPT in drop state */
+  body[data-state="drop"] .hero-wrap{display:block;}
+  body[data-state="configure"] .hero-wrap,
+  body[data-state="result"] .hero-wrap{display:none;}
+
+  /* Disclaimer bar visible only in drop state */
+  body[data-state="drop"] .disc{display:block;}
+  body[data-state="configure"] .disc,
+  body[data-state="result"] .disc{display:none;}
+
+  /* Progress indicator hidden on mobile (action bar handles this) */
+  .prog-wrap{display:none;}
+
+  /* Hide the desktop "How It Works" + "Golden Pull" panels in non-drop states */
+  body[data-state="configure"] .cpanel:has(#how-it-works),
+  body[data-state="result"] .cpanel:has(#how-it-works){display:none;}
+  body[data-state="configure"] .cpanel:has(.golden-grid),
+  body[data-state="result"] .cpanel:has(.golden-grid){display:none;}
+
+  /* Show/hide upload section based on state */
+  body[data-state="drop"] #upload-section{display:block;}
+  body[data-state="configure"] #upload-section{display:none;}
+  body[data-state="result"] #upload-section{display:none;}
+
+  /* Show pulls only in configure state */
+  body[data-state="drop"] #pull-section,
+  body[data-state="drop"] #amode-section{display:none;}
+  body[data-state="configure"] #pull-section,
+  body[data-state="configure"] #amode-section{display:block;}
+  body[data-state="result"] #pull-section,
+  body[data-state="result"] #amode-section{display:none;}
+
+  /* Show results only in result state */
+  body[data-state="drop"] #results,
+  body[data-state="configure"] #results{display:none !important;}
+  body[data-state="result"] #results.vis{display:block !important;}
+
+  /* Show mobile vehicle card in configure state */
+  #mobile-vehicle-card{display:none;}
+  body[data-state="configure"] #mobile-vehicle-card{display:block;}
+
+  /* Show action bar in configure and result states */
+  body[data-state="configure"] #mobile-action-bar,
+  body[data-state="result"] #mobile-action-bar{display:flex;}
+
+  /* Reserve space at bottom for action bar */
+  body[data-state="configure"] main,
+  body[data-state="result"] main{padding-bottom:80px;}
+
+  /* Mobile padding tweaks */
+  .hero-wrap{padding:32px 20px 24px;}
+  .hero-wrap::before{display:none;}
+  .hero-wrap h1{font-size:36px;line-height:1;}
+  .hero-sub{font-size:13px;}
+  .cpanel{padding:24px 18px;}
+  .upzone{padding:38px 22px;}
+  .up-icon{font-size:54px;}
+  .stats-g{grid-template-columns:1fr 1fr;}
+  .sbox{padding:18px 14px;}
+  .sval{font-size:32px;}
+  .slbl{font-size:8px;}
+  .sunit{font-size:10px;}
+  .chart-w,.interp-w,.card-w{padding:18px 14px;}
+  #dynoChart{max-height:280px;}
+  .pull-item{grid-template-columns:36px 1fr auto;gap:10px;padding:12px 14px;}
+  .ptag-w{display:none;}
+  .pq-num{font-size:24px;}
+  .pq-lbl{font-size:8px;}
+  .amode-btn{padding:11px 12px;}
+  .amode-btn strong{font-size:12px;letter-spacing:.04em;margin-bottom:3px;}
+  .amode-btn span{font-size:10px;line-height:1.35;}
+  .interp-bar{display:none;}
+  #shareCard{padding:18px 14px;max-width:100%;}
+  .sc-v{font-size:26px;}
+  .sc-l{font-size:8px;}
+  .golden-grid,.howitworks-grid{grid-template-columns:1fr;gap:20px;}
+
+  /* Form inputs 14px to prevent iOS zoom */
+  select,input[type=number],input[type=text],input[type=email],textarea{font-size:14px;padding:11px 12px;}
+  .tbtn{font-size:11px;padding:10px 4px;}
+
+  /* Header tweaks */
+  .h-logo{padding:12px 16px;gap:10px;}
+  .h-name{font-size:16px;letter-spacing:.08em;}
+  .h-meta{padding:0 12px;font-size:9px;}
+  header nav a{padding:14px 10px;font-size:9px;}
+}
+
+@media(max-width:380px){
+  .h-meta{display:none;}
+  .hero-wrap h1{font-size:32px;}
+  .badges{display:none;}
+  .sval{font-size:28px;}
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* MOBILE VEHICLE CARD */
+/* ═══════════════════════════════════════════════════════════ */
+.vehicle-card{background:var(--s2);border:1px solid var(--b1);border-left:3px solid var(--amber);padding:16px 18px;margin:18px;}
+.vc-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.vc-title{font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.04em;color:var(--text);margin-bottom:6px;}
+.vc-row{font-size:12px;color:var(--mid);margin-bottom:3px;}
+.vc-row strong{color:var(--text);font-weight:500;}
+.vc-edit{display:inline-block;margin-top:14px;padding:9px 16px;border:1px solid var(--b2);color:var(--mid);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .15s;}
+.vc-edit:hover{border-color:var(--amber);color:var(--amber);background:var(--adim);}
+.vc-num{font-family:var(--disp);font-size:24px;font-weight:700;color:var(--amber);margin:8px 0 4px;}
+.vc-num small{font-size:11px;color:var(--mid);font-weight:400;font-family:var(--mono);letter-spacing:.04em;}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* MOBILE ACTION BAR */
+/* ═══════════════════════════════════════════════════════════ */
+.actionbar{position:fixed;left:0;right:0;bottom:0;background:rgba(7,9,12,.96);backdrop-filter:blur(8px);border-top:1px solid var(--b1);padding:12px 16px calc(12px + var(--bar-h));z-index:50;}
+.actionbar-inner{display:flex;gap:10px;align-items:center;width:100%;}
+.actionbar-status{font-size:11px;color:var(--mid);flex:1;display:none;}
+.btn-primary{padding:13px 22px;background:var(--amber);color:#07090c;font-family:var(--disp);font-size:14px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;transition:background .2s;flex:1;}
+.btn-primary:hover:not(:disabled){background:#f0b030;}
+.btn-primary:disabled{background:var(--s3);color:var(--dim);cursor:not-allowed;}
+.btn-secondary{padding:13px 22px;background:transparent;color:var(--mid);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--b2);cursor:pointer;transition:all .2s;flex:1;}
+.btn-secondary:hover{border-color:var(--amber);color:var(--amber);background:var(--adim);}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* MODALS */
+/* ═══════════════════════════════════════════════════════════ */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;}
+.modal-bg.vis{display:flex;}
+body.light .modal-bg{background:rgba(40,50,70,.55);}
+.modal-box{background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
+.modal-box.wide{max-width:680px;}
+.modal-head{padding:22px 26px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:1;}
+.modal-title{font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);}
+.modal-close{background:transparent;border:none;color:var(--mid);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-family:inherit;}
+.modal-close:hover{color:var(--amber);}
+.modal-body{padding:20px 26px;flex:1;}
+.modal-foot{padding:14px 26px;border-top:1px solid var(--b1);display:flex;gap:10px;justify-content:flex-end;background:var(--s1);position:sticky;bottom:0;}
+.modal-body p{font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:14px;}
+
+/* Mobile modal full-screen */
+@media(max-width:600px){
+  .modal-bg{padding:0;align-items:stretch;}
+  .modal-box{max-height:100vh;border-left:none;border-top:3px solid var(--amber);}
+  .modal-box.wide{max-width:100%;}
+}
+
+.limit-icon{font-family:var(--disp);font-size:42px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:14px;text-align:center;}
+.limit-tier{padding:14px;background:var(--s2);border:1px solid var(--b2);margin-bottom:10px;}
+.limit-tier strong{display:block;font-family:var(--disp);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.limit-tier p{margin:0;font-size:11px;color:var(--mid);}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* FOOTER */
+/* ═══════════════════════════════════════════════════════════ */
+footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:11px;color:var(--dim);position:relative;z-index:2;}
 .ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;padding:36px 40px 28px;}
 .ft-col{display:flex;flex-direction:column;}
 .ft-title{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text);margin-bottom:12px;}
-.ft-link{color:var(--mid);text-decoration:none;font-size:11px;padding:4px 0;transition:color .15s;}
+.ft-link{color:var(--mid);text-decoration:none;font-size:11px;padding:4px 0;cursor:pointer;}
 .ft-link:hover{color:var(--amber);}
 .ft-text{font-size:11px;color:var(--dim);line-height:1.7;}
 .ft-bottom{display:flex;justify-content:space-between;padding:16px 40px;border-top:1px solid var(--b1);font-size:10px;color:var(--dim);flex-wrap:wrap;gap:8px;}
-@media(max-width:860px){.ft-grid{grid-template-columns:1fr 1fr;gap:24px;padding:28px 20px 20px;}.ft-bottom{padding:14px 20px;}}
+
+@media(max-width:880px){
+  body[data-state="configure"] footer,body[data-state="result"] footer{display:none;}
+  .ft-grid{grid-template-columns:1fr 1fr;gap:24px;padding:28px 20px 20px;}
+  .ft-bottom{padding:14px 20px;}
+}
 @media(max-width:480px){.ft-grid{grid-template-columns:1fr;}}
 
-.prog-wrap{display:flex;align-items:stretch;background:var(--s1);border-bottom:1px solid var(--b1);padding:18px 28px;gap:0;}
-.prog-step{display:flex;align-items:center;gap:12px;flex:1;padding:8px 16px;transition:all .25s;opacity:1;}
-.prog-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:16px;font-weight:700;border:1.5px solid var(--b2);color:var(--dim);background:var(--s2);transition:all .3s;flex-shrink:0;}
-.prog-step.active .prog-num{border-color:var(--amber);color:var(--amber);background:var(--adim);box-shadow:0 0 16px rgba(232,160,32,.25);}
-.prog-step.done .prog-num{border-color:var(--green);color:var(--green);background:rgba(0,184,148,.10);}
-.prog-step.done .prog-num{font-size:0;}
-.prog-step.done .prog-num::before{content:'\2713';font-size:18px;}
-.prog-info{display:flex;flex-direction:column;line-height:1.2;}
-.prog-title{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);}
-.prog-step:not(.active):not(.done) .prog-title{color:var(--mid);}
-.prog-sub{font-size:10px;color:var(--dim);letter-spacing:.04em;margin-top:3px;}
-.prog-line{flex:0 0 40px;align-self:center;height:1px;background:var(--b2);margin:0 4px;transition:background .3s;}
-.prog-line.done{background:var(--green);}
-@media(max-width:700px){
-  .prog-wrap{padding:14px 16px;}
-  .prog-step{padding:6px 4px;gap:8px;}
-  .prog-num{width:30px;height:30px;font-size:14px;}
-  .prog-title{font-size:11px;}
-  .prog-sub{display:none;}
-  .prog-line{flex:0 0 16px;}
+/* Mobile-only state hero compressed */
+@media(max-width:880px){
+  body[data-state="drop"] .upzone{margin:0 18px;}
 }
-
-.fb-modal{display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.fb-modal.vis{display:flex;}
-.fb-box{background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:520px;width:90%;padding:32px;margin:0 16px;}
-.fb-box h3{font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;color:var(--text);}
-.fb-box p{font-size:12px;color:var(--mid);line-height:1.7;margin-bottom:16px;}
-.fb-box select,.fb-box textarea,.fb-box input{margin-bottom:12px;}
-.fb-box textarea{resize:vertical;min-height:100px;background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;width:100%;}
-.fb-box textarea:focus{outline:none;border-color:var(--amber);}
-.fb-actions{display:flex;gap:10px;margin-top:8px;}
-.fb-btn{flex:1;padding:14px;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;transition:all .2s;}
-.fb-btn.primary{background:var(--amber);color:#07090c;}
-.fb-btn.primary:hover{background:#f0b030;}
-.fb-btn.cancel{background:var(--s3);color:var(--mid);}
-.fb-btn.cancel:hover{background:var(--b1);color:var(--text);}
-
-.callout{padding:10px 12px;background:rgba(232,160,32,.06);border-left:2px solid var(--amber);font-size:11px;color:var(--mid);line-height:1.6;margin-bottom:14px;}
-.callout strong{color:var(--text);}
-
-.limit-modal{display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.limit-modal.vis{display:flex;}
-.limit-box{background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:480px;width:90%;padding:36px;margin:0 16px;text-align:center;}
-.limit-icon{font-family:var(--disp);font-size:48px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:14px;}
-.limit-box h3{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;color:var(--text);}
-.limit-box p{font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:20px;}
-.limit-tier{padding:14px;background:var(--s2);border:1px solid var(--b2);margin-bottom:10px;text-align:left;}
-.limit-tier strong{display:block;font-family:var(--disp);font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
-.limit-tier p{margin:0;font-size:11px;color:var(--mid);}
-.limit-counter{display:inline-block;padding:3px 8px;background:var(--adim);border:1px solid var(--amber);color:var(--amber);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:10px;font-weight:700;}
-
-.amode-btn{flex:1;padding:14px 18px;background:var(--s2);cursor:pointer;border-right:1px solid var(--b2);transition:all .15s;}
-.amode-btn:last-child{border-right:none;}
-.amode-btn:hover{background:var(--s3);}
-.amode-btn.on{background:var(--adim);border-color:var(--amber);}
-.amode-btn strong{display:block;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mid);margin-bottom:4px;}
-.amode-btn.on strong{color:var(--amber);}
-.amode-btn span{display:block;font-size:11px;color:var(--dim);line-height:1.4;}
-.pull-item.isel{border-left:3px solid var(--amber);background:var(--adim);}
-.pnum.isel{color:var(--amber);}
-
 </style>
-<script data-goatcounter="https://miatadyno.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+<script data-goatcounter="https://miatadyno.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
-<body>
+<body data-state="drop">
 
 <header class="fi">
   <div class="h-logo">
@@ -491,10 +476,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
   </div>
   <div class="h-meta">NC 2006-2015 · Beta <span class="limit-counter" id="usageCount">0/2</span></div>
   <nav>
-    <a href="#" onclick="toggleTheme();return false;" id="themeToggle" title="Toggle theme">☀</a>
-    <a href="#how-it-works">How It Works</a>
-    <a href="#" onclick="openFeedback();return false;">Feedback</a>
-    <a href="mailto:thuvhoang19@gmail.com">Contact</a>
+    <a onclick="toggleTheme()" id="themeToggle" title="Toggle theme">☀</a>
+    <a onclick="openFeedback()">Feedback</a>
   </nav>
 </header>
 
@@ -513,558 +496,564 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 
 <div class="layout fi d2">
 
-<div class="sidebar">
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- DESKTOP SIDEBAR (hidden on mobile)                        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="sidebar">
 
-  <!-- LOG FILE -->
-  <div class="sec">
-    <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-t">Log File</span><span class="sec-c">▸</span>
-    </div>
-    <div class="sec-bd" style="padding:0;">
-      <div class="upzone" id="upzone">
-        <input type="file" id="fileIn" accept=".csv">
-        <span class="up-icon">CSV</span>
-        <p><strong>Drop your OBD log here</strong></p>
-        <p>or click to browse</p>
-        <small>OBD Scanner. Live Data. Stop. Share. Save to Files.</small>
-      </div>
-      <div class="upst" id="upst"></div>
-    </div>
-  </div>
-
-  <!-- YOUR CAR -->
-  <div class="sec">
-    <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-t">Your Car</span><span class="sec-c">▸</span>
-    </div>
-    <div class="sec-bd">
-      <div class="fl">
-        <label class="lbl">Miata Generation</label>
-        <select id="ncGen" onchange="calcW()">
-          <option value="nc1">NC1 (2006-2008)</option>
-          <option value="nc2" selected>NC2 (2009-2012)</option>
-          <option value="nc3">NC3 (2013-2015)</option>
-        </select>
-      </div>
-
-      <div class="fl">
-        <label class="lbl">Top Type</label>
-        <div class="trow" id="tTop">
-          <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
-          <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT</div>
+    <div class="sec">
+      <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Log File</span><span class="sec-c">▸</span></div>
+      <div class="sec-bd" style="padding:0;">
+        <div class="upzone" id="upzone">
+          <input type="file" id="fileIn" accept=".csv">
+          <span class="up-icon">CSV</span>
+          <p><strong>Drop your OBD log here</strong></p>
+          <p>or click to browse</p>
+          <small>BlueDriver · OBD Fusion · Torque Pro</small>
         </div>
-      </div>
-
-      <div class="fl">
-        <label class="lbl">Top Position During Pull</label>
-        <div class="trow" id="tPos">
-          <div class="tbtn on" data-v="up" onclick="setT('tPos',this);calcW()">Top Up</div>
-          <div class="tbtn" data-v="down" onclick="setT('tPos',this);calcW()">Top Down</div>
-        </div>
-        <p style="font-size:10px;color:var(--dim);margin-top:5px;">Top down adds about 22% drag.</p>
-      </div>
-
-      <div class="fl">
-        <label class="lbl">Driver Weight (lbs)</label>
-        <input type="number" id="drvWt" value="170" min="100" max="350" onchange="calcW()">
-        <p style="font-size:10px;color:var(--amber);margin-top:6px;line-height:1.5;">
-          <strong>Solo runs only.</strong> Passengers reduce data accuracy.
-        </p>
+        <div class="upst" id="upst"></div>
       </div>
     </div>
-  </div>
 
-  <!-- WHEELS & TIRES -->
-  <div class="sec">
-    <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span>
-    </div>
-    <div class="sec-bd">
-
-      <div class="callout">
-        <strong>Critical for accuracy.</strong> Your OBD reads speed based on stock tire size. If you've changed tire size, the speed is wrong, which directly affects your power calculation. Even a 5% tire diameter change creates a 5% power error.
-      </div>
-
-      <div class="fl">
-        <label class="lbl">Rim Size</label>
-        <div class="trow" id="tRim">
-          <div class="tbtn" data-v="15" onclick="setT('tRim',this);setRim(15)">15"</div>
-          <div class="tbtn" data-v="16" onclick="setT('tRim',this);setRim(16)">16"</div>
-          <div class="tbtn on" data-v="17" onclick="setT('tRim',this);setRim(17)">17"</div>
-          <div class="tbtn" data-v="18" onclick="setT('tRim',this);setRim(18)">18"</div>
-        </div>
-      </div>
-
-      <div class="fl">
-        <label class="lbl">Wheel Weight per Corner</label>
-        <select id="whlWt" onchange="checkCustomWheel();calcW()"></select>
-        <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;" id="whl-note">Weigh one wheel on a bathroom scale for the most accurate number.</p>
-      </div>
-
-      <div class="fl" id="customWheelRow" style="display:none;">
-        <label class="lbl">Custom Wheel Weight per Corner (lbs)</label>
-        <input type="number" id="whlCustom" value="15" min="6" max="35" step="0.1" onchange="calcW()">
-      </div>
-
-      <div class="fl">
-        <label class="lbl">Tire Size</label>
-        <select id="tireSel" onchange="checkCustomTire();calcW()"></select>
-        <p style="font-size:10px;color:var(--dim);margin-top:5px;">Stock NC1: 195/50R16 · Stock NC2/3: 205/45R17</p>
-      </div>
-
-      <div class="fl" id="customTireRow" style="display:none;">
-        <label class="lbl">Custom Tire Size</label>
-        <div class="g3">
-          <div>
-            <label class="lbl" style="font-size:9px;">Width</label>
-            <input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()">
-          </div>
-          <div>
-            <label class="lbl" style="font-size:9px;">Aspect</label>
-            <input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()">
-          </div>
-          <div>
-            <label class="lbl" style="font-size:9px;">Rim</label>
-            <input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()">
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- CAR WEIGHT -->
-  <div class="sec">
-    <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-t">Car Weight</span><span class="sec-c">▸</span>
-    </div>
-    <div class="sec-bd">
-
-      <div class="fl">
-        <label class="lbl">Which weight do you know?</label>
-        <div class="trow" id="tWtMode">
-          <div class="tbtn on" data-v="total" onclick="setT('tWtMode',this);setWeightMode('total')">Total Car</div>
-          <div class="tbtn" data-v="mods" onclick="setT('tWtMode',this);setWeightMode('mods')">Just Mods</div>
-          <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate</div>
-        </div>
-      </div>
-
-      <div id="path-total" style="margin-top:14px;">
+    <div class="sec">
+      <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Your Car</span><span class="sec-c">▸</span></div>
+      <div class="sec-bd">
         <div class="fl">
-          <label class="lbl">Total Car Weight (lbs)</label>
-          <input type="number" id="totalWt" value="2509" min="2000" max="3500" step="10" onchange="calcW()">
-          <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">
-            Your scale weight including all aftermarket parts. Don't include yourself or fuel. We add those automatically.
-          </p>
+          <label class="lbl">Miata Generation</label>
+          <select id="ncGen" onchange="calcW()">
+            <option value="nc1">NC1 (2006-2008)</option>
+            <option value="nc2" selected>NC2 (2009-2012)</option>
+            <option value="nc3">NC3 (2013-2015)</option>
+          </select>
         </div>
-      </div>
-
-      <div id="path-mods" style="display:none;margin-top:14px;">
         <div class="fl">
-          <label class="lbl">Weight Change From Mods (lbs)</label>
-          <input type="number" id="modWt" value="0" min="-500" max="500" step="1" placeholder="-25 if you removed weight" onchange="calcW()">
-          <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">
-            Total weight you've added or removed from stock. Use a negative number if your mods made it lighter.
-          </p>
+          <label class="lbl">Top Type</label>
+          <div class="trow" id="tTop">
+            <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
+            <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT</div>
+          </div>
+        </div>
+        <div class="fl">
+          <label class="lbl">Top Position During Pull</label>
+          <div class="trow" id="tPos">
+            <div class="tbtn on" data-v="up" onclick="setT('tPos',this);calcW()">Top Up</div>
+            <div class="tbtn" data-v="down" onclick="setT('tPos',this);calcW()">Top Down</div>
+          </div>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;">Top down adds about 22% drag.</p>
+        </div>
+        <div class="fl">
+          <label class="lbl">Driver Weight (lbs)</label>
+          <input type="number" id="drvWt" value="170" min="100" max="350" onchange="calcW()">
+          <p style="font-size:10px;color:var(--amber);margin-top:6px;line-height:1.5;"><strong>Solo runs only.</strong> Passengers reduce data accuracy.</p>
         </div>
       </div>
+    </div>
 
-      <div id="path-estimate" style="display:none;margin-top:14px;">
-        <p style="font-size:11px;color:var(--mid);line-height:1.7;">
-          We'll start with stock curb weight and apply your mods from the sections below. Configure exhaust and other mods to see your total.
-        </p>
-      </div>
-
-      <div class="wsum">
-        <div class="wsrow tot">
-          <span>Total weight</span>
-          <span class="wv n" id="ws-tot">.</span>
+    <div class="sec">
+      <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span></div>
+      <div class="sec-bd">
+        <div class="callout"><strong>Critical for accuracy.</strong> OBD reads speed based on stock tire size. Even a 5% tire diameter change creates a 5% power error.</div>
+        <div class="fl">
+          <label class="lbl">Rim Size</label>
+          <div class="trow" id="tRim">
+            <div class="tbtn" data-v="15" onclick="setT('tRim',this);setRim(15)">15"</div>
+            <div class="tbtn" data-v="16" onclick="setT('tRim',this);setRim(16)">16"</div>
+            <div class="tbtn on" data-v="17" onclick="setT('tRim',this);setRim(17)">17"</div>
+            <div class="tbtn" data-v="18" onclick="setT('tRim',this);setRim(18)">18"</div>
+          </div>
         </div>
-        <p style="font-size:9px;color:var(--dim);margin-top:4px;text-align:right;">(Car + half-tank fuel + driver)</p>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- EXHAUST (estimate path only) -->
-  <div class="sec" id="sec-exhaust">
-  <div class="sec-hd" onclick="toggleSec(this)">
-    <span class="sec-t">Exhaust System</span><span class="sec-c">▸</span>
-  </div>
-  <div class="sec-bd">
-    
-    <div class="exh-comp">
-      <div class="exh-lbl">Cat-Back / Muffler <span class="exh-d" id="d-cb">±0 lbs</span></div>
-      <select id="catback" onchange="exhDelta('catback','d-cb');checkCustomExh('catback');calcW()">
-        <option value="0">Stock OEM</option>
-        <option value="-13.8">Flyin' Miata Cat-Back (−13.8 lbs)</option>
-        <option value="-16.0">Racing Beat Power Pulse (−16.0 lbs)</option>
-        <option value="-14.5">GoodWin Racing Cat-Back (−14.5 lbs)</option>
-        <option value="-12.5">Borla ATAK (−12.5 lbs)</option>
-        <option value="-17.0">Cobalt SS (−17.0 lbs)</option>
-        <option value="custom">Custom (enter weight below)</option>
-      </select>
-      <input type="number" id="catbackCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
-    </div>
-
-    <div class="exh-comp" style="margin-top:10px;">
-      <div class="exh-lbl">Midpipe <span class="exh-d" id="d-mp">±0 lbs</span></div>
-      <select id="midpipe" onchange="exhDelta('midpipe','d-mp');checkCustomExh('midpipe');calcW()">
-        <option value="0">Stock OEM Midpipe</option>
-        <option value="-4.5">Flyin' Miata High-Flow Cat (−4.5 lbs)</option>
-        <option value="-4.0">Racing Beat High-Flow Cat (−4.0 lbs)</option>
-        <option value="-8.0">Test Pipe (−8.0 lbs)</option>
-        <option value="custom">Custom (enter weight below)</option>
-      </select>
-      <input type="number" id="midpipeCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
-    </div>
-
-    <div class="exh-comp" style="margin-top:10px;">
-      <div class="exh-lbl">Headers <span class="exh-d" id="d-hd">±0 lbs</span></div>
-      <select id="headers" onchange="exhDelta('headers','d-hd');checkCustomExh('headers');calcW()">
-        <option value="0">Stock OEM Manifold</option>
-        <option value="-8.5">Flyin' Miata Long Tube (−8.5 lbs)</option>
-        <option value="-8.0">Racing Beat Header (−8.0 lbs)</option>
-        <option value="-9.0">GoodWin Racing Header (−9.0 lbs)</option>
-        <option value="custom">Custom (enter weight below)</option>
-      </select>
-      <input type="number" id="headersCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
-    </div>
-
-  </div>
-</div>
-
-  <!-- OTHER MODS (estimate path only) -->
-  <div class="sec" id="sec-other" style="display:none;">
-        <div class="sec-hd" onclick="toggleSec(this)">
-          <span class="sec-t">Other Mods</span><span class="sec-c">▸</span>
+        <div class="fl">
+          <label class="lbl">Wheel Weight per Corner</label>
+          <select id="whlWt" onchange="checkCustomWheel();calcW()"></select>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;" id="whl-note">Weigh one wheel on a bathroom scale for accuracy.</p>
         </div>
-        <div class="sec-bd">
+        <div class="fl" id="customWheelRow" style="display:none;">
+          <label class="lbl">Custom Wheel Weight (lbs)</label>
+          <input type="number" id="whlCustom" value="15" min="6" max="35" step="0.1" onchange="calcW()">
+        </div>
+        <div class="fl">
+          <label class="lbl">Tire Size</label>
+          <select id="tireSel" onchange="checkCustomTire();calcW()"></select>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;">Stock NC1: 195/50R16 · Stock NC2/3: 205/45R17</p>
+        </div>
+        <div class="fl" id="customTireRow" style="display:none;">
+          <label class="lbl">Custom Tire Size</label>
+          <div class="g3">
+            <div><label class="lbl" style="font-size:9px;">Width</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
+            <div><label class="lbl" style="font-size:9px;">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
+            <div><label class="lbl" style="font-size:9px;">Rim</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Car Weight</span><span class="sec-c">▸</span></div>
+      <div class="sec-bd">
+        <div class="fl">
+          <label class="lbl">Which weight do you know?</label>
+          <div class="trow" id="tWtMode">
+            <div class="tbtn on" data-v="total" onclick="setT('tWtMode',this);setWeightMode('total')">Total Car</div>
+            <div class="tbtn" data-v="mods" onclick="setT('tWtMode',this);setWeightMode('mods')">Just Mods</div>
+            <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate</div>
+          </div>
+        </div>
+        <div id="path-total" style="margin-top:14px;">
           <div class="fl">
-            <label class="lbl">AC System</label>
-            <div class="trow" id="tAC">
-              <div class="tbtn on" data-v="0" onclick="setT('tAC',this);calcW()">Stock</div>
-              <div class="tbtn" data-v="-28" onclick="setT('tAC',this);calcW()">Deleted (-28 lbs)</div>
+            <label class="lbl">Total Car Weight (lbs)</label>
+            <input type="number" id="totalWt" value="2509" min="2000" max="3500" step="10" onchange="calcW()">
+            <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">Scale weight including aftermarket parts. Don't include yourself or fuel.</p>
+          </div>
+        </div>
+        <div id="path-mods" style="display:none;margin-top:14px;">
+          <div class="fl">
+            <label class="lbl">Weight Change From Mods (lbs)</label>
+            <input type="number" id="modWt" value="0" min="-500" max="500" step="1" placeholder="-25 if you removed weight" onchange="calcW()">
+            <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">Negative if your mods made the car lighter.</p>
+          </div>
+        </div>
+        <div id="path-estimate" style="display:none;margin-top:14px;">
+          <p style="font-size:11px;color:var(--mid);line-height:1.7;">We'll start with stock curb weight and apply your mods from below.</p>
+        </div>
+        <div class="wsum">
+          <div class="wsrow tot">
+            <span>Total weight</span>
+            <span class="wv n" id="ws-tot">.</span>
+          </div>
+          <p style="font-size:9px;color:var(--dim);margin-top:4px;text-align:right;">(Car + half-tank fuel + driver)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec" id="sec-exhaust">
+      <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Exhaust System</span><span class="sec-c">▸</span></div>
+      <div class="sec-bd">
+        <div class="exh-comp">
+          <div class="exh-lbl">Cat-Back / Muffler <span class="exh-d" id="d-cb">±0 lbs</span></div>
+          <select id="catback" onchange="exhDelta('catback','d-cb');checkCustomExh('catback');calcW()">
+            <option value="0">Stock OEM</option>
+            <option value="-13.8">Flyin' Miata Cat-Back (−13.8 lbs)</option>
+            <option value="-16.0">Racing Beat Power Pulse (−16.0 lbs)</option>
+            <option value="-14.5">GoodWin Racing Cat-Back (−14.5 lbs)</option>
+            <option value="-12.5">Borla ATAK (−12.5 lbs)</option>
+            <option value="-17.0">Cobalt SS (−17.0 lbs)</option>
+            <option value="custom">Custom (enter weight below)</option>
+          </select>
+          <input type="number" id="catbackCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
+        </div>
+        <div class="exh-comp">
+          <div class="exh-lbl">Midpipe <span class="exh-d" id="d-mp">±0 lbs</span></div>
+          <select id="midpipe" onchange="exhDelta('midpipe','d-mp');checkCustomExh('midpipe');calcW()">
+            <option value="0">Stock OEM Midpipe</option>
+            <option value="-4.5">Flyin' Miata High-Flow Cat (−4.5 lbs)</option>
+            <option value="-4.0">Racing Beat High-Flow Cat (−4.0 lbs)</option>
+            <option value="-8.0">Test Pipe (−8.0 lbs)</option>
+            <option value="custom">Custom (enter weight below)</option>
+          </select>
+          <input type="number" id="midpipeCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
+        </div>
+        <div class="exh-comp">
+          <div class="exh-lbl">Headers <span class="exh-d" id="d-hd">±0 lbs</span></div>
+          <select id="headers" onchange="exhDelta('headers','d-hd');checkCustomExh('headers');calcW()">
+            <option value="0">Stock OEM Manifold</option>
+            <option value="-8.5">Flyin' Miata Long Tube (−8.5 lbs)</option>
+            <option value="-8.0">Racing Beat Header (−8.0 lbs)</option>
+            <option value="-9.0">GoodWin Racing Header (−9.0 lbs)</option>
+            <option value="custom">Custom (enter weight below)</option>
+          </select>
+          <input type="number" id="headersCustom" value="0" step="0.5" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
+        </div>
+      </div>
+    </div>
+
+    <div class="sec" id="sec-other">
+      <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Other Mods</span><span class="sec-c">▸</span></div>
+      <div class="sec-bd">
+        <div class="fl">
+          <label class="lbl">AC System</label>
+          <div class="trow" id="tAC">
+            <div class="tbtn on" data-v="0" onclick="setT('tAC',this);calcW()">Stock</div>
+            <div class="tbtn" data-v="-28" onclick="setT('tAC',this);calcW()">Deleted (-28 lbs)</div>
+          </div>
+        </div>
+        <div class="fl">
+          <label class="lbl">Roll Bar / Cage</label>
+          <select id="rollbar" onchange="checkCustomExh('rollbar');calcW()">
+            <option value="0">None (stock)</option>
+            <option value="22">Hard Dog M2 (+22 lbs)</option>
+            <option value="28">Hard Dog M3 (+28 lbs)</option>
+            <option value="65">Full tube cage (+65 lbs)</option>
+            <option value="custom">Custom (+/- lbs)</option>
+          </select>
+          <input type="number" id="rollbarCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
+        </div>
+        <div class="fl">
+          <label class="lbl">Forced Induction</label>
+          <select id="forced" onchange="checkCustomExh('forced');calcW()">
+            <option value="0">None (naturally aspirated)</option>
+            <option value="45">FM Supercharger Kit (+45 lbs)</option>
+            <option value="38">Other supercharger (+38 lbs)</option>
+            <option value="custom">Custom (+/- lbs)</option>
+          </select>
+          <input type="number" id="forcedCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
+        </div>
+        <div class="fl">
+          <label class="lbl">Custom Adjustment (lbs)</label>
+          <input type="number" id="xDelta" value="0" step="1" placeholder="+/- lbs" onchange="calcW()">
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Mod Description</span><span class="sec-c">▸</span></div>
+      <div class="sec-bd">
+        <div class="fl">
+          <label class="lbl">What did you do? (shows on result card)</label>
+          <input type="text" id="modDesc" placeholder="e.g. Race muffler + 16x8 wheels">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-go" id="goBtn" disabled>Run Analysis</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CONTENT (visible on both desktop and mobile)              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="content">
+    <div class="disc">For use on private property and closed courses only. Never exceed posted speed limits. Beta. Results are estimates, not certified dyno figures.</div>
+
+    <!-- DESKTOP-ONLY: PROGRESS INDICATOR -->
+    <div class="prog-wrap">
+      <div class="prog-step" id="step-1">
+        <div class="prog-num">1</div>
+        <div class="prog-info"><div class="prog-title">Upload Log</div><div class="prog-sub">CSV from your OBD scanner</div></div>
+      </div>
+      <div class="prog-line" id="line-1-2"></div>
+      <div class="prog-step" id="step-2">
+        <div class="prog-num">2</div>
+        <div class="prog-info"><div class="prog-title">Configure Car</div><div class="prog-sub">Generation, weight, mods</div></div>
+      </div>
+      <div class="prog-line" id="line-2-3"></div>
+      <div class="prog-step" id="step-3">
+        <div class="prog-num">3</div>
+        <div class="prog-info"><div class="prog-title">Run Analysis</div><div class="prog-sub">Get your power curve</div></div>
+      </div>
+    </div>
+
+    <!-- MOBILE-ONLY: VEHICLE CARD (visible in configure state) -->
+    <div id="mobile-vehicle-card">
+      <div class="vehicle-card">
+        <div class="vc-label">Vehicle Profile</div>
+        <div class="vc-title" id="vcTitle">NC2 Soft Top</div>
+        <div class="vc-row" id="vcWheels">17" wheels · 205/45R17</div>
+        <div class="vc-row" id="vcDriver">170 lb driver · solo · top up</div>
+        <div class="vc-num" id="vcWeight">2,679 <small>lbs total</small></div>
+        <button class="vc-edit" onclick="openVehicleEdit()">Edit Vehicle</button>
+      </div>
+    </div>
+
+    <!-- MOBILE-ONLY: UPLOAD SECTION (visible in drop state) -->
+    <div id="upload-section">
+      <div class="cpanel" id="how-it-works" style="background:var(--s1);">
+        <div class="plabel">How It Works</div>
+        <div class="howitworks-grid">
+          <div class="hw-step">
+            <div class="hw-num">01</div>
+            <div class="hw-title">Capture</div>
+            <p class="hw-text">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your pull.</p>
+            <div class="hw-pids">
+              <p>Required PIDs</p>
+              <span>RPM · Vehicle Speed · Throttle Position</span>
             </div>
           </div>
-          <div class="fl">
-            <label class="lbl">Roll Bar / Cage</label>
-            <select id="rollbar" onchange="checkCustomExh('rollbar');calcW()">
-              <option value="0">None (stock)</option>
-              <option value="22">Hard Dog M2 (+22 lbs)</option>
-              <option value="28">Hard Dog M3 (+28 lbs)</option>
-              <option value="65">Full tube cage (+65 lbs)</option>
-              <option value="custom">Custom (+/- lbs)</option>
-            </select>
-            <input type="number" id="rollbarCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
+          <div class="hw-step">
+            <div class="hw-num">02</div>
+            <div class="hw-title">Analyze</div>
+            <p class="hw-text">Road load physics calculates wheel HP from acceleration, mass, aero drag, rolling resistance. SAE J1349 atmospheric correction.</p>
           </div>
-          <div class="fl">
-            <label class="lbl">Forced Induction</label>
-            <select id="forced" onchange="checkCustomExh('forced');calcW()">
-              <option value="0">None (naturally aspirated)</option>
-              <option value="45">FM Supercharger Kit (+45 lbs)</option>
-              <option value="38">Other supercharger (+38 lbs)</option>
-              <option value="custom">Custom (+/- lbs)</option>
-            </select>
-            <input type="number" id="forcedCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none; width:100%; margin-top:6px;" onchange="calcW()">
-          </div>
-          <div class="fl">
-            <label class="lbl">Custom Weight Adjustment (lbs)</label>
-            <input type="number" id="xDelta" value="0" step="1" placeholder="+/- lbs" onchange="calcW()">
+          <div class="hw-step">
+            <div class="hw-num">03</div>
+            <div class="hw-title">Compare</div>
+            <p class="hw-text">Run quality scoring rejects bad data. Multi-run averaging reduces noise. Stock reference shows where you land.</p>
           </div>
         </div>
       </div>
 
-  <!-- MOD DESCRIPTION -->
-  <div class="sec">
-    <div class="sec-hd" onclick="toggleSec(this)">
-      <span class="sec-t">Mod Description</span><span class="sec-c">▸</span>
-    </div>
-    <div class="sec-bd">
-      <div class="fl">
-        <label class="lbl">What did you do? (shows on result card)</label>
-        <input type="text" id="modDesc" placeholder="e.g. Race muffler + 16x8 wheels">
-      </div>
-    </div>
-  </div>
-
-  <button class="btn-go" id="goBtn" disabled>Run Analysis</button>
-</div>
-
-<!-- CONTENT -->
-<div class="content">
-  <div class="disc">For use on private property and closed courses only. Never exceed posted speed limits. Beta. Results are estimates, not certified dyno figures.</div>
-
-  <div class="prog-wrap">
-    <div class="prog-step" id="step-1">
-      <div class="prog-num">1</div>
-      <div class="prog-info"><div class="prog-title">Upload Log</div><div class="prog-sub">CSV from your OBD scanner</div></div>
-    </div>
-    <div class="prog-line" id="line-1-2"></div>
-    <div class="prog-step" id="step-2">
-      <div class="prog-num">2</div>
-      <div class="prog-info"><div class="prog-title">Configure Car</div><div class="prog-sub">Generation, weight, mods</div></div>
-    </div>
-    <div class="prog-line" id="line-2-3"></div>
-    <div class="prog-step" id="step-3">
-      <div class="prog-num">3</div>
-      <div class="prog-info"><div class="prog-title">Run Analysis</div><div class="prog-sub">Get your power curve</div></div>
-    </div>
-  </div>
-
-  <div class="cpanel" style="background:var(--s1);">
-    <div class="plabel">How to Get Good Data</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:6px;">
-      <div>
-        <p style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:10px;font-family:var(--disp);letter-spacing:.08em;text-transform:uppercase;">The Golden Pull</p>
-        <ol style="font-size:12px;color:var(--mid);line-height:1.85;padding-left:16px;">
-          <li><strong style="color:var(--text);">Warmup.</strong> Drive 10 to 15 minutes before the run. Warm oil means consistent friction and accurate power numbers.</li>
-          <li><strong style="color:var(--text);">Pick your gear.</strong> 3rd gear if you have a long, safe, flat stretch (preferred, gives 7 to 9 seconds of clean data). 2nd gear if you don't.</li>
-          <li><strong style="color:var(--text);">Steady entry.</strong> Roll at 2,000 RPM in your chosen gear. Start logging in your OBD app.</li>
-          <li><strong style="color:var(--text);">Floor it instantly.</strong> Don't roll into the throttle. Pedal to the carpet in one motion.</li>
-          <li><strong style="color:var(--text);">Hold to 7,100 RPM.</strong> The NC2/3 has a 7,200 RPM redline and peak power happens around 6,700 to 7,000 RPM. Lifting at 6,500 cuts off your peak.</li>
-          <li><strong style="color:var(--text);">Lift and coast.</strong> Stay in gear and coast for 3 seconds before braking.</li>
-          <li><strong style="color:var(--text);">Pull twice in opposite directions.</strong> Averaging both runs cancels out road grade and wind.</li>
-        </ol>
-      </div>
-      <div>
-        <p style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:10px;font-family:var(--disp);letter-spacing:.08em;text-transform:uppercase;">What to Avoid</p>
-        <ul style="font-size:12px;color:var(--mid);line-height:1.85;padding-left:16px;">
-          <li><strong style="color:var(--text);">No mid-pull shifts.</strong> One gear from start to redline.</li>
-          <li><strong style="color:var(--text);">No hills or ramps.</strong> Even 1 percent grade adds or removes about 5 WHP.</li>
-          <li><strong style="color:var(--text);">No headwind.</strong> A 10 mph headwind costs real power.</li>
-          <li><strong style="color:var(--text);">No wet or cold roads.</strong> Below 40F or wet pavement reduces traction.</li>
-          <li><strong style="color:var(--text);">No traffic.</strong> Wait until the road is fully clear.</li>
-          <li><strong style="color:var(--text);">No passengers.</strong> Solo runs only for cleanest data.</li>
-        </ul>
-        <div style="margin-top:14px;padding:10px 12px;background:var(--s2);border-left:2px solid var(--amber);">
-          <p style="font-size:11px;color:var(--text);font-weight:600;margin-bottom:4px;">Safety Check</p>
-          <p style="font-size:11px;color:var(--mid);line-height:1.6;">3rd gear pulls to 7,100 RPM in an NC reach roughly 85 to 90 MPH. Closed course or private property only. If you don't have access, stick to 2nd gear which tops out around 60 MPH.</p>
+      <div class="cpanel" style="background:var(--s1);">
+        <div class="plabel">How to Get Good Data</div>
+        <div class="golden-grid">
+          <div>
+            <div class="golden-h">The Golden Pull</div>
+            <ol>
+              <li><strong>Warmup.</strong> Drive 10-15 min before logging.</li>
+              <li><strong>Pick 3rd gear</strong> (long, safe stretch). 2nd if not.</li>
+              <li><strong>Roll at 2,000 RPM</strong> in your gear, start logging.</li>
+              <li><strong>Floor it instantly.</strong> No rolling into throttle.</li>
+              <li><strong>Hold to 7,100 RPM.</strong> Peak is at 6,700-7,000.</li>
+              <li><strong>Lift and coast</strong> 3 seconds before braking.</li>
+              <li><strong>Pull twice</strong> in opposite directions to cancel grade and wind.</li>
+            </ol>
+          </div>
+          <div>
+            <div class="golden-h">What to Avoid</div>
+            <ul>
+              <li><strong>No mid-pull shifts.</strong> One gear start to redline.</li>
+              <li><strong>No hills.</strong> 1% grade adds/removes 5 WHP.</li>
+              <li><strong>No headwind.</strong> 10 mph headwind costs real power.</li>
+              <li><strong>No wet roads.</strong> Below 40°F or wet = traction loss.</li>
+              <li><strong>No traffic.</strong> Wait for fully clear road.</li>
+              <li><strong>No passengers.</strong> Solo runs only.</li>
+            </ul>
+            <div class="safety-note">
+              <p>Safety Check</p>
+              <small>3rd gear pulls hit 85-90 MPH. Closed course or private property only. If you can't access one, stick to 2nd gear (~60 MPH).</small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="cpanel" id="how-it-works" style="background:var(--s1);">
-    <div class="plabel">How It Works</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:14px;">
-      <div>
-        <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">01</div>
-        <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Capture</p>
-        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your pull.</p>
-      <div style="margin-top:10px;padding:10px 12px;background:rgba(232,160,32,.08);border-left:2px solid var(--amber);">
-        <p style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Required PIDs</p>
-        <p style="font-size:11px;color:var(--text);line-height:1.6;">RPM · Vehicle Speed · Throttle Position</p>
-        <p style="font-size:10px;color:var(--mid);margin-top:8px;letter-spacing:.04em;"><strong style="color:var(--text);">Recommended:</strong> Barometric Pressure, Intake Air Temperature</p>
-      </div>
-      </div>
-
-      <div>
-        <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">02</div>
-        <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Analyze</p>
-        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Road load physics calculates wheel horsepower from acceleration, mass, aero drag, and rolling resistance. SAE J1349 atmospheric correction normalizes to standard conditions.</p>
-      </div>
-      <div>
-        <div style="font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;">03</div>
-        <p style="font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;">Compare</p>
-        <p style="font-size:11px;color:var(--mid);line-height:1.7;">Run quality scoring rejects bad data. Multi-run averaging reduces noise. Stock reference band shows where your number lands relative to a baseline NC.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="cpanel">
-    <div class="plabel">Analysis Mode</div>
-    <div style="display:flex;gap:0;margin-bottom:18px;border:1px solid var(--b2);">
-      <div class="amode-btn on" data-mode="same" onclick="setAnalysisMode('same')">
-        <strong>Same Setup</strong>
-        <span>Multiple pulls, same car. See your best run + consistency.</span>
-      </div>
-      <div class="amode-btn" data-mode="compare" onclick="setAnalysisMode('compare')">
-        <strong>Before vs After</strong>
-        <span>Compare a pull from before a mod vs after.</span>
-      </div>
-    </div>
-    <div class="ptitle" id="modeTitle">Select Pulls to Analyze</div>
-    <p style="font-size:11px;color:var(--mid);" id="modeHelp">
-      Tap pulls to include them. We'll average all selected pulls and show your best individual run.
-    </p>
-  </div>
-
-  <div class="cpanel full" id="pullSec">
-    <div class="empty-st">
-      <span class="big">.</span>
-      Upload a CSV file to detect full-throttle pulls.<br>
-      Requires <strong>Absolute Throttle Position</strong> and <strong>Vehicle Speed</strong> PIDs.
-    </div>
-  </div>
-
-  <div id="results">
-    <div id="resultBanner" style="display:none;padding:14px 30px;background:rgba(232,160,32,.08);border-bottom:1px solid var(--b1);border-left:3px solid var(--amber);">
-      <p id="resultBannerTitle" style="font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;"></p>
-      <p id="resultBannerBody" style="font-size:12px;color:var(--mid);line-height:1.6;"></p>
-    </div>
-    <div class="stats-g" id="statsLabels">
-      <div class="sbox"><div class="slbl">WHP</div><div class="sval">.</div><div class="sunit">wheel hp</div></div>
-    </div>
-    <div class="chart-w">
-      <div class="plabel" style="margin-bottom:16px;">Power Curve</div>
-      <canvas id="dynoChart" height="340"></canvas>
-    </div>
-    <div class="interp-w">
-      <div class="interp-bar">Analysis</div>
-      <div class="interp-txt ld" id="interp">Generating interpretation...</div>
-    </div>
-    <div class="card-w">
-      <div class="plabel" style="margin-bottom:14px;">Shareable Card</div>
-      <div id="shareCard">
-        <div class="sc-top">
-          <div><div class="sc-logo">Miata<span>Dyno</span></div><div class="sc-veh" id="cVeh">NC2 MX-5 (2009-2012)</div></div>
-          <div class="sc-mod" id="cMod">.</div>
+    <!-- ANALYSIS MODE TOGGLE (visible in configure state on mobile) -->
+    <div class="cpanel" id="amode-section">
+      <div class="plabel">Analysis Mode</div>
+      <div class="amode-row">
+        <div class="amode-btn on" data-mode="same" onclick="setAnalysisMode('same')">
+          <strong>Same Setup</strong>
+          <span>Multiple pulls, same car. Best run + average + consistency.</span>
         </div>
-        <div class="sc-nums">
-          <div class="sc-n"><div class="sc-v" id="cBef">.</div><div class="sc-l">Before WHP</div></div>
-          <div class="sc-n"><div class="sc-v" id="cAft">.</div><div class="sc-l">After WHP</div></div>
-          <div class="sc-n"><div class="sc-v g" id="cGain">.</div><div class="sc-l">WHP Gain</div></div>
-        </div>
-        <div class="sc-ft">
-          <span id="cCond">.</span>
-          <span>dannyhng.github.io/miatadyno</span>
+        <div class="amode-btn" data-mode="compare" onclick="setAnalysisMode('compare')">
+          <strong>Before vs After</strong>
+          <span>Compare a pull from before a mod vs after.</span>
         </div>
       </div>
-      <button class="btn-dl" onclick="dlCard()">Download PNG</button>
+      <div class="ptitle" id="modeTitle" style="margin-top:18px;">Select Pulls to Analyze</div>
+      <p style="font-size:11px;color:var(--mid);" id="modeHelp">Tap pulls to include them. We'll average all selected pulls and show your best individual run.</p>
     </div>
+
+    <!-- PULLS LIST -->
+    <div class="cpanel full" id="pull-section">
+      <div id="pullSec">
+        <div class="empty-st">
+          <span class="big">.</span>
+          Upload a CSV file to detect full-throttle pulls.<br>
+          Requires <strong>Throttle Position</strong> and <strong>Vehicle Speed</strong> PIDs.
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results">
+      <div class="res-banner" id="resBanner">
+        <p class="res-banner-t" id="resBannerT"></p>
+        <p class="res-banner-b" id="resBannerB"></p>
+      </div>
+      <div class="stats-g" id="statsLabels">
+        <div class="sbox"><div class="slbl">WHP</div><div class="sval">.</div><div class="sunit">wheel hp</div></div>
+      </div>
+      <div class="chart-w">
+        <div class="plabel" style="margin-bottom:16px;">Power Curve</div>
+        <canvas id="dynoChart" height="340"></canvas>
+      </div>
+      <div class="interp-w">
+        <div class="interp-bar">Analysis</div>
+        <div class="interp-txt ld" id="interp">Generating interpretation...</div>
+      </div>
+      <div class="card-w">
+        <div class="plabel" style="margin-bottom:14px;">Shareable Card</div>
+        <div id="shareCard">
+          <div class="sc-top">
+            <div><div class="sc-logo">Miata<span>Dyno</span></div><div class="sc-veh" id="cVeh">.</div></div>
+            <div class="sc-mod" id="cMod">.</div>
+          </div>
+          <div class="sc-nums">
+            <div class="sc-n"><div class="sc-v" id="cBef">.</div><div class="sc-l" id="cBefL">Before WHP</div></div>
+            <div class="sc-n"><div class="sc-v" id="cAft">.</div><div class="sc-l" id="cAftL">After WHP</div></div>
+            <div class="sc-n"><div class="sc-v g" id="cGain">.</div><div class="sc-l" id="cGainL">WHP Gain</div></div>
+          </div>
+          <div class="sc-ft">
+            <span id="cCond">.</span>
+            <span>dannyhng.github.io/miatadyno</span>
+          </div>
+        </div>
+        <button class="btn-dl" onclick="dlCard()">Download PNG</button>
+      </div>
+    </div>
+
   </div>
-</div>
 </div>
 
 <footer>
   <div class="ft-grid">
     <div class="ft-col">
       <div class="ft-title">MiataDyno</div>
-      <p class="ft-text">Virtual dyno analysis built for the NC Miata community. Upload an OBD log, get a real power estimate, share results.</p>
-      <p class="ft-text" style="margin-top:8px;">Currently in beta. Free while we validate accuracy with real users.</p>
+      <p class="ft-text">Virtual dyno analysis built for the NC Miata community.</p>
     </div>
     <div class="ft-col">
       <div class="ft-title">Product</div>
-      <a class="ft-link" href="#how-it-works">How It Works</a>
-      <a class="ft-link" href="#" onclick="openFeedback();return false;">Send Feedback</a>
+      <a class="ft-link" onclick="openFeedback()">Send Feedback</a>
       <a class="ft-link" href="mailto:thuvhoang19@gmail.com?subject=MiataDyno%20Bug%20Report">Report a Bug</a>
     </div>
     <div class="ft-col">
       <div class="ft-title">Contact</div>
       <a class="ft-link" href="mailto:thuvhoang19@gmail.com">thuvhoang19@gmail.com</a>
-      <p class="ft-text" style="margin-top:8px;">Based in Portland, Oregon</p>
+      <p class="ft-text" style="margin-top:8px;">Portland, OR</p>
     </div>
     <div class="ft-col">
       <div class="ft-title">Legal</div>
-      <a class="ft-link" href="#" onclick="openLegal('terms');return false;">Terms of Use</a>
-      <a class="ft-link" href="#" onclick="openLegal('privacy');return false;">Privacy</a>
-      <a class="ft-link" href="#" onclick="openLegal('disclaimer');return false;">Accuracy Disclaimer</a>
+      <a class="ft-link" onclick="openLegal('terms')">Terms of Use</a>
+      <a class="ft-link" onclick="openLegal('privacy')">Privacy</a>
+      <a class="ft-link" onclick="openLegal('disclaimer')">Accuracy Disclaimer</a>
     </div>
   </div>
   <div class="ft-bottom">
-    <span>&copy; 2026 MiataDyno. All rights reserved.</span>
-    <span>Results are estimates. Not affiliated with Mazda Motor Corporation.</span>
+    <span>&copy; 2026 MiataDyno</span>
+    <span>Estimates only. Not affiliated with Mazda.</span>
   </div>
 </footer>
 
+<!-- MOBILE-ONLY ACTION BAR -->
+<div class="actionbar" id="mobile-action-bar">
+  <div class="actionbar-inner" id="actionBarInner"></div>
+</div>
+
+<!-- ═══ MOBILE EDIT VEHICLE MODAL ═══ -->
+<div class="modal-bg" id="vehicleModal">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <span class="modal-title">Edit Vehicle</span>
+      <button class="modal-close" onclick="closeVehicleEdit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:11px;color:var(--mid);margin-bottom:14px;">Tap a section to expand it. Same fields as the desktop sidebar.</p>
+      <div id="modal-sections-host"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeVehicleEdit()">Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- TERMS MODAL -->
-<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-  <div style="background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:520px;width:90%;padding:36px;margin:0 16px;">
-    <p style="font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;color:var(--text);">Before You Run</p>
-    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:20px;">
-      MiataDyno estimates wheel horsepower using road load physics applied to your OBD log data. Results are estimates, not certified dyno figures.
-    </p>
-    <p style="font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:24px;">
-      To collect data, you'll need to do a wide-open throttle acceleration run.
-      <strong style="color:var(--text);">This must only be done on private property, a closed course, or a road where it is safe and lawful to do so.</strong>
-      You are solely responsible for how you use this tool.
-    </p>
-    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:24px;">
-      <input type="checkbox" id="termsCheck" style="margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex-shrink:0;">
-      <span style="font-size:12px;color:var(--mid);line-height:1.6;">
-        I understand this tool is for estimation purposes only. I will only perform acceleration runs where it is safe and legal, and I take full responsibility for my driving.
-      </span>
-    </label>
-    <button id="termsAccept" onclick="acceptTerms()" disabled
-      style="width:100%;padding:16px;background:var(--s3);color:var(--dim);font-family:var(--disp);font-size:16px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:not-allowed;transition:all .2s;">
-      I Understand. Continue.
-    </button>
+<div class="modal-bg" id="termsModal">
+  <div class="modal-box">
+    <div class="modal-head"><span class="modal-title">Before You Run</span></div>
+    <div class="modal-body">
+      <p>MiataDyno estimates wheel horsepower from your OBD log. Results are estimates, not certified dyno figures.</p>
+      <p>Acceleration runs must only be done on private property, closed courses, or where it is safe and legal. <strong style="color:var(--text);">You are solely responsible for how you use this tool.</strong></p>
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-top:14px;">
+        <input type="checkbox" id="termsCheck" style="margin-top:3px;accent-color:var(--amber);width:18px;height:18px;flex-shrink:0;">
+        <span style="font-size:12px;color:var(--mid);line-height:1.6;">I understand this tool is for estimation only. I will only perform acceleration runs where it is safe and legal, and I take full responsibility for my driving.</span>
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-primary" id="termsAccept" onclick="acceptTerms()" disabled>I Understand. Continue.</button>
+    </div>
   </div>
 </div>
 
 <!-- FEEDBACK MODAL -->
-<div class="fb-modal" id="fbModal">
-  <div class="fb-box">
-    <h3>Send Feedback</h3>
-    <p>Found a bug, have a feature request, or want to share your result? Your input shapes what gets built next.</p>
-    <label class="lbl">Type</label>
-    <select id="fbType">
-      <option value="bug">Bug Report</option>
-      <option value="feature">Feature Request</option>
-      <option value="result">Sharing My Result</option>
-      <option value="general">General Feedback</option>
-    </select>
-    <label class="lbl">Your Email (optional)</label>
-    <input type="email" id="fbEmail" placeholder="you@example.com">
-    <label class="lbl">Message</label>
-    <textarea id="fbMsg" placeholder="What's on your mind?"></textarea>
-    <div class="fb-actions">
-      <button class="fb-btn cancel" onclick="closeFeedback()">Cancel</button>
-      <button class="fb-btn primary" onclick="sendFeedback()">Send</button>
+<div class="modal-bg" id="fbModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">Send Feedback</span>
+      <button class="modal-close" onclick="closeFeedback()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Found a bug, have a feature request, or want to share your result?</p>
+      <div class="fl">
+        <label class="lbl">Type</label>
+        <select id="fbType">
+          <option value="bug">Bug Report</option>
+          <option value="feature">Feature Request</option>
+          <option value="result">Sharing My Result</option>
+          <option value="general">General Feedback</option>
+        </select>
+      </div>
+      <div class="fl">
+        <label class="lbl">Your Email (optional)</label>
+        <input type="email" id="fbEmail" placeholder="you@example.com">
+      </div>
+      <div class="fl">
+        <label class="lbl">Message</label>
+        <textarea id="fbMsg" rows="4" placeholder="What's on your mind?"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeFeedback()">Cancel</button>
+      <button class="btn-primary" onclick="sendFeedback()">Send</button>
     </div>
   </div>
 </div>
 
 <!-- LEGAL MODAL -->
-<div class="fb-modal" id="legalModal">
-  <div class="fb-box" style="max-width:640px;max-height:80vh;overflow-y:auto;">
-    <h3 id="legalTitle">Terms</h3>
-    <div id="legalContent" style="font-size:12px;color:var(--mid);line-height:1.8;"></div>
-    <div class="fb-actions" style="margin-top:20px;">
-      <button class="fb-btn primary" onclick="closeLegal()">Close</button>
+<div class="modal-bg" id="legalModal">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <span class="modal-title" id="legalTitle">Terms</span>
+      <button class="modal-close" onclick="closeLegal()">✕</button>
+    </div>
+    <div class="modal-body" id="legalContent" style="font-size:12px;color:var(--mid);line-height:1.8;"></div>
+    <div class="modal-foot">
+      <button class="btn-primary" onclick="closeLegal()">Close</button>
     </div>
   </div>
 </div>
 
-<!-- USAGE LIMIT MODAL -->
-<div class="limit-modal" id="limitModal">
-  <div class="limit-box">
-    <div class="limit-icon">!</div>
-    <h3>Free Limit Reached</h3>
-    <p>You've used your 2 free analyses for this month. The Pro tier launches soon and will include unlimited analyses, saved run history, AI interpretation, and before/after comparison across mod stages.</p>
-    <div class="limit-tier">
-      <strong>Get Notified When Pro Launches</strong>
-      <p>Send me feedback or your email and you'll get a founding member discount when paid tier opens.</p>
+<!-- LIMIT MODAL -->
+<div class="modal-bg" id="limitModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">Free Limit Reached</span>
+      <button class="modal-close" onclick="closeLimitModal()">✕</button>
     </div>
-    <div class="fb-actions">
-      <button class="fb-btn cancel" onclick="closeLimitModal()">Close</button>
-      <button class="fb-btn primary" onclick="closeLimitModal();openFeedback()">Get Notified</button>
+    <div class="modal-body">
+      <div class="limit-icon">!</div>
+      <p style="text-align:center;">You've used your 2 free analyses for this month.</p>
+      <p>The Pro tier launches soon: unlimited analyses, saved run history, AI interpretation, before/after across mod stages.</p>
+      <div class="limit-tier">
+        <strong>Get Notified When Pro Launches</strong>
+        <p>Send feedback or your email for a founding member discount.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeLimitModal()">Close</button>
+      <button class="btn-primary" onclick="closeLimitModal();openFeedback()">Get Notified</button>
     </div>
   </div>
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════
+// MEDIA QUERY MATCHER
+// ═══════════════════════════════════════════════════════════════
+const MOBILE_BP = '(max-width: 880px)';
+function isMobile(){ return window.matchMedia(MOBILE_BP).matches; }
 
-// ═══ INVITE CODE GATE ═══
-const VALID_CODES = [
-  'MD-NC-FOUNDER',     // give to first 5 testers
-  'MD-NC-X7K2',        // give to next batch
-  'MD-NC-9PQR',
-  'MD-NC-J3LM',
-  'MD-NC-AB42',
-  'MD-NC-WX91',
-];
+// ═══════════════════════════════════════════════════════════════
+// STATE (only takes effect on mobile)
+// ═══════════════════════════════════════════════════════════════
+let appState = 'drop';
+function setState(name){
+  appState = name;
+  document.body.dataset.state = name;
+  if(isMobile()){
+    updateMobileActionBar();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+}
 
+// ═══════════════════════════════════════════════════════════════
+// INVITE CODE GATE
+// ═══════════════════════════════════════════════════════════════
+const VALID_CODES = ['MD-NC-FOUNDER','MD-NC-X7K2','MD-NC-9PQR','MD-NC-J3LM','MD-NC-AB42','MD-NC-WX91'];
 function checkAccessCode(){
-  // Check if user has already entered a valid code (saved in localStorage)
   try {
     const saved = localStorage.getItem('miatadyno_access');
     if(saved && VALID_CODES.includes(saved)) return true;
   } catch(e){}
   return false;
 }
-
 function promptAccessCode(){
   const code = prompt('MiataDyno is in private beta. Enter your access code:\n\n(If you don\'t have one, send feedback to request access.)');
   if(!code) return false;
@@ -1073,146 +1062,178 @@ function promptAccessCode(){
     try { localStorage.setItem('miatadyno_access', trimmed); } catch(e){}
     alert('Access granted. Welcome to the MiataDyno beta.');
     return true;
-  } else {
-    alert('Invalid code. Send feedback to request access.');
-    return false;
   }
+  alert('Invalid code. Send feedback to request access.');
+  return false;
 }
 
-// ═══ VEHICLE DB ═══
+// ═══════════════════════════════════════════════════════════════
+// VEHICLE DATA
+// ═══════════════════════════════════════════════════════════════
 const NCP = {
-  nc1:{name:'NC1 MX-5 (2006-2008)',wt:2480,swl:15.0,stl:19.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
-  nc2:{name:'NC2 MX-5 (2009-2012)',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
-  nc3:{name:'NC3 MX-5 (2013-2015)',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc1:{name:'NC1 MX-5 (2006-2008)',short:'NC1',wt:2480,swl:15.0,stl:19.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc2:{name:'NC2 MX-5 (2009-2012)',short:'NC2',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc3:{name:'NC3 MX-5 (2013-2015)',short:'NC3',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
 };
 const CD_MAP = { up_soft:.36, up_prht:.34, down:.44 };
 
 const WHEEL_OPTIONS = {
-  15: [
-    {label:'Lightweight forged (Volk TE37, 949 6UL) ~10-12 lbs', wt:11.0},
-    {label:'Flow-formed mid-range (Enkei RPF1 15x8) ~13 lbs', wt:13.2},
-    {label:'Budget cast (Rota, XXR) ~15 lbs', wt:15.0},
-    {label:'Heavy cast / steel ~18 lbs', wt:18.0},
-  ],
-  16: [
-    {label:'Stock NC1 OEM 16x6.5 (15.0 lbs)', wt:15.0},
-    {label:'Enkei RPF1 16x8 (13.7 lbs)', wt:13.7},
-    {label:'Mid-range aftermarket ~15-16 lbs', wt:15.5},
-    {label:'Heavy cast / steel ~18+ lbs', wt:18.5},
-  ],
-  17: [
-    {label:'Stock NC2/3 OEM 17x7 (19.0 lbs)', wt:19.0},
-    {label:'Enkei RPF1 17x8 (15.9 lbs)', wt:15.9},
-    {label:'Rays Volk CE28N 17x8 (13.2 lbs)', wt:13.2},
-    {label:'Konig Hypergram 17x8 (16.5 lbs)', wt:16.5},
-    {label:'Mid-range (17-18 lbs)', wt:17.5},
-  ],
-  18: [
-    {label:'Lightweight forged 18" ~14-16 lbs', wt:15.0},
-    {label:'Mid-range cast 18" ~18-20 lbs', wt:19.0},
-    {label:'Heavy cast 18" ~21+ lbs', wt:21.5},
-  ],
+  15: [{label:'Lightweight forged ~10-12 lbs', wt:11.0},{label:'Flow-formed mid-range ~13 lbs', wt:13.2},{label:'Budget cast ~15 lbs', wt:15.0},{label:'Heavy cast / steel ~18 lbs', wt:18.0}],
+  16: [{label:'Stock NC1 OEM 16x6.5 (15.0 lbs)', wt:15.0},{label:'Enkei RPF1 16x8 (13.7 lbs)', wt:13.7},{label:'Mid-range aftermarket ~15-16 lbs', wt:15.5},{label:'Heavy cast / steel ~18+ lbs', wt:18.5}],
+  17: [{label:'Stock NC2/3 OEM 17x7 (19.0 lbs)', wt:19.0},{label:'Enkei RPF1 17x8 (15.9 lbs)', wt:15.9},{label:'Volk CE28N 17x8 (13.2 lbs)', wt:13.2},{label:'Konig Hypergram 17x8 (16.5 lbs)', wt:16.5},{label:'Mid-range ~17-18 lbs', wt:17.5}],
+  18: [{label:'Lightweight forged 18" ~14-16 lbs', wt:15.0},{label:'Mid-range cast 18" ~18-20 lbs', wt:19.0},{label:'Heavy cast 18" ~21+ lbs', wt:21.5}],
 };
-
 const TIRE_OPTIONS = {
-  15: [
-    {label:'205/50R15 ~18.5 lbs (Falken RT660, RE-71RS)', wt:18.5, w:205,a:50,r:15},
-    {label:'195/55R15 ~17 lbs', wt:17.0, w:195,a:55,r:15},
-    {label:'225/50R15 ~20.5 lbs', wt:20.5, w:225,a:50,r:15},
-    {label:'Custom size...', wt:'custom', w:205,a:50,r:15},
-  ],
-  16: [
-    {label:'195/50R16 ~19 lbs (stock NC1)', wt:19.0, w:195,a:50,r:16},
-    {label:'205/45R16 ~18 lbs', wt:18.0, w:205,a:45,r:16},
-    {label:'205/50R16 ~20 lbs', wt:20.0, w:205,a:50,r:16},
-    {label:'205/55R16 ~19.5 lbs', wt:19.5, w:205,a:55,r:16},
-    {label:'Custom size...', wt:'custom', w:195,a:50,r:16},
-  ],
-  17: [
-    {label:'205/45R17 ~17.5 lbs (stock NC2/3)', wt:17.5, w:205,a:45,r:17},
-    {label:'215/45R17 ~18.7 lbs', wt:18.7, w:215,a:45,r:17},
-    {label:'225/45R17 ~21 lbs', wt:21.0, w:225,a:45,r:17},
-    {label:'235/40R17 ~21.5 lbs', wt:21.5, w:235,a:40,r:17},
-    {label:'Custom size...', wt:'custom', w:205,a:45,r:17},
-  ],
-  18: [
-    {label:'205/40R18 ~18.5 lbs', wt:18.5, w:205,a:40,r:18},
-    {label:'225/40R18 ~20 lbs', wt:20.0, w:225,a:40,r:18},
-    {label:'235/40R18 ~21.5 lbs', wt:21.5, w:235,a:40,r:18},
-    {label:'Custom size...', wt:'custom', w:225,a:40,r:18},
-  ],
+  15: [{label:'205/50R15 ~18.5 lbs', wt:18.5, w:205,a:50,r:15},{label:'195/55R15 ~17 lbs', wt:17.0, w:195,a:55,r:15},{label:'225/50R15 ~20.5 lbs', wt:20.5, w:225,a:50,r:15},{label:'Custom size...', wt:'custom', w:205,a:50,r:15}],
+  16: [{label:'195/50R16 ~19 lbs (stock NC1)', wt:19.0, w:195,a:50,r:16},{label:'205/45R16 ~18 lbs', wt:18.0, w:205,a:45,r:16},{label:'205/50R16 ~20 lbs', wt:20.0, w:205,a:50,r:16},{label:'205/55R16 ~19.5 lbs', wt:19.5, w:205,a:55,r:16},{label:'Custom size...', wt:'custom', w:195,a:50,r:16}],
+  17: [{label:'205/45R17 ~17.5 lbs (stock NC2/3)', wt:17.5, w:205,a:45,r:17},{label:'215/45R17 ~18.7 lbs', wt:18.7, w:215,a:45,r:17},{label:'225/45R17 ~21 lbs', wt:21.0, w:225,a:45,r:17},{label:'235/40R17 ~21.5 lbs', wt:21.5, w:235,a:40,r:17},{label:'Custom size...', wt:'custom', w:205,a:45,r:17}],
+  18: [{label:'205/40R18 ~18.5 lbs', wt:18.5, w:205,a:40,r:18},{label:'225/40R18 ~20 lbs', wt:20.0, w:225,a:40,r:18},{label:'235/40R18 ~21.5 lbs', wt:21.5, w:235,a:40,r:18},{label:'Custom size...', wt:'custom', w:225,a:40,r:18}],
 };
 
-// ═══ UI HELPERS ═══
-function toggleSec(h){h.closest('.sec').classList.toggle('coll');}
-function setT(id,btn){document.getElementById(id).querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+// ═══════════════════════════════════════════════════════════════
+// DATA STATE
+// ═══════════════════════════════════════════════════════════════
+let rows = [], pulls = [];
+let analysisMode = 'same';
+let selPulls = [], selB = null, selA = null;
+let baro = 99.9, iat_k = 298, rho = 1.225;
+let chart = null;
+let termsAccepted = false;
 
-function setAnalysisMode(mode){
-  analysisMode = mode;
-  document.querySelectorAll('.amode-btn').forEach(b=>b.classList.toggle('on', b.dataset.mode === mode));
-
-  const title = document.getElementById('modeTitle');
-  const help  = document.getElementById('modeHelp');
-
-  if(mode === 'same'){
-    title.textContent = 'Select Pulls to Average';
-    help.innerHTML = 'Tap pulls to include them. We\'ll show your best run + average + consistency. <strong>Recommended for single-session uploads.</strong>';
+// ═══════════════════════════════════════════════════════════════
+// MOBILE ACTION BAR
+// ═══════════════════════════════════════════════════════════════
+function updateMobileActionBar(){
+  const inner = document.getElementById('actionBarInner');
+  if(appState === 'configure'){
+    const ready = analysisMode === 'compare'
+      ? (selB !== null && selA !== null)
+      : (selPulls.length >= 1);
+    inner.innerHTML = `<button class="btn-primary" id="mobileGo" ${ready ? '' : 'disabled'}>${ready ? 'Run Analysis →' : 'Select pulls...'}</button>`;
+    if(ready){
+      document.getElementById('mobileGo').addEventListener('click', triggerRun);
+    }
+  } else if(appState === 'result'){
+    inner.innerHTML = `
+      <button class="btn-secondary" onclick="resetToDrop()">← New Pull</button>
+      <button class="btn-primary" onclick="dlCard()">Download PNG</button>`;
   } else {
-    title.textContent = 'Select Before & After';
-    help.innerHTML = 'Tap once for BEFORE (red). Tap again for AFTER (blue). Tap again to deselect. <strong>Use when comparing pulls from different mod stages.</strong>';
+    inner.innerHTML = '';
   }
+}
 
-  // Clear selections when switching modes
-  selPulls = [];
-  selB = null;
-  selA = null;
+function triggerRun(){
+  if(!checkAccessCode()){ if(!promptAccessCode()) return; }
+  if(!checkLimit()){
+    if(window.goatcounter) window.goatcounter.count({path:'/event/limit-reached', event:true});
+    openLimitModal();
+    return;
+  }
+  if(!termsAccepted){
+    document.getElementById('termsModal').classList.add('vis');
+    return;
+  }
+  runAnalysis();
+}
+
+function resetToDrop(){
+  rows = []; pulls = []; selPulls = []; selB = null; selA = null;
+  document.getElementById('upst').classList.remove('vis');
+  document.getElementById('upzone').classList.remove('success','error');
+  document.getElementById('fileIn').value = '';
+  if(chart){ chart.destroy(); chart = null; }
+  document.getElementById('results').classList.remove('vis');
   renderPulls();
-  checkReady();
+  setState('drop');
   updateProgress();
 }
 
-function exhDelta(sid,lid){
-  const v=parseFloat(document.getElementById(sid).value)||0;
-  const el=document.getElementById(lid);
-  if(v===0){el.textContent='+/- 0 lbs';el.style.color='var(--mid)';}
-  else if(v<0){el.textContent=v+' lbs';el.style.color='var(--green)';}
-  else{el.textContent='+'+v+' lbs';el.style.color='var(--red2)';}
+// ═══════════════════════════════════════════════════════════════
+// MOBILE MODAL: clones the desktop sidebar into the modal
+// ═══════════════════════════════════════════════════════════════
+function openVehicleEdit(){
+  const host = document.getElementById('modal-sections-host');
+  // Move all .sec elements from sidebar to modal (they keep their state)
+  const sidebar = document.querySelector('.sidebar');
+  const sections = sidebar.querySelectorAll('.sec');
+  sections.forEach(s => host.appendChild(s));
+  document.getElementById('vehicleModal').classList.add('vis');
+}
+function closeVehicleEdit(){
+  // Move sections BACK to sidebar (in case user resizes back to desktop)
+  const host = document.getElementById('modal-sections-host');
+  const sidebar = document.querySelector('.sidebar');
+  const goBtn = document.getElementById('goBtn');
+  const sections = host.querySelectorAll('.sec');
+  sections.forEach(s => sidebar.insertBefore(s, goBtn));
+  document.getElementById('vehicleModal').classList.remove('vis');
+  updateMobileVehicleCard();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORM HELPERS
+// ═══════════════════════════════════════════════════════════════
+function toggleSec(h){ h.closest('.sec').classList.toggle('coll'); }
+function setT(id, btn){
+  document.getElementById(id).querySelectorAll('.tbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function setAnalysisMode(mode){
+  analysisMode = mode;
+  document.querySelectorAll('.amode-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  const title = document.getElementById('modeTitle');
+  const help = document.getElementById('modeHelp');
+  if(mode === 'same'){
+    title.textContent = 'Select Pulls to Average';
+    help.innerHTML = "Tap pulls to include them. We'll show your best run + average + consistency. Best for single-session uploads.";
+  } else {
+    title.textContent = 'Select Before & After';
+    help.innerHTML = 'Tap once for BEFORE (red). Tap again for AFTER (blue). Use when comparing pulls from different mod stages.';
+  }
+  selPulls = []; selB = null; selA = null;
+  renderPulls();
+  checkReady();
+  updateProgress();
+  if(isMobile()) updateMobileActionBar();
+}
+
+function exhDelta(sid, lid){
+  const v = parseFloat(document.getElementById(sid).value) || 0;
+  const el = document.getElementById(lid);
+  if(v === 0){ el.textContent = '+/- 0 lbs'; el.style.color = 'var(--mid)'; }
+  else if(v < 0){ el.textContent = v + ' lbs'; el.style.color = 'var(--green)'; }
+  else { el.textContent = '+' + v + ' lbs'; el.style.color = 'var(--red2)'; }
 }
 
 function setWeightMode(mode){
   const isEstimate = mode === 'estimate';
-  document.getElementById('path-total').style.display    = mode === 'total' ? 'block' : 'none';
-  document.getElementById('path-mods').style.display     = mode === 'mods'  ? 'block' : 'none';
+  document.getElementById('path-total').style.display = mode === 'total' ? 'block' : 'none';
+  document.getElementById('path-mods').style.display = mode === 'mods' ? 'block' : 'none';
   document.getElementById('path-estimate').style.display = isEstimate ? 'block' : 'none';
   ['sec-exhaust','sec-other'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = isEstimate ? 'block' : 'none';
+    if(el) el.style.display = isEstimate ? 'block' : 'none';
   });
   calcW();
 }
 
 function setRim(size){
   const whlSel = document.getElementById('whlWt');
-  const opts = WHEEL_OPTIONS[size].map(o=>`<option value="${o.wt}">${o.label}</option>`).join('');
+  const opts = WHEEL_OPTIONS[size].map(o => `<option value="${o.wt}">${o.label}</option>`).join('');
   whlSel.innerHTML = opts + '<option value="custom">Custom weight (enter below)</option>';
-
   const tireSel = document.getElementById('tireSel');
-  tireSel.innerHTML = TIRE_OPTIONS[size].map(o=>
-    `<option value="${o.wt}" data-w="${o.w}" data-a="${o.a}" data-r="${o.r}">${o.label}</option>`
-  ).join('');
-
+  tireSel.innerHTML = TIRE_OPTIONS[size].map(o => `<option value="${o.wt}" data-w="${o.w}" data-a="${o.a}" data-r="${o.r}">${o.label}</option>`).join('');
   if(size===16){ tireSel.value = 19.0; }
   else if(size===17){ tireSel.value = 17.5; whlSel.value = 19.0; }
-
   checkCustomTire();
   checkCustomWheel();
-
   const note = document.getElementById('whl-note');
-  if(size===18){
-    note.innerHTML='<strong>Heavy 18" wheels add significant rotating mass.</strong> Expect slower acceleration and heavier steering. Best for stance builds.';
+  if(size===18 && note){
+    note.innerHTML='<strong>Heavy 18" wheels add significant rotating mass.</strong> Best for stance builds.';
     note.style.color='var(--amber)';
-  } else {
-    note.innerHTML='Weigh one wheel on a bathroom scale for the most accurate number.';
+  } else if(note){
+    note.innerHTML='Weigh one wheel on a bathroom scale for accuracy.';
     note.style.color='var(--dim)';
   }
   calcW();
@@ -1223,288 +1244,253 @@ function checkCustomWheel(){
   const row = document.getElementById('customWheelRow');
   if(row) row.style.display = sel?.value === 'custom' ? 'block' : 'none';
 }
-
 function checkCustomTire(){
   const sel = document.getElementById('tireSel');
   const row = document.getElementById('customTireRow');
   if(row) row.style.display = sel?.value === 'custom' ? 'block' : 'none';
 }
-
 function checkCustomExh(id){
   const sel = document.getElementById(id);
   const inp = document.getElementById(id + 'Custom');
   if(inp) inp.style.display = sel?.value === 'custom' ? 'block' : 'none';
 }
 
-function initWheelSelectors(){
-  setRim(17);
-}
-
-// ═══ WEIGHT CALC ═══
+// ═══════════════════════════════════════════════════════════════
+// WEIGHT CALC
+// ═══════════════════════════════════════════════════════════════
 function calcW(){
   const mode = document.querySelector('#tWtMode .tbtn.on')?.dataset.v || 'total';
-  const gen  = document.getElementById('ncGen').value;
+  const gen = document.getElementById('ncGen').value;
   const base = NCP[gen];
-
   const drvWeight = parseFloat(document.getElementById('drvWt').value) || 0;
-  const topPos    = document.querySelector('#tPos .tbtn.on')?.dataset.v || 'up';
-  const topType   = document.querySelector('#tTop .tbtn.on')?.dataset.v || 'soft';
-
-  // Tire diameter: rim (in) -> meters, sidewall (mm) -> meters, multiply by 2 for both sides
+  const topPos = document.querySelector('#tPos .tbtn.on')?.dataset.v || 'up';
+  const topType = document.querySelector('#tTop .tbtn.on')?.dataset.v || 'soft';
   const tireDia = (w,a,r) => (r * 0.0254) + 2 * (w * (a/100) * 0.001);
-
   const Cd = topPos === 'down' ? CD_MAP.down : (topType === 'prht' ? CD_MAP.up_prht : CD_MAP.up_soft);
-
   let vehicleWeight = 0;
   let dia_m = tireDia(205, 45, 17);
 
-  // Always read tire selection for diameter, regardless of mode
   const tireSelEl = document.getElementById('tireSel');
   if(tireSelEl && tireSelEl.value !== 'custom' && tireSelEl.options.length){
     const opt = tireSelEl.options[tireSelEl.selectedIndex];
-    if(opt && opt.dataset.w){
-      dia_m = tireDia(parseFloat(opt.dataset.w), parseFloat(opt.dataset.a), parseFloat(opt.dataset.r));
-    }
-  } else if (tireSelEl && tireSelEl.value === 'custom') {
+    if(opt && opt.dataset.w) dia_m = tireDia(parseFloat(opt.dataset.w), parseFloat(opt.dataset.a), parseFloat(opt.dataset.r));
+  } else if(tireSelEl?.value === 'custom'){
     const tW = document.getElementById('tW');
     const tA = document.getElementById('tA');
     const tR = document.getElementById('tR');
-    if(tW && tA && tR){
-      dia_m = tireDia(parseFloat(tW.value), parseFloat(tA.value), parseFloat(tR.value));
-    }
+    if(tW && tA && tR) dia_m = tireDia(parseFloat(tW.value), parseFloat(tA.value), parseFloat(tR.value));
   }
 
-  if (mode === 'total') {
+  if(mode === 'total'){
     vehicleWeight = parseFloat(document.getElementById('totalWt').value) || base.wt;
-  } else if (mode === 'mods') {
+  } else if(mode === 'mods'){
     const modDelta = parseFloat(document.getElementById('modWt').value) || 0;
     vehicleWeight = base.wt + modDelta;
   } else {
-    // Helper to handle custom vs preset dropdowns
     const getVal = (id) => {
       const sel = document.getElementById(id);
       if(!sel) return 0;
-      if(sel.value === 'custom'){
-        return parseFloat(document.getElementById(id + 'Custom')?.value) || 0;
-      }
+      if(sel.value === 'custom') return parseFloat(document.getElementById(id+'Custom')?.value) || 0;
       return parseFloat(sel.value) || 0;
     };
-
-    // Wheel weight (handles custom)
     const whlEl = document.getElementById('whlWt');
     let whlVal;
-    if(whlEl?.value === 'custom'){
-      whlVal = parseFloat(document.getElementById('whlCustom')?.value) || base.swl;
-    } else {
-      whlVal = whlEl ? parseFloat(whlEl.value) : base.swl;
-    }
+    if(whlEl?.value === 'custom') whlVal = parseFloat(document.getElementById('whlCustom')?.value) || base.swl;
+    else whlVal = whlEl ? parseFloat(whlEl.value) : base.swl;
     const wheels = 4 * (whlVal - base.swl);
-
-    // Exhaust (handles custom for each component)
     const exh = getVal('catback') + getVal('midpipe') + getVal('headers');
-
-    // Others (handles custom rollbar/forced induction)
-    const others = getVal('rollbar') + 
-                   getVal('forced') + 
-                   (parseFloat(document.getElementById('xDelta')?.value)||0) +
-                   (parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v)||0);
-
+    const others = getVal('rollbar') + getVal('forced') +
+      (parseFloat(document.getElementById('xDelta')?.value) || 0) +
+      (parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v) || 0);
     vehicleWeight = base.wt + exh + wheels + others;
   }
 
-  // Add PRHT weight if applicable (78 lbs over soft top)
-  if (topType === 'prht' && mode !== 'total') {
-    vehicleWeight += 78;
-  }
+  if(topType === 'prht' && mode !== 'total') vehicleWeight += 78;
 
-  const fuelWeight = 0.5 * 12.7 * 6.1; // half tank, gallons * lbs/gallon
+  const fuelWeight = 0.5 * 12.7 * 6.1;
   const totalWeightLbs = vehicleWeight + fuelWeight + drvWeight;
-
   const wsTot = document.getElementById('ws-tot');
   if(wsTot) wsTot.textContent = Math.round(totalWeightLbs) + ' lbs';
+
+  if(isMobile()) updateMobileVehicleCard();
 
   return {
     tot: totalWeightLbs,
     tot_kg: totalWeightLbs * 0.453592,
     eff: (totalWeightLbs * 0.453592) * (1 + base.rot),
-    base: base,
-    gen: gen,
-    Cd: Cd,
-    dia_m: dia_m,
-    spd_corr: dia_m / 0.6325 // stock NC2/3 reference diameter (205/45R17)
+    base, gen, Cd, dia_m,
+    spd_corr: dia_m / 0.6325,
+    topType, topPos, drvWeight
   };
 }
 
-// ═══ PHYSICS ═══
-const G=9.81, RDA=287.058;
-let baro=99.9, iat_k=298, rho=1.225;
-let rows=[], pulls=[], selB=null, selA=null;
-let analysisMode = 'same';   // 'same' or 'compare'
-let selPulls = [];           // array of selected pull indices for 'same' mode
+function updateMobileVehicleCard(){
+  const w = calcW.bypass ? null : null;
+  const gen = document.getElementById('ncGen').value;
+  const base = NCP[gen];
+  const drvWeight = parseFloat(document.getElementById('drvWt').value) || 0;
+  const topPos = document.querySelector('#tPos .tbtn.on')?.dataset.v || 'up';
+  const topType = document.querySelector('#tTop .tbtn.on')?.dataset.v || 'soft';
+  const topLabel = topType === 'prht' ? 'PRHT' : 'Soft Top';
+  const posLabel = topPos === 'down' ? 'top down' : 'top up';
+  const titleEl = document.getElementById('vcTitle');
+  if(titleEl) titleEl.textContent = `${base.short} ${topLabel}`;
 
-function savgol(a,w){
-  const ww=Math.max(7, w%2===0 ? w+1 : w), h=Math.floor(ww/2);
-  return a.map((_,i)=>{
+  const tireSelEl = document.getElementById('tireSel');
+  const rim = document.querySelector('#tRim .tbtn.on')?.dataset.v || '17';
+  let tireText = `${rim}" wheels`;
+  if(tireSelEl && tireSelEl.value !== 'custom'){
+    const opt = tireSelEl.options[tireSelEl.selectedIndex];
+    if(opt && opt.dataset.w) tireText += ` · ${opt.dataset.w}/${opt.dataset.a}R${opt.dataset.r}`;
+  }
+  const wheelsEl = document.getElementById('vcWheels');
+  if(wheelsEl) wheelsEl.textContent = tireText;
+  const drvEl = document.getElementById('vcDriver');
+  if(drvEl) drvEl.textContent = `${drvWeight} lb driver · solo · ${posLabel}`;
+
+  const wsTot = document.getElementById('ws-tot')?.textContent;
+  const weightEl = document.getElementById('vcWeight');
+  if(weightEl && wsTot) weightEl.innerHTML = wsTot.replace(' lbs', ' <small>lbs total</small>');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHYSICS
+// ═══════════════════════════════════════════════════════════════
+const G=9.81, RDA=287.058;
+function savgol(a, w){
+  const ww = Math.max(7, w%2 === 0 ? w+1 : w), h = Math.floor(ww/2);
+  return a.map((_, i) => {
     let s=0, ws=0;
     for(let j=-h; j<=h; j++){
-      const idx=i+j;
-      if(idx<0||idx>=a.length) continue;
-      const wt=1 - Math.pow(j/(h+1),2);
+      const idx = i+j;
+      if(idx<0 || idx>=a.length) continue;
+      const wt = 1 - Math.pow(j/(h+1), 2);
       s += a[idx]*wt;
       ws += wt;
     }
     return s/ws;
   });
 }
-
-function grad(y,x){
-  const n=y.length, o=new Array(n);
+function grad(y, x){
+  const n = y.length, o = new Array(n);
   for(let i=0; i<n; i++){
-    if(i===0) o[i] = (y[1]-y[0]) / (x[1]-x[0]);
-    else if(i===n-1) o[i] = (y[n-1]-y[n-2]) / (x[n-1]-x[n-2]);
-    else o[i] = (y[i+1]-y[i-1]) / (x[i+1]-x[i-1]);
+    if(i===0) o[i] = (y[1]-y[0])/(x[1]-x[0]);
+    else if(i===n-1) o[i] = (y[n-1]-y[n-2])/(x[n-1]-x[n-2]);
+    else o[i] = (y[i+1]-y[i-1])/(x[i+1]-x[i-1]);
   }
   return o;
 }
-
 function calcHP(seg, prof){
   if(seg.length<5) return null;
-  const t = seg.map(r=>r.time);
-  // Apply tire diameter speed correction
-  const sv = savgol(seg.map(r=>r.speed_mph * prof.spd_corr * 0.44704), Math.max(7, Math.floor(seg.length/6)*2+1));
+  const t = seg.map(r => r.time);
+  const sv = savgol(seg.map(r => r.speed_mph * prof.spd_corr * 0.44704), Math.max(7, Math.floor(seg.length/6)*2+1));
   const ac = grad(sv, t);
-  // SAE J1349 correction
   const corr = (99.0/baro) * Math.sqrt(iat_k/298.0);
-  return seg.map((r,i)=>{
-    const v=sv[i], a=ac[i];
+  return seg.map((r,i) => {
+    const v = sv[i], a = ac[i];
     const RHO_STD = 1.225;
     const Ft = prof.eff*a + prof.base.Crr*prof.tot_kg*G + 0.5*RHO_STD*prof.Cd*prof.base.A*v*v;
-    const WHP = (Ft*v/745.7) * corr;
+    const WHP = (Ft*v/745.7)*corr;
     const WTQ = r.rpm>0 ? (WHP*5252)/r.rpm : 0;
-    return {rpm:r.rpm, v, WHP, WTQ};
-  }).filter(r=> r.v>3 && r.rpm>500);
+    return { rpm:r.rpm, v, WHP, WTQ };
+  }).filter(r => r.v>3 && r.rpm>500);
 }
-
 function bin(data, bs=500){
   if(!data?.length) return [];
   const mn = Math.floor(Math.min(...data.map(r=>r.rpm))/bs)*bs;
   const mx = Math.ceil(Math.max(...data.map(r=>r.rpm))/bs)*bs;
-  const out=[];
+  const out = [];
   for(let b=mn; b<mx; b+=bs){
-    const inn = data.filter(r=> r.rpm>=b && r.rpm<b+bs);
+    const inn = data.filter(r => r.rpm>=b && r.rpm<b+bs);
     if(!inn.length) continue;
     out.push({
       rpm: b+bs/2,
       WHP: inn.reduce((s,r)=>s+r.WHP, 0)/inn.length,
-      WTQ: inn.reduce((s,r)=>s+r.WTQ, 0)/inn.length
+      WTQ: inn.reduce((s,r)=>s+r.WTQ, 0)/inn.length,
     });
   }
   return out;
 }
 
-// ═══ CSV PARSE ═══
-function findC(hs, kws){return hs.find(h => kws.some(k => h.toLowerCase().includes(k.toLowerCase())));}
-
+// ═══════════════════════════════════════════════════════════════
+// CSV PARSE
+// ═══════════════════════════════════════════════════════════════
+function findC(hs, kws){ return hs.find(h => kws.some(k => h.toLowerCase().includes(k.toLowerCase()))); }
 function parseCSV(txt){
   if(txt.charCodeAt(0)===0xFEFF) txt = txt.slice(1);
   const lines = txt.split(/\r?\n/).filter(l=>l.trim());
   if(lines.length<4) return {ok:false, msg:'File too short.'};
-
-  // Detect if there's a multi-line preamble (BlueDriver: 2 lines, others: variable)
-  // Find the line that contains "Time" or "RPM" - that's the header row
   let headerIdx = 0;
-  for(let i = 0; i < Math.min(10, lines.length); i++){
+  for(let i=0; i<Math.min(10, lines.length); i++){
     const l = lines[i].toLowerCase();
-    if(l.includes('time') || l.includes('rpm') || l.includes('engine')){
-      headerIdx = i;
-      break;
-    }
+    if(l.includes('time') || l.includes('rpm') || l.includes('engine')){ headerIdx = i; break; }
   }
-
   const csvText = lines.slice(headerIdx).join('\n');
-  const p = Papa.parse(csvText, {
-    header: true,
-    skipEmptyLines: true,
-    dynamicTyping: true,
-    transformHeader: h => h.trim()  // trim headers as Papa parses them
-  });
-
+  const p = Papa.parse(csvText, {header:true, skipEmptyLines:true, dynamicTyping:true, transformHeader: h => h.trim()});
   if(!p.data.length) return {ok:false, msg:'No data found.'};
-
-  const hs = p.meta.fields;  // already trimmed by transformHeader
-  console.log('Detected headers:', hs);
-
+  const hs = p.meta.fields;
   const tC = findC(hs, ['time']);
   const rC = findC(hs, ['rpm']);
   const sC = findC(hs, ['speed']);
   const thC = findC(hs, ['throttle','load']);
   const bC = findC(hs, ['baro','barometric']);
   const iC = findC(hs, ['intake air']);
-
-  console.log('Mapped columns:', {time:tC, rpm:rC, speed:sC, throttle:thC, baro:bC, iat:iC});
-
-  if(!rC||!sC) return {ok:false, msg:`Missing RPM or Speed column. Found: ${hs.join(', ')}`};
-  if(!thC) return {ok:false, msg:`No Throttle Position column. Found columns: ${hs.join(', ')}`};
-
-  const data = p.data.map(r=>({
+  if(!rC||!sC) return {ok:false, msg:`Missing RPM or Speed column.`};
+  if(!thC) return {ok:false, msg:`No Throttle Position column.`};
+  const data = p.data.map(r => ({
     time: parseFloat(r[tC])||0,
     rpm: parseFloat(r[rC])||0,
     speed_mph: parseFloat(r[sC])||0,
     throttle: parseFloat(r[thC])||0,
     baro_r: bC ? parseFloat(r[bC]) : null,
-    iat_r: iC ? parseFloat(r[iC]) : null
+    iat_r: iC ? parseFloat(r[iC]) : null,
   })).filter(r => !isNaN(r.time));
-
   const bv = data.map(r=>r.baro_r).filter(v => v && v>0);
   const iv = data.map(r=>r.iat_r).filter(v => v && v>0);
-
   if(bv.length){
     const br = bv.reduce((a,b)=>a+b)/bv.length;
-    // <50 means inHg (BlueDriver), >50 means kPa
     baro = br<50 ? br*3.38639 : br;
   }
   if(iv.length){
     const ir = iv.reduce((a,b)=>a+b)/iv.length;
-    // >60 likely Fahrenheit, <60 Celsius (assumes ambient temp)
     const ic = ir>60 ? (ir-32)*5/9 : ir;
     iat_k = ic+273.15;
   }
-  rho = (baro*1000) / (RDA*iat_k);
-
+  rho = (baro*1000)/(RDA*iat_k);
   return {ok:true, data};
 }
 
 function detectPulls(data){
-  const THRESH=80, MIN_D=3, MIN_S=5;
-  const out=[];
-  let inp=false, st=null, stt=null;
-  data.forEach((r,i)=>{
+  const THRESH = 80, MIN_D = 3, MIN_S = 5;
+  const out = [];
+  let inp = false, st = null, stt = null;
+  data.forEach((r,i) => {
     if(r.throttle>=THRESH && r.speed_mph>=MIN_S){
-      if(!inp){ inp=true; st=i; stt=r.time; }
+      if(!inp){ inp = true; st = i; stt = r.time; }
     } else if(inp){
       const dur = r.time-stt;
       if(dur>=MIN_D){
         const seg = data.slice(st, i);
-        let drops=0;
-        for(let j=1; j<seg.length; j++){
-          if(seg[j].speed_mph < seg[j-1].speed_mph - 2) drops++;
-        }
+        let drops = 0;
+        for(let j=1; j<seg.length; j++) if(seg[j].speed_mph < seg[j-1].speed_mph - 2) drops++;
         out.push({
           si:st, ei:i-1, st:stt, dur,
           maxRPM: Math.max(...seg.map(r=>r.rpm)),
           maxSpd: Math.max(...seg.map(r=>r.speed_mph)),
           maxThr: Math.max(...seg.map(r=>r.throttle)),
-          q: Math.max(0, Math.min(100, 100 - drops*15)),
+          q: Math.max(0, Math.min(100, 100-drops*15)),
           rows: seg
         });
       }
-      inp=false;
+      inp = false;
     }
   });
   return out;
 }
 
-// ═══ FILE UPLOAD ═══
+// ═══════════════════════════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════════════════════════
 const upz = document.getElementById('upzone');
 document.getElementById('fileIn').addEventListener('change', e => handleFile(e.target.files[0]));
 upz.addEventListener('dragover', e => { e.preventDefault(); upz.classList.add('dov'); });
@@ -1516,111 +1502,72 @@ function showSt(msg, type){
   el.textContent = msg;
   el.className = 'upst vis ' + type;
   const zone = document.getElementById('upzone');
-  zone.classList.remove('success', 'error');
+  zone.classList.remove('success','error');
   if(type === 'ok') zone.classList.add('success');
   else if(type === 'err') zone.classList.add('error');
 }
 
-// ═══ ROBUST FILE READER ═══
 function readFileSmart(file){
   return new Promise((resolve, reject) => {
     const rd = new FileReader();
     rd.onload = e => {
       const buffer = e.target.result;
       const bytes = new Uint8Array(buffer);
-
       let encoding = 'utf-8';
       let startOffset = 0;
-
-      // Detect BOM
-      if(bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xFE){
-        encoding = 'utf-16le';
-        startOffset = 2;
-      } else if(bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF){
-        encoding = 'utf-16be';
-        startOffset = 2;
-      } else if(bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF){
-        encoding = 'utf-8';
-        startOffset = 3;
-      } else {
-        // Heuristic: check for null bytes (UTF-16 without BOM)
+      if(bytes.length>=2 && bytes[0]===0xFF && bytes[1]===0xFE){ encoding='utf-16le'; startOffset=2; }
+      else if(bytes.length>=2 && bytes[0]===0xFE && bytes[1]===0xFF){ encoding='utf-16be'; startOffset=2; }
+      else if(bytes.length>=3 && bytes[0]===0xEF && bytes[1]===0xBB && bytes[2]===0xBF){ encoding='utf-8'; startOffset=3; }
+      else {
         let nullCount = 0;
         const sample = Math.min(200, bytes.length);
-        for(let i = 1; i < sample; i += 2){
-          if(bytes[i] === 0) nullCount++;
-        }
-        if(nullCount > sample * 0.3){ encoding = 'utf-16le'; }
+        for(let i=1; i<sample; i+=2) if(bytes[i]===0) nullCount++;
+        if(nullCount > sample*0.3) encoding = 'utf-16le';
       }
-
       try {
         const decoder = new TextDecoder(encoding);
         resolve({text: decoder.decode(bytes.slice(startOffset)), encoding});
-      } catch(err){
-        reject(err);
-      }
+      } catch(err){ reject(err); }
     };
     rd.onerror = () => reject(new Error('File read failed'));
     rd.readAsArrayBuffer(file);
   });
 }
 
-// ═══ HANDLE FILE (uses smart reader) ═══
 async function handleFile(f){
   if(!f) return;
   try {
-    const {text, encoding} = await readFileSmart(f);
-    console.log('File encoding detected:', encoding);
-
+    const {text} = await readFileSmart(f);
     const res = parseCSV(text);
-    if(!res.ok){
-      console.error('Parse failed:', res.msg);
-      showSt(res.msg, 'err');
-      return;
-    }
-
-    console.log('CSV parsed:', res.data.length, 'rows');
-    console.log('First 3 rows:', res.data.slice(0, 3));
-
+    if(!res.ok){ showSt(res.msg, 'err'); return; }
     rows = res.data;
     pulls = detectPulls(rows);
-
-    if(window.goatcounter){
-      window.goatcounter.count({path: '/event/csv-uploaded', event: true});
-    }
-
-    console.log('Pulls detected:', pulls.length);
-    if(pulls.length){
-      pulls.forEach((p,i) => console.log(`  Pull ${i+1}: ${p.dur.toFixed(1)}s, ${p.maxRPM} RPM, ${p.maxThr.toFixed(0)}% throttle, q=${p.q}`));
-    } else {
-      const maxThr = rows.length ? Math.max(...rows.map(r=>r.throttle)) : 0;
-      const maxSpd = rows.length ? Math.max(...rows.map(r=>r.speed_mph)) : 0;
-      const overThr = rows.filter(r => r.throttle >= 80 && r.speed_mph >= 5).length;
-      console.warn(`No pulls. Max throttle: ${maxThr}% | Max speed: ${maxSpd}mph | Rows over threshold: ${overThr}`);
-      console.warn('Detection requires throttle >= 80% AND speed >= 5 MPH for at least 3 seconds continuous');
-    }
-
+    if(window.goatcounter) window.goatcounter.count({path:'/event/csv-uploaded', event:true});
     showSt(`${res.data.length} rows · ${pulls.length} pulls · Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C`, pulls.length ? 'ok' : 'err');
-
-    selB = null;
-    selA = null;
+    selB = null; selA = null; selPulls = [];
     renderPulls();
     checkReady();
     updateProgress();
+    // Auto-advance to configure state on mobile
+    if(isMobile() && pulls.length){
+      setTimeout(() => setState('configure'), 600);
+    }
   } catch(err){
-    console.error('File handling error:', err);
     showSt('Failed to read file: ' + err.message, 'err');
   }
 }
 
-// ═══ PULL RENDER ═══
+// ═══════════════════════════════════════════════════════════════
+// PULLS
+// ═══════════════════════════════════════════════════════════════
 function renderPulls(){
   const sec = document.getElementById('pullSec');
   if(!pulls.length){
-    sec.innerHTML = '<div class="empty-st"><span class="big">!</span>No full-throttle pulls detected.<br>Ensure Absolute Throttle Position PID is logged and you did a WOT run.</div>';
+    sec.innerHTML = '<div class="empty-st"><span class="big">!</span>No full-throttle pulls detected.<br>Ensure Throttle Position PID is logged and you did a WOT run.</div>';
     return;
   }
   sec.innerHTML = '';
-  pulls.forEach((p,i)=>{
+  pulls.forEach((p,i) => {
     const qc = p.q>=80 ? 'var(--green)' : p.q>=50 ? 'var(--amber)' : 'var(--red2)';
     const div = document.createElement('div');
     div.className = 'pull-item';
@@ -1629,651 +1576,360 @@ function renderPulls(){
     div.addEventListener('click', () => selPull(i, div));
     sec.appendChild(div);
   });
-  // Auto-select all pulls in same-setup mode, or first 2 in compare mode
-if(analysisMode === 'same'){
-  pulls.forEach((_, i) => selPull(i, sec.children[i]));
-} else {
-  if(pulls.length>=1) selPull(0, sec.children[0]);
-  if(pulls.length>=2) selPull(1, sec.children[1]);
-}
+  if(analysisMode === 'same'){
+    pulls.forEach((_, i) => selPull(i, sec.children[i]));
+  } else {
+    if(pulls.length>=1) selPull(0, sec.children[0]);
+    if(pulls.length>=2) selPull(1, sec.children[1]);
+  }
 }
 
 function selPull(idx, el){
   if(analysisMode === 'compare'){
-    // Original before/after logic
-    if(selB===idx){ selB=null; el.classList.remove('ib'); document.getElementById('pt'+idx).innerHTML=''; }
-    else if(selA===idx){ selA=null; el.classList.remove('ia'); document.getElementById('pt'+idx).innerHTML=''; }
-    else if(selB===null){ selB=idx; el.classList.add('ib'); document.getElementById('pt'+idx).innerHTML='<div class="ptag b">Before</div>'; }
-    else if(selA===null){ selA=idx; el.classList.add('ia'); document.getElementById('pt'+idx).innerHTML='<div class="ptag a">After</div>'; }
+    if(selB === idx){ selB = null; el.classList.remove('ib'); document.getElementById('pt'+idx).innerHTML=''; }
+    else if(selA === idx){ selA = null; el.classList.remove('ia'); document.getElementById('pt'+idx).innerHTML=''; }
+    else if(selB === null){ selB = idx; el.classList.add('ib'); document.getElementById('pt'+idx).innerHTML='<div class="ptag b">Before</div>'; }
+    else if(selA === null){ selA = idx; el.classList.add('ia'); document.getElementById('pt'+idx).innerHTML='<div class="ptag a">After</div>'; }
   } else {
-    // Same-setup mode: toggle selection
     const i = selPulls.indexOf(idx);
-    if(i >= 0){
+    if(i>=0){
       selPulls.splice(i, 1);
       el.classList.remove('isel');
       document.getElementById('pt'+idx).innerHTML='';
     } else {
       selPulls.push(idx);
       el.classList.add('isel');
-      const order = selPulls.length;
-      document.getElementById('pt'+idx).innerHTML=`<div class="ptag" style="color:var(--amber);border-color:var(--amber);background:var(--adim);">Pull ${order}</div>`;
+      document.getElementById('pt'+idx).innerHTML=`<div class="ptag s">Pull ${selPulls.length}</div>`;
     }
   }
   checkReady();
   updateProgress();
+  if(isMobile()) updateMobileActionBar();
 }
 
 function checkReady(){
-  if(analysisMode === 'compare'){
-    document.getElementById('goBtn').disabled = selB===null || selA===null;
-  } else {
-    document.getElementById('goBtn').disabled = selPulls.length < 1;
-  }
+  const ready = analysisMode === 'compare' ? (selB!==null && selA!==null) : (selPulls.length >= 1);
+  const goBtn = document.getElementById('goBtn');
+  if(goBtn) goBtn.disabled = !ready;
 }
 
-// ═══ ANALYSIS ═══
-let chart = null;
-document.getElementById('goBtn').addEventListener('click', () => {
-  if(!checkAccessCode()){
-    if(!promptAccessCode()) return;
-  }
-  if(!checkLimit()){
-    if(window.goatcounter) {
-      window.goatcounter.count({path: '/event/limit-reached', event: true});
-    }
-    openLimitModal();
-    return;
-  }
-  if(!termsAccepted){
-    document.getElementById('termsModal').style.display = 'flex';
-    return;
-  }
-  runAnalysis();
-});
+// ═══════════════════════════════════════════════════════════════
+// ANALYSIS
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('goBtn').addEventListener('click', () => triggerRun());
 
 function runAnalysis(){
   const w = calcW();
-  const prof = {eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr};
+  const prof = { eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr };
   const mod = document.getElementById('modDesc').value || 'Current Setup';
   const vn = w.base.name;
-
-  if(analysisMode === 'compare'){
-    runCompareAnalysis(prof, w, mod, vn);
-  } else {
-    runSameSetupAnalysis(prof, w, mod, vn);
-  }
-
-  const res = document.getElementById('results');
-  res.classList.add('vis');
+  if(analysisMode === 'compare') runCompareAnalysis(prof, w, mod, vn);
+  else runSameSetupAnalysis(prof, w, mod, vn);
+  document.getElementById('results').classList.add('vis');
   if(typeof incrementUsage === 'function') incrementUsage();
-  setTimeout(() => res.scrollIntoView({behavior:'smooth', block:'start'}), 100);
-
-  if(window.goatcounter) {
-    window.goatcounter.count({path: '/event/analysis-completed', event: true});
-  }
+  if(window.goatcounter) window.goatcounter.count({path:'/event/analysis-completed', event:true});
+  if(isMobile()) setState('result');
+  else setTimeout(() => document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'}), 100);
 }
 
 function runCompareAnalysis(prof, w, mod, vn){
-  if(selB === null || selA === null){
-    alert('Select both a BEFORE and AFTER pull.');
-    return;
-  }
+  if(selB === null || selA === null){ alert('Select both BEFORE and AFTER pulls.'); return; }
   const rB = calcHP(pulls[selB].rows, prof);
   const rA = calcHP(pulls[selA].rows, prof);
-  if(!rB || !rA){ alert('Not enough clean data in selected pulls.'); return; }
+  if(!rB || !rA){ alert('Not enough clean data.'); return; }
   const bB = bin(rB), bA = bin(rA);
   if(!bB.length || !bA.length){ alert('Not enough binned data.'); return; }
-
   const pB = Math.max(...bB.map(r=>r.WHP));
   const pA = Math.max(...bA.map(r=>r.WHP));
   const tB = Math.max(...bB.map(r=>r.WTQ));
   const tA = Math.max(...bA.map(r=>r.WTQ));
-  const hg = pA - pB, tg = tA - tB;
+  const hg = pA-pB, tg = tA-tB;
 
-  // Update stat boxes
   document.getElementById('statsLabels').innerHTML = `
-    <div class="sbox"><div class="slbl">Before WHP</div><div class="sval" id="sBefore">.</div><div class="sunit">wheel hp</div></div>
-    <div class="sbox"><div class="slbl">After WHP</div><div class="sval" id="sAfter">.</div><div class="sunit">wheel hp</div></div>
-    <div class="sbox hl"><div class="slbl">Gain WHP</div><div class="sval a" id="sGain">.</div><div class="sunit">wheel hp</div></div>
-    <div class="sbox"><div class="slbl">Gain WTQ</div><div class="sval" id="sTqGain">.</div><div class="sunit">lb-ft torque</div></div>`;
-
-  anim('sBefore', pB);
-  anim('sAfter', pA);
-  anim('sGain', hg, true);
-  anim('sTqGain', tg, true);
+    <div class="sbox"><div class="slbl">Before WHP</div><div class="sval">${pB.toFixed(1)}</div><div class="sunit">wheel hp</div></div>
+    <div class="sbox"><div class="slbl">After WHP</div><div class="sval">${pA.toFixed(1)}</div><div class="sunit">wheel hp</div></div>
+    <div class="sbox hl"><div class="slbl">Gain WHP</div><div class="sval a">${hg>=0?'+':''}${hg.toFixed(1)}</div><div class="sunit">wheel hp</div></div>
+    <div class="sbox"><div class="slbl">Gain WTQ</div><div class="sval">${tg>=0?'+':''}${tg.toFixed(1)}</div><div class="sunit">lb-ft torque</div></div>`;
 
   document.getElementById('cVeh').textContent = vn;
   document.getElementById('cMod').textContent = mod;
   document.getElementById('cBef').textContent = pB.toFixed(1);
   document.getElementById('cAft').textContent = pA.toFixed(1);
-  document.getElementById('cGain').textContent = (hg>=0 ? '+' : '') + hg.toFixed(1) + ' WHP';
+  document.getElementById('cGain').textContent = (hg>=0?'+':'') + hg.toFixed(1) + ' WHP';
+  document.getElementById('cBefL').textContent = 'Before WHP';
+  document.getElementById('cAftL').textContent = 'After WHP';
+  document.getElementById('cGainL').textContent = 'WHP Gain';
   document.getElementById('cCond').textContent = `Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
 
-  // Show context banner explaining the result vs Mazda's HP rating
-  const banner = document.getElementById('resultBanner');
-  const bTitle = document.getElementById('resultBannerTitle');
-  const bBody = document.getElementById('resultBannerBody');
+  const banner = document.getElementById('resBanner');
+  const bTitle = document.getElementById('resBannerT');
+  const bBody = document.getElementById('resBannerB');
   const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
-
-  if(avgPeak >= ref.lo && avgPeak <= ref.hi){
-    bTitle.textContent = `Healthy stock NC2/3 power`;
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for a stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 18-20% on its way to the wheels, which is why a healthy stock NC reads in the 120s on a chassis dyno, not 170.`;
-    banner.style.display = 'block';
-  } else if(avgPeak < ref.lo){
-    bTitle.textContent = `Below typical stock range`;
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is below the typical NC2/3 range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (which is around 6,700-7,000 RPM) or the road wasn't flat. <strong>This isn't a comparison to Mazda's 170 hp rating</strong> — that's at the crankshaft, while this number is at the wheels after drivetrain losses.`;
-    banner.style.display = 'block';
+  if(pA >= ref.lo && pA <= ref.hi){
+    bTitle.textContent = 'Healthy stock NC2/3 power';
+    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> after lands in the typical Dynojet range for stock NC2/3 (${ref.lo}-${ref.hi} WHP).`;
+    banner.classList.add('vis');
+  } else if(pA < ref.lo){
+    bTitle.textContent = 'Below typical stock range';
+    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> is below typical NC2/3 (${ref.lo}-${ref.hi} WHP). Most likely lifted before peak power.`;
+    banner.classList.add('vis');
   } else {
-    bTitle.textContent = `Above typical stock`;
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is above the typical NC2/3 stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off and inflating the number.`;
-    banner.style.display = 'block';
+    bTitle.textContent = 'Above typical stock';
+    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> is above stock (${ref.lo}-${ref.hi} WHP). Either mods are working or weight/tire input is off.`;
+    banner.classList.add('vis');
   }
-
   drawCompareChart(bB, bA);
   genCompareInterp(pB, pA, hg, tg, mod, vn, w.gen);
 }
 
 function runSameSetupAnalysis(prof, w, mod, vn){
   if(!selPulls.length){ alert('Select at least one pull.'); return; }
-
   const allBinned = selPulls.map(idx => {
     const calc = calcHP(pulls[idx].rows, prof);
     return calc ? bin(calc) : null;
   }).filter(b => b && b.length);
+  if(!allBinned.length){ alert('No selected pulls had enough clean data.'); return; }
 
-  if(!allBinned.length){
-    alert('No selected pulls had enough clean data. Try different pulls or check run quality scores.');
-    return;
-  }
-
-  // Per-pull peaks
   const peaks = allBinned.map(b => Math.max(...b.map(r=>r.WHP)));
   const torquePeaks = allBinned.map(b => Math.max(...b.map(r=>r.WTQ)));
-
-  // Best individual pull
   const bestIdx = peaks.indexOf(Math.max(...peaks));
   const bestPeak = peaks[bestIdx];
   const bestTorque = torquePeaks[bestIdx];
 
-  // Average across all pulls (interpolate to common RPM grid)
   const rpmGrid = [];
-  for(let r = 2500; r <= 7000; r += 250) rpmGrid.push(r);
-
+  for(let r=2500; r<=7000; r+=250) rpmGrid.push(r);
   const interp = (b, x) => {
     if(!b.length) return null;
-    if(x < b[0].rpm) return null;
-    if(x > b[b.length-1].rpm) return null;
-    for(let i = 0; i < b.length-1; i++){
-      if(b[i].rpm <= x && b[i+1].rpm >= x){
-        const f = (x - b[i].rpm) / (b[i+1].rpm - b[i].rpm);
-        return {WHP: b[i].WHP + f*(b[i+1].WHP - b[i].WHP), WTQ: b[i].WTQ + f*(b[i+1].WTQ - b[i].WTQ)};
+    if(x < b[0].rpm || x > b[b.length-1].rpm) return null;
+    for(let i=0; i<b.length-1; i++){
+      if(b[i].rpm<=x && b[i+1].rpm>=x){
+        const f = (x - b[i].rpm)/(b[i+1].rpm - b[i].rpm);
+        return { WHP: b[i].WHP + f*(b[i+1].WHP - b[i].WHP), WTQ: b[i].WTQ + f*(b[i+1].WTQ - b[i].WTQ) };
       }
     }
     return null;
   };
-
   const avgCurve = rpmGrid.map(rpm => {
     const samples = allBinned.map(b => interp(b, rpm)).filter(s => s);
     if(!samples.length) return null;
+    const avgWHP = samples.reduce((s,v)=>s+v.WHP, 0)/samples.length;
     return {
-      rpm,
-      WHP: samples.reduce((s,v)=>s+v.WHP, 0)/samples.length,
+      rpm, WHP: avgWHP,
       WTQ: samples.reduce((s,v)=>s+v.WTQ, 0)/samples.length,
       n: samples.length,
-      stdHP: samples.length > 1 ? Math.sqrt(samples.reduce((s,v)=>s+Math.pow(v.WHP - samples.reduce((a,b)=>a+b.WHP,0)/samples.length, 2), 0)/samples.length) : 0,
+      stdHP: samples.length>1 ? Math.sqrt(samples.reduce((s,v)=>s+Math.pow(v.WHP-avgWHP, 2), 0)/samples.length) : 0,
     };
   }).filter(v => v);
 
   const avgPeak = avgCurve.length ? Math.max(...avgCurve.map(r=>r.WHP)) : bestPeak;
   const avgTorque = avgCurve.length ? Math.max(...avgCurve.map(r=>r.WTQ)) : bestTorque;
-
-  // Consistency: mean ±1σ across pulls (lower = more consistent)
   const meanStd = avgCurve.filter(r=>r.n>1).reduce((s,r)=>s+r.stdHP, 0) / Math.max(1, avgCurve.filter(r=>r.n>1).length);
-  const consistencyScore = Math.max(0, Math.min(100, 100 - meanStd * 8));
-
-  // Drivetrain loss math (15% on 6MT NC manual)
+  const consistencyScore = Math.max(0, Math.min(100, 100 - meanStd*8));
   const DTL = 0.15;
-  const estCrankHP = avgPeak / (1 - DTL);
-  const estCrankTQ = avgTorque / (1 - DTL);
+  const estCrankHP = avgPeak/(1-DTL);
 
-  // Update stat boxes for same-setup mode
   document.getElementById('statsLabels').innerHTML = `
-    <div class="sbox"><div class="slbl">Best WHP</div><div class="sval" id="sBest">.</div><div class="sunit">wheel hp · single best run</div></div>
-    <div class="sbox hl"><div class="slbl">Avg WHP</div><div class="sval a" id="sAvg">.</div><div class="sunit">wheel hp · ${selPulls.length} pulls</div></div>
-    <div class="sbox"><div class="slbl">Est. Crank HP</div><div class="sval" id="sCrank">.</div><div class="sunit">at the engine, ~15% DTL</div></div>
-    <div class="sbox"><div class="slbl">Consistency</div><div class="sval" id="sCons">.</div><div class="sunit">${consistencyScore >= 85 ? 'excellent' : consistencyScore >= 70 ? 'good' : 'noisy'}</div></div>`;
+    <div class="sbox"><div class="slbl">Best WHP</div><div class="sval">${bestPeak.toFixed(1)}</div><div class="sunit">single best run</div></div>
+    <div class="sbox hl"><div class="slbl">Avg WHP</div><div class="sval a">${avgPeak.toFixed(1)}</div><div class="sunit">${selPulls.length} pulls</div></div>
+    <div class="sbox"><div class="slbl">Est. Crank HP</div><div class="sval">${estCrankHP.toFixed(0)}</div><div class="sunit">at engine, ~15% DTL</div></div>
+    <div class="sbox"><div class="slbl">Consistency</div><div class="sval">${consistencyScore.toFixed(0)}</div><div class="sunit">${consistencyScore>=85?'excellent':consistencyScore>=70?'good':'noisy'}</div></div>`;
 
-  anim('sBest', bestPeak);
-  anim('sAvg', avgPeak);
-  anim('sCrank', estCrankHP);
-  document.getElementById('sCons').textContent = consistencyScore.toFixed(0);
-
-  // Show context banner explaining the result vs Mazda's HP rating
-  const banner = document.getElementById('resultBanner');
-  const bTitle = document.getElementById('resultBannerTitle');
-  const bBody = document.getElementById('resultBannerBody');
-  const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
-
-  if(avgPeak >= ref.lo && avgPeak <= ref.hi){
-    bTitle.textContent = `Healthy stock NC2/3 power`;
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for a stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 18-20% on its way to the wheels, which is why a healthy stock NC reads in the 120s on a chassis dyno, not 170.`;
-    banner.style.display = 'block';
-  } else if(avgPeak < ref.lo){
-    bTitle.textContent = `Below typical stock range`;
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is below the typical NC2/3 range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (which is around 6,700-7,000 RPM) or the road wasn't flat. <strong>This isn't a comparison to Mazda's 170 hp rating</strong> — that's at the crankshaft, while this number is at the wheels after drivetrain losses.`;
-    banner.style.display = 'block';
-  } else {
-    bTitle.textContent = `Above typical stock`;
-    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is above the typical NC2/3 stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off and inflating the number.`;
-    banner.style.display = 'block';
-  }
-
-  // Update share card to same-setup variant
   document.getElementById('cVeh').textContent = vn;
   document.getElementById('cMod').textContent = mod;
   document.getElementById('cBef').textContent = bestPeak.toFixed(1);
   document.getElementById('cAft').textContent = avgPeak.toFixed(1);
-  document.getElementById('cGain').textContent = '~' + estCrankHP.toFixed(0) + ' Crank HP';
+  document.getElementById('cGain').textContent = '~' + estCrankHP.toFixed(0);
+  document.getElementById('cBefL').textContent = 'Best WHP';
+  document.getElementById('cAftL').textContent = 'Avg WHP';
+  document.getElementById('cGainL').textContent = 'Crank HP';
   document.getElementById('cCond').textContent = `${selPulls.length} pulls · Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
 
-  // Update share card labels for same-setup
-  document.querySelectorAll('.sc-l')[0].textContent = 'Best WHP';
-  document.querySelectorAll('.sc-l')[1].textContent = 'Avg WHP';
-  document.querySelectorAll('.sc-l')[2].textContent = 'Est. Crank HP';
-
+  const banner = document.getElementById('resBanner');
+  const bTitle = document.getElementById('resBannerT');
+  const bBody = document.getElementById('resBannerB');
+  const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
+  if(avgPeak >= ref.lo && avgPeak <= ref.hi){
+    bTitle.textContent = 'Healthy stock NC2/3 power';
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 15-18% on its way to the wheels.`;
+    banner.classList.add('vis');
+  } else if(avgPeak < ref.lo){
+    bTitle.textContent = 'Below typical stock range';
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is below the NC range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (around 6,700-7,000 RPM).`;
+    banner.classList.add('vis');
+  } else {
+    bTitle.textContent = 'Above typical stock';
+    bBody.innerHTML = `Your <strong>${avgPeak.toFixed(0)} WHP</strong> is above stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off.`;
+    banner.classList.add('vis');
+  }
   drawSameSetupChart(allBinned, avgCurve);
   genSameSetupInterp(bestPeak, avgPeak, estCrankHP, consistencyScore, meanStd, w.gen, mod);
 }
 
-function anim(id, target, sign=false){
-  const el = document.getElementById(id);
-  let cur = 0;
-  const dur = 600, step = 16;
-  const inc = target/(dur/step);
-  const iv = setInterval(() => {
-    cur += inc;
-    if(Math.abs(cur) >= Math.abs(target)){
-      cur = target;
-      clearInterval(iv);
-    }
-    el.textContent = (sign && cur>=0 ? '+' : '') + cur.toFixed(1);
-  }, step);
-}
-
+// ═══════════════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════════════
 function drawCompareChart(bef, aft){
   if(chart) chart.destroy();
   const isLight = document.body.classList.contains('light');
-  Chart.defaults.color = isLight ? '#384156' : '#6b7a94';
   const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(30,37,53,0.8)';
   const subGridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(30,37,53,0.5)';
-  const tooltipBg = isLight ? '#ffffff' : '#0d1018';
-  const tooltipBorder = isLight ? '#c8d0dd' : '#2a3347';
-  const tooltipTitle = isLight ? '#0a0e18' : '#eaf0fc';
-  const tooltipBody = isLight ? '#384156' : '#96a8c4';
   const axisColor = isLight ? '#5a6478' : '#6478a0';
-
+  Chart.defaults.color = axisColor;
   const allVals = [...bef, ...aft].flatMap(r=>[r.WHP, r.WTQ]).filter(v=>!isNaN(v) && v>0);
-  const yMax = Math.ceil((Math.max(...allVals)*1.15) / 20) * 20;
-
-  const gen = document.getElementById('ncGen')?.value || 'nc2';
-  const stockRef = {nc1:{lo:113, hi:123}, nc2:{lo:118, hi:128}, nc3:{lo:118, hi:128}};
-  const ref = stockRef[gen] || stockRef.nc2;
+  const yMax = Math.ceil((Math.max(...allVals)*1.15)/20)*20;
 
   chart = new Chart(document.getElementById('dynoChart').getContext('2d'), {
     type: 'line',
-    data: {datasets: [
-      {
-        label: `Stock reference (${ref.lo}-${ref.hi} WHP)`,
-        data: [{x:2000, y:ref.hi}, {x:7500, y:ref.hi}],
-        borderColor: 'rgba(100,120,160,0.0)',
-        backgroundColor: 'rgba(100,120,160,0.07)',
-        borderWidth: 0, pointRadius: 0, tension: 0, fill: '+1', order: 10,
-      },
-      {
-        label: '_stockLow',
-        data: [{x:2000, y:ref.lo}, {x:7500, y:ref.lo}],
-        borderColor: 'rgba(100,120,160,0.25)',
-        backgroundColor: 'transparent',
-        borderWidth: 1, borderDash: [4,6], pointRadius: 0, tension: 0, fill: false, order: 10,
-      },
-      {label:'Before WHP', data:bef.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#d63031', backgroundColor:'rgba(214,48,49,.08)', borderWidth:2.5, borderDash:[6,4], pointRadius:3, pointHoverRadius:5, tension:.35, fill:false, order:1},
-      {label:'After WHP',  data:aft.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', backgroundColor:'rgba(232,160,32,.08)', borderWidth:2.5, pointRadius:3, pointHoverRadius:5, tension:.35, fill:false, order:1},
-      {label:'Before WTQ', data:bef.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(214,48,49,.4)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false, order:2},
-      {label:'After WTQ',  data:aft.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(232,160,32,.4)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false, order:2},
+    data: {datasets:[
+      {label:'Before WHP', data:bef.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#d63031', borderWidth:2.5, borderDash:[6,4], pointRadius:3, tension:.35, fill:false},
+      {label:'After WHP', data:aft.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:2.5, pointRadius:3, tension:.35, fill:false},
+      {label:'Before WTQ', data:bef.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(214,48,49,.4)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false},
+      {label:'After WTQ', data:aft.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(232,160,32,.4)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false},
     ]},
     options: {
-      responsive: true,
-      animation: {duration:900, easing:'easeOutQuart'},
+      responsive: true, maintainAspectRatio: false,
+      animation: {duration:900},
       interaction: {mode:'index', intersect:false},
-      plugins: {
-        legend: {
-          labels: {
-            color: '#6b7a94',
-            font: {family:'JetBrains Mono', size:11},
-            boxWidth: 18,
-            filter: (item) => !item.text.startsWith('_'),
-          }
-        },
-        tooltip: {
-          backgroundColor: '#0d1018',
-          borderColor: '#2a3347',
-          borderWidth: 1,
-          titleFont: {family:'JetBrains Mono', size:11},
-          bodyFont: {family:'JetBrains Mono', size:11},
-          titleColor: '#eaf0fc',
-          bodyColor: '#96a8c4',
-          padding: 12,
-          callbacks: {
-            title: i => `${i[0].raw.x.toFixed(0)} RPM`,
-            label: i => {
-              if(i.dataset.label.startsWith('_') || i.dataset.label.includes('reference')) return null;
-              return `${i.dataset.label}: ${i.raw.y.toFixed(1)}`;
-            },
-            afterBody: items => {
-              const whpItems = items.filter(i => i.dataset.label.includes('WHP') && !i.dataset.label.includes('reference'));
-              if(whpItems.length === 2){
-                const delta = (whpItems[1].raw.y - whpItems[0].raw.y).toFixed(1);
-                const sign = delta >= 0 ? '+' : '';
-                return [`Delta: ${sign}${delta} WHP`];
-              }
-              return [];
-            }
-          }
-        },
-      },
+      plugins: {legend:{labels:{color:axisColor, font:{family:'JetBrains Mono', size:11}}}},
       scales: {
-        x: {
-          type: 'linear',
-          min: 2000, max: 7500,
-          title: {display:true, text:'Engine RPM', color:'#6478a0', font:{family:'JetBrains Mono', size:11}},
-          ticks: {color:'#6478a0', font:{family:'JetBrains Mono', size:11}, stepSize:500},
-          grid: {color:'rgba(30,37,53,0.8)'},
-        },
-        y: {
-          suggestedMin: 0,
-          suggestedMax: yMax,
-          beginAtZero: true,
-          title: {display:true, text:'WHP / WTQ (lb-ft)', color:'#6478a0', font:{family:'JetBrains Mono', size:11}},
-          ticks: {color:'#6478a0', font:{family:'JetBrains Mono', size:11}},
-          grid: {color:'rgba(30,37,53,0.5)'},
-        }
+        x: {type:'linear', min:2000, max:7500, title:{display:true, text:'Engine RPM', color:axisColor}, ticks:{color:axisColor, stepSize:500}, grid:{color:gridColor}},
+        y: {suggestedMin:0, suggestedMax:yMax, beginAtZero:true, title:{display:true, text:'WHP / WTQ (lb-ft)', color:axisColor}, ticks:{color:axisColor}, grid:{color:subGridColor}}
       }
-    },
-    plugins: [{
-      id: 'miataDynoOverlay',
-      afterDraw(chart){
-        const {ctx, chartArea:{left,right,top,bottom}, scales:{x,y}} = chart;
-        ctx.save();
-        const x5252 = x.getPixelForValue(5252);
-        if(x5252>=left && x5252<=right){
-          ctx.beginPath();
-          ctx.strokeStyle = 'rgba(100,120,160,0.3)';
-          ctx.lineWidth = 1;
-          ctx.setLineDash([4,4]);
-          ctx.moveTo(x5252, top);
-          ctx.lineTo(x5252, bottom);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.fillStyle = 'rgba(100,120,160,0.5)';
-          ctx.font = '9px JetBrains Mono';
-          ctx.textAlign = 'center';
-          ctx.fillText('5252', x5252, bottom+14);
-        }
-        const aftDataset = chart.data.datasets.find(d => d.label === 'After WHP');
-        if(aftDataset && aftDataset.data.length){
-          const peak = aftDataset.data.reduce((a,b) => b.y>a.y ? b : a);
-          const px = x.getPixelForValue(peak.x);
-          const py = y.getPixelForValue(peak.y);
-          if(px>=left && px<=right){
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(232,160,32,0.4)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([3,3]);
-            ctx.moveTo(px, py);
-            ctx.lineTo(px, bottom);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillStyle = '#e8a020';
-            ctx.font = 'bold 11px JetBrains Mono';
-            ctx.textAlign = 'center';
-            ctx.fillText(`${peak.y.toFixed(1)} WHP`, px, py-10);
-            ctx.font = '9px JetBrains Mono';
-            ctx.fillStyle = 'rgba(232,160,32,0.7)';
-            ctx.fillText(`@ ${peak.x.toFixed(0)} RPM`, px, py-22);
-          }
-        }
-        ctx.restore();
-      }
-    }]
+    }
   });
 }
 
 function drawSameSetupChart(allBinned, avgCurve){
   if(chart) chart.destroy();
   const isLight = document.body.classList.contains('light');
-  Chart.defaults.color = isLight ? '#384156' : '#6b7a94';
   const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(30,37,53,0.8)';
   const subGridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(30,37,53,0.5)';
-  const tooltipBg = isLight ? '#ffffff' : '#0d1018';
-  const tooltipBorder = isLight ? '#c8d0dd' : '#2a3347';
-  const tooltipTitle = isLight ? '#0a0e18' : '#eaf0fc';
-  const tooltipBody = isLight ? '#384156' : '#96a8c4';
   const axisColor = isLight ? '#5a6478' : '#6478a0';
-
+  Chart.defaults.color = axisColor;
   const allVals = [...allBinned.flat(), ...avgCurve].flatMap(r=>[r.WHP, r.WTQ]).filter(v=>!isNaN(v) && v>0);
-  const yMax = Math.ceil((Math.max(...allVals)*1.15) / 20) * 20;
-
-  const gen = document.getElementById('ncGen')?.value || 'nc2';
-  const stockRef = {nc1:{lo:113, hi:123}, nc2:{lo:118, hi:128}, nc3:{lo:118, hi:128}};
-  const ref = stockRef[gen] || stockRef.nc2;
-
-  const datasets = [
-    {label: `Stock reference (${ref.lo}-${ref.hi} WHP)`, data: [{x:2000, y:ref.hi}, {x:7500, y:ref.hi}], borderColor: 'rgba(100,120,160,0.0)', backgroundColor: 'rgba(100,120,160,0.07)', borderWidth: 0, pointRadius: 0, tension: 0, fill: '+1', order: 10},
-    {label: '_stockLow', data: [{x:2000, y:ref.lo}, {x:7500, y:ref.lo}], borderColor: 'rgba(100,120,160,0.25)', backgroundColor: 'transparent', borderWidth: 1, borderDash: [4,6], pointRadius: 0, tension: 0, fill: false, order: 10},
-  ];
-
-  // Individual pulls (faded)
-  const colors = ['rgba(150,168,196,0.35)', 'rgba(180,140,90,0.35)', 'rgba(120,170,140,0.35)', 'rgba(190,120,160,0.35)'];
+  const yMax = Math.ceil((Math.max(...allVals)*1.15)/20)*20;
+  const colors = ['rgba(150,168,196,0.35)','rgba(180,140,90,0.35)','rgba(120,170,140,0.35)','rgba(190,120,160,0.35)'];
+  const datasets = [];
   allBinned.forEach((b, i) => {
-    datasets.push({
-      label: `Pull ${i+1} WHP`,
-      data: b.map(r=>({x:r.rpm, y:r.WHP})),
-      borderColor: colors[i % colors.length],
-      borderWidth: 1.5, pointRadius: 2, tension: .35, fill: false, order: 3
-    });
+    datasets.push({label:`Pull ${i+1}`, data:b.map(r=>({x:r.rpm, y:r.WHP})), borderColor:colors[i%colors.length], borderWidth:1.5, pointRadius:2, tension:.35, fill:false});
   });
-
-  // Average curve (the hero line)
-  datasets.push({
-    label: `Average WHP (${allBinned.length} pulls)`,
-    data: avgCurve.map(r=>({x:r.rpm, y:r.WHP})),
-    borderColor: '#e8a020', backgroundColor: 'rgba(232,160,32,.10)',
-    borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, tension: .35, fill: false, order: 1
-  });
-  datasets.push({
-    label: 'Average WTQ',
-    data: avgCurve.map(r=>({x:r.rpm, y:r.WTQ})),
-    borderColor: 'rgba(232,160,32,.5)', borderWidth: 1.5, borderDash:[3,3], pointRadius: 0, tension: .35, fill: false, order: 2
-  });
-
-  // ±1σ band around average
-  const stdUpper = avgCurve.filter(r=>r.n>1).map(r=>({x:r.rpm, y:r.WHP + r.stdHP}));
-  const stdLower = avgCurve.filter(r=>r.n>1).map(r=>({x:r.rpm, y:r.WHP - r.stdHP}));
-  if(stdUpper.length){
-    datasets.push({label:'_stdUpper', data:stdUpper, borderColor:'rgba(232,160,32,0)', backgroundColor:'rgba(232,160,32,0.10)', borderWidth:0, pointRadius:0, tension:.35, fill:'+1', order:5});
-    datasets.push({label:'_stdLower', data:stdLower, borderColor:'rgba(232,160,32,0)', backgroundColor:'transparent', borderWidth:0, pointRadius:0, tension:.35, fill:false, order:5});
-  }
-
+  datasets.push({label:`Average WHP (${allBinned.length} pulls)`, data:avgCurve.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:3, pointRadius:4, tension:.35, fill:false});
+  datasets.push({label:'Average WTQ', data:avgCurve.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(232,160,32,.5)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false});
   chart = new Chart(document.getElementById('dynoChart').getContext('2d'), {
-    type: 'line',
-    data: {datasets},
+    type:'line', data:{datasets},
     options: {
-      responsive: true,
-      animation: {duration:900, easing:'easeOutQuart'},
+      responsive: true, maintainAspectRatio: false,
+      animation: {duration:900},
       interaction: {mode:'index', intersect:false},
-      plugins: {
-        legend: {labels: {color: '#6b7a94', font: {family:'JetBrains Mono', size:11}, boxWidth: 18, filter: (item) => !item.text.startsWith('_')}},
-        tooltip: {
-          backgroundColor: '#0d1018', borderColor: '#2a3347', borderWidth: 1,
-          titleColor: '#eaf0fc', bodyColor: '#96a8c4', padding: 12,
-          callbacks: {
-            title: i => `${i[0].raw.x.toFixed(0)} RPM`,
-            label: i => i.dataset.label.startsWith('_') ? null : `${i.dataset.label}: ${i.raw.y.toFixed(1)}`,
-          }
-        },
-      },
+      plugins: {legend:{labels:{color:axisColor, font:{family:'JetBrains Mono', size:11}}}},
       scales: {
-        x: {type: 'linear', min: 2000, max: 7500, title: {display:true, text:'Engine RPM', color:'#6478a0'}, ticks: {color:'#6478a0', stepSize:500}, grid: {color:'rgba(30,37,53,0.8)'}},
-        y: {suggestedMin: 0, suggestedMax: yMax, beginAtZero: true, title: {display:true, text:'WHP / WTQ (lb-ft)', color:'#6478a0'}, ticks: {color:'#6478a0'}, grid: {color:'rgba(30,37,53,0.5)'}}
+        x: {type:'linear', min:2000, max:7500, title:{display:true, text:'Engine RPM', color:axisColor}, ticks:{color:axisColor, stepSize:500}, grid:{color:gridColor}},
+        y: {suggestedMin:0, suggestedMax:yMax, beginAtZero:true, title:{display:true, text:'WHP / WTQ (lb-ft)', color:axisColor}, ticks:{color:axisColor}, grid:{color:subGridColor}}
       }
     }
   });
 }
 
+// ═══════════════════════════════════════════════════════════════
+// INTERPRETATION
+// ═══════════════════════════════════════════════════════════════
 function genSameSetupInterp(bestPeak, avgPeak, estCrankHP, consistencyScore, meanStd, gen, mod){
   const el = document.getElementById('interp');
   el.className = 'interp-txt';
   const refRange = gen === 'nc1' ? {low:113, high:123, label:'NC1'} : {low:118, high:128, label:'NC2/NC3'};
   const crankRef = gen === 'nc1' ? '170' : '167-170';
-
-  let parts = [];
-
-  // Power summary with WHP vs HP explanation
-  parts.push(`<strong>What you're seeing:</strong> Your average peak across ${selPulls.length} pull${selPulls.length > 1 ? 's' : ''} was ${avgPeak.toFixed(1)} WHP (wheel horsepower). Your best individual run hit ${bestPeak.toFixed(1)} WHP.`);
-
-  // The big WHP vs HP explanation
-  parts.push(`<strong>Why this isn't 170:</strong> Mazda's 170 hp number is measured at the engine crankshaft on a lab dyno. By the time power reaches the wheels, the drivetrain (transmission, differential, axles, tire scrub) eats roughly 15% of it. So a stock NC making 170 crank hp delivers about ${(170*0.85).toFixed(0)} WHP at the wheels. <strong>Your estimated crank HP is ${estCrankHP.toFixed(0)}</strong> based on a ${(0.15*100).toFixed(0)}% drivetrain loss assumption, which lines up with stock NC2/3 spec (${crankRef} hp).`);
-
-  // Reference comparison
+  const parts = [];
+  parts.push(`<strong>What you're seeing:</strong> Your average peak across ${selPulls.length} pull${selPulls.length>1?'s':''} was ${avgPeak.toFixed(1)} WHP. Your best run hit ${bestPeak.toFixed(1)} WHP.`);
+  parts.push(`<strong>Why this isn't 170:</strong> Mazda's 170 hp is at the crankshaft, not the wheels. After ~15% drivetrain loss, a stock NC delivers about ${(170*0.85).toFixed(0)} WHP. Your estimated crank HP is ${estCrankHP.toFixed(0)}, lining up with stock NC2/3 spec (${crankRef} hp).`);
   if(avgPeak < refRange.low - 5){
-    parts.push(`<strong>Your number vs reference:</strong> ${avgPeak.toFixed(1)} WHP is below the typical stock ${refRange.label} dyno range (${refRange.low}-${refRange.high} WHP). Most likely cause: you lifted before peak power. The NC's peak is at 6,700-7,000 RPM, so if you shifted at 6,500 you cut off the top of your curve. Pull harder next time.`);
-  } else if(avgPeak <= refRange.high + 3){
-    parts.push(`<strong>Your number vs reference:</strong> ${avgPeak.toFixed(1)} WHP is right inside the typical ${refRange.label} stock range (${refRange.low}-${refRange.high} WHP measured on a Dynojet). The math checks out — your car is making expected stock power.`);
+    parts.push(`<strong>Reference:</strong> ${avgPeak.toFixed(1)} WHP is below typical stock ${refRange.label} range. Most likely you lifted before peak power (6,700-7,000 RPM).`);
+  } else if(avgPeak <= refRange.high+3){
+    parts.push(`<strong>Reference:</strong> ${avgPeak.toFixed(1)} WHP is right inside typical ${refRange.label} stock range (${refRange.low}-${refRange.high} WHP). Math checks out.`);
   } else {
-    parts.push(`<strong>Your number vs reference:</strong> ${avgPeak.toFixed(1)} WHP is ${(avgPeak - refRange.high).toFixed(1)} WHP above the typical ${refRange.label} stock range (${refRange.low}-${refRange.high} WHP). Either your mods are working or one of your inputs (weight, tire size) is off.`);
+    parts.push(`<strong>Reference:</strong> ${avgPeak.toFixed(1)} WHP is ${(avgPeak-refRange.high).toFixed(1)} WHP above stock. Mods working, or weight/tire input is off.`);
   }
-
-  // Consistency
   if(consistencyScore >= 85){
-    parts.push(`<strong>Consistency:</strong> Excellent (${consistencyScore.toFixed(0)}/100). Run-to-run variance is only ±${meanStd.toFixed(1)} WHP, which means the data is trustworthy. Your pulls are repeatable and there's no major heat soak or driver inconsistency showing.`);
+    parts.push(`<strong>Consistency:</strong> Excellent (${consistencyScore.toFixed(0)}/100). Run-to-run variance only ±${meanStd.toFixed(1)} WHP.`);
   } else if(consistencyScore >= 70){
-    parts.push(`<strong>Consistency:</strong> Good (${consistencyScore.toFixed(0)}/100). Run-to-run variance is ±${meanStd.toFixed(1)} WHP. Reasonable but not perfect. Could be small differences in throttle application, engine temp, or wind.`);
+    parts.push(`<strong>Consistency:</strong> Good (${consistencyScore.toFixed(0)}/100). Variance ±${meanStd.toFixed(1)} WHP.`);
   } else {
-    parts.push(`<strong>Consistency:</strong> Noisy (${consistencyScore.toFixed(0)}/100). Run-to-run variance is ±${meanStd.toFixed(1)} WHP, which is high. Possible causes: heat soak between pulls, wind gusts, road grade, inconsistent throttle, or wheel slip. Look at the chart — if individual pull lines are spread out, that's your noise floor.`);
+    parts.push(`<strong>Consistency:</strong> Noisy (${consistencyScore.toFixed(0)}/100). ±${meanStd.toFixed(1)} WHP variance is high.`);
   }
-
-  // Practical advice
-  if(mod === 'Current Setup' || mod === 'Modification'){
-    parts.push(`<strong>Next step:</strong> Save this number. When you install your next mod, do another pull on the same road in similar conditions and switch to "Before vs After" mode to measure the actual gain.`);
-  }
-
-  el.innerHTML = parts.map(p => `<p style="margin-bottom:14px;">${p}</p>`).join('');
+  el.innerHTML = parts.map(p => `<p>${p}</p>`).join('');
 }
 
-// ═══ INTERPRETATION ═══
 function genCompareInterp(pB, pA, hg, tg, mod, vn, gen){
   const el = document.getElementById('interp');
   el.className = 'interp-txt';
-  const refRange = gen === 'nc1'
-    ? {low:113, high:123, label:'NC1 (2006-2008)'}
-    : {low:118, high:128, label:'NC2/NC3 (2009-2015)'};
-
-  let context = '';
-  if(pA < refRange.low - 5){
-    context = ` Your peak (${pA.toFixed(1)} WHP) is below typical stock range for ${refRange.label} (${refRange.low}-${refRange.high} WHP). This usually means you lifted before redline. Peak power on the NC happens around 6,700-7,000 RPM. Hold the throttle to 7,100 next time.`;
-  } else if(pA <= refRange.high + 3){
-    context = ` Your peak (${pA.toFixed(1)} WHP) is within typical stock range for ${refRange.label} (${refRange.low}-${refRange.high} WHP). The math checks out.`;
+  const refRange = gen === 'nc1' ? {low:113, high:123, label:'NC1'} : {low:118, high:128, label:'NC2/NC3'};
+  let context;
+  if(pA < refRange.low-5){
+    context = ` Your peak (${pA.toFixed(1)} WHP) is below typical ${refRange.label} (${refRange.low}-${refRange.high} WHP). You might've lifted before redline.`;
+  } else if(pA <= refRange.high+3){
+    context = ` Your peak (${pA.toFixed(1)} WHP) is within typical ${refRange.label} stock range. Math checks out.`;
   } else {
-    const gain = pA - refRange.high;
-    context = ` Your peak (${pA.toFixed(1)} WHP) is ${gain.toFixed(1)} WHP above stock reference for ${refRange.label} (${refRange.low}-${refRange.high} WHP). That's consistent with mods adding power.`;
+    context = ` Your peak (${pA.toFixed(1)} WHP) is ${(pA-refRange.high).toFixed(1)} WHP above stock reference, consistent with mods adding power.`;
   }
-  el.textContent = fallback(hg, mod, pA, tg) + context;
+  const sign = hg>=0?'+':'';
+  const tsign = tg>=0?'+':'';
+  let main;
+  if(Math.abs(hg)<4) main = `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Within measurement variance. Do 2-3 more pulls to confirm.`;
+  else if(Math.abs(hg)<12) main = `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Solid result.`;
+  else main = `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Strong result.`;
+  el.innerHTML = `<p>${main + context}</p>`;
 }
 
-function fallback(hg, mod, pA, tg){
-  const sign = hg>=0 ? '+' : '';
-  const tsign = tg>=0 ? '+' : '';
-  if(Math.abs(hg)<4)
-    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Within measurement variance. Do 2-3 more pulls to confirm.`;
-  if(Math.abs(hg)<12)
-    return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Solid result, consistent with what NC owners typically see from this mod.`;
-  return `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Strong result. Peak at ${pA.toFixed(1)} WHP is well above stock baseline.`;
-}
-
-// ═══ DOWNLOAD ═══
+// ═══════════════════════════════════════════════════════════════
+// DOWNLOAD
+// ═══════════════════════════════════════════════════════════════
 async function dlCard(){
-  if(window.goatcounter) {
-    window.goatcounter.count({path: '/event/png-downloaded', event: true});
-  }
-  // Build a temporary container with both the share card AND the chart
+  if(window.goatcounter) window.goatcounter.count({path:'/event/png-downloaded', event:true});
   const card = document.getElementById('shareCard');
   const chartCanvas = document.getElementById('dynoChart');
-
-  // Create a temporary wrapper
   const wrap = document.createElement('div');
   wrap.style.cssText = 'background:#07090c;padding:24px;width:760px;position:fixed;top:-9999px;left:-9999px;font-family:JetBrains Mono,monospace;';
-
   const cardClone = card.cloneNode(true);
   cardClone.style.cssText = 'background:#07090c;border:1px solid #2a3347;padding:26px 30px;margin-bottom:18px;width:100%;max-width:none;';
-
-  // Convert chart to image
   const chartImg = document.createElement('img');
   chartImg.src = chartCanvas.toDataURL('image/png');
   chartImg.style.cssText = 'width:100%;background:#0d1018;border:1px solid #2a3347;padding:16px;box-sizing:border-box;';
-
   const footer = document.createElement('div');
   footer.style.cssText = 'margin-top:14px;text-align:center;font-size:11px;color:#6478a0;letter-spacing:.05em;';
   footer.textContent = 'dannyhng.github.io/miatadyno · Virtual Dyno for NC Miata';
-
   wrap.appendChild(cardClone);
   wrap.appendChild(chartImg);
   wrap.appendChild(footer);
   document.body.appendChild(wrap);
-
-  // Wait for image to load
   await new Promise(r => chartImg.complete ? r() : (chartImg.onload = r));
-
   try {
     const c = await html2canvas(wrap, {backgroundColor:'#07090c', scale:2, useCORS:true, logging:false});
     const a = document.createElement('a');
     a.download = 'miatadyno-result.png';
     a.href = c.toDataURL('image/png');
     a.click();
-  } catch(err){
-    console.error('Download failed:', err);
-    alert('Download failed. Check console for details.');
-  } finally {
-    document.body.removeChild(wrap);
-  }
+  } catch(err){ alert('Download failed: ' + err.message); }
+  finally { document.body.removeChild(wrap); }
 }
 
-// ═══ USAGE LIMITS ═══
+// ═══════════════════════════════════════════════════════════════
+// USAGE LIMITS
+// ═══════════════════════════════════════════════════════════════
 const FREE_LIMIT = 2;
-const RESET_DAYS = 30; // resets every 30 days
-
+const RESET_DAYS = 30;
 function getUsage(){
   try {
     const data = JSON.parse(localStorage.getItem('miatadyno_usage') || '{}');
     const now = Date.now();
-    if(!data.firstUse || (now - data.firstUse) > RESET_DAYS * 24 * 60 * 60 * 1000){
-      // Reset window
-      return {count: 0, firstUse: now};
-    }
-    return {count: data.count || 0, firstUse: data.firstUse};
-  } catch(e){
-    return {count: 0, firstUse: Date.now()};
-  }
+    if(!data.firstUse || (now - data.firstUse) > RESET_DAYS*24*60*60*1000) return {count:0, firstUse:now};
+    return {count: data.count||0, firstUse: data.firstUse};
+  } catch(e){ return {count:0, firstUse:Date.now()}; }
 }
-
 function incrementUsage(){
   const usage = getUsage();
   usage.count += 1;
-  try {
-    localStorage.setItem('miatadyno_usage', JSON.stringify(usage));
-  } catch(e){}
+  try { localStorage.setItem('miatadyno_usage', JSON.stringify(usage)); } catch(e){}
   updateUsageDisplay();
 }
-
 function updateUsageDisplay(){
   const usage = getUsage();
   const el = document.getElementById('usageCount');
@@ -2286,53 +1942,81 @@ function updateUsageDisplay(){
     }
   }
 }
-
-function checkLimit(){
-  const usage = getUsage();
-  return usage.count < FREE_LIMIT;
-}
-
-function openLimitModal(){
-  document.getElementById('limitModal').classList.add('vis');
-}
-
-function closeLimitModal(){
-  document.getElementById('limitModal').classList.remove('vis');
-}
-
-// Initialize on load
+function checkLimit(){ return getUsage().count < FREE_LIMIT; }
+function openLimitModal(){ document.getElementById('limitModal').classList.add('vis'); }
+function closeLimitModal(){ document.getElementById('limitModal').classList.remove('vis'); }
 updateUsageDisplay();
 
-// ═══ TERMS ═══
-let termsAccepted = false;
+// ═══════════════════════════════════════════════════════════════
+// TERMS, THEME, FEEDBACK, LEGAL, PROGRESS (mostly unchanged)
+// ═══════════════════════════════════════════════════════════════
 const termsChk = document.getElementById('termsCheck');
 if(termsChk){
   termsChk.addEventListener('change', function(){
-    const btn = document.getElementById('termsAccept');
-    if(!btn) return;
-    btn.disabled = !this.checked;
-    btn.style.background = this.checked ? 'var(--amber)' : 'var(--s3)';
-    btn.style.color = this.checked ? '#07090c' : 'var(--dim)';
-    btn.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+    document.getElementById('termsAccept').disabled = !this.checked;
   });
 }
 function acceptTerms(){
   termsAccepted = true;
-  document.getElementById('termsModal').style.display = 'none';
+  document.getElementById('termsModal').classList.remove('vis');
   runAnalysis();
 }
 
-// ═══ PROGRESS ═══
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light');
+  document.getElementById('themeToggle').textContent = isLight ? '☾' : '☀';
+  try { localStorage.setItem('miatadyno_theme', isLight ? 'light' : 'dark'); } catch(e){}
+}
+try {
+  if(localStorage.getItem('miatadyno_theme') === 'light'){
+    document.body.classList.add('light');
+    document.getElementById('themeToggle').textContent = '☾';
+  }
+} catch(e){}
+
+function openFeedback(){ document.getElementById('fbModal').classList.add('vis'); }
+function closeFeedback(){ document.getElementById('fbModal').classList.remove('vis'); }
+function sendFeedback(){
+  const type = document.getElementById('fbType').value;
+  const email = document.getElementById('fbEmail').value;
+  const msg = document.getElementById('fbMsg').value;
+  if(!msg.trim()){ alert('Please enter a message.'); return; }
+  const subject = `MiataDyno Feedback: ${type}`;
+  const body = `Type: ${type}\nFrom: ${email||'(not provided)'}\n\n${msg}`;
+  window.location.href = `mailto:thuvhoang19@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  closeFeedback();
+  document.getElementById('fbMsg').value = '';
+}
+
+const LEGAL_CONTENT = {
+  terms: {title:'Terms of Use', body:`<p><strong>Acceptance.</strong> By using MiataDyno, you agree to these terms.</p>
+<p><strong>Permitted Use.</strong> MiataDyno is for personal use. Acceleration runs only on private property, closed courses, or where safe and legal.</p>
+<p><strong>No Warranty.</strong> Results are estimates. Not certified dyno measurements.</p>
+<p><strong>No Liability.</strong> MiataDyno is not responsible for any consequences from use.</p>
+<p><strong>No Affiliation.</strong> Independent project. Not affiliated with Mazda Motor Corporation.</p>`},
+  privacy: {title:'Privacy Policy', body:`<p><strong>Data Processing.</strong> CSV files are processed entirely in your browser and not sent to any server.</p>
+<p><strong>Analytics.</strong> We use GoatCounter for basic page-view counts. No cookies, no personal data, no tracking.</p>
+<p><strong>Local Storage.</strong> Used only for theme preference and usage limit tracking.</p>`},
+  disclaimer: {title:'Accuracy Disclaimer', body:`<p>MiataDyno measures the difference between two acceleration runs on the same road. The delta is the reliable output. Absolute power is an estimate.</p>
+<p><strong>Validation.</strong> Physics engine validated against a stock NC2 PRHT producing approximately 126 WHP, within the 118-128 WHP Dynojet reference range.</p>`}
+};
+function openLegal(key){
+  const c = LEGAL_CONTENT[key];
+  document.getElementById('legalTitle').textContent = c.title;
+  document.getElementById('legalContent').innerHTML = c.body;
+  document.getElementById('legalModal').classList.add('vis');
+}
+function closeLegal(){ document.getElementById('legalModal').classList.remove('vis'); }
+
 function updateProgress(){
   const fileLoaded = rows.length > 0;
-  const pullsSelected = analysisMode === 'compare'
-    ? (selB !== null && selA !== null)
-    : (selPulls.length > 0);
+  const pullsSelected = analysisMode === 'compare' ? (selB!==null && selA!==null) : (selPulls.length>0);
   const s1 = document.getElementById('step-1');
   const s2 = document.getElementById('step-2');
   const s3 = document.getElementById('step-3');
   const l12 = document.getElementById('line-1-2');
   const l23 = document.getElementById('line-2-3');
+  if(!s1) return;
   [s1, s2, s3].forEach(s => s.className = 'prog-step');
   [l12, l23].forEach(l => l.className = 'prog-line');
   if(!fileLoaded){
@@ -2350,79 +2034,28 @@ function updateProgress(){
   }
 }
 
-// ═══ THEME ═══
-function toggleTheme(){
-  const isLight = document.body.classList.toggle('light');
-  document.getElementById('themeToggle').textContent = isLight ? '☾' : '☀';
-  try { localStorage.setItem('miatadyno_theme', isLight ? 'light' : 'dark'); } catch(e){}
-}
-try {
-  if(localStorage.getItem('miatadyno_theme') === 'light'){
-    document.body.classList.add('light');
-    document.getElementById('themeToggle').textContent = '☾';
+// ═══════════════════════════════════════════════════════════════
+// VIEWPORT CHANGE HANDLER
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  if(!isMobile()){
+    // Desktop: ensure modal is closed and sections are back in sidebar
+    closeVehicleEdit();
+    document.body.dataset.state = 'drop';
+  } else {
+    updateMobileActionBar();
   }
-} catch(e){}
+});
 
-// ═══ FEEDBACK ═══
-function openFeedback(){ document.getElementById('fbModal').classList.add('vis'); }
-function closeFeedback(){ document.getElementById('fbModal').classList.remove('vis'); }
-function sendFeedback(){
-  const type = document.getElementById('fbType').value;
-  const email = document.getElementById('fbEmail').value;
-  const msg = document.getElementById('fbMsg').value;
-  if(!msg.trim()){ alert('Please enter a message.'); return; }
-  const subject = `MiataDyno Feedback: ${type}`;
-  const body = `Type: ${type}\nFrom: ${email||'(not provided)'}\n\n${msg}`;
-  window.location.href = `mailto:thuvhoang19@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  closeFeedback();
-  document.getElementById('fbMsg').value = '';
-}
-
-// ═══ LEGAL ═══
-const LEGAL_CONTENT = {
-  terms: {
-    title: 'Terms of Use',
-    body: `<p><strong>Acceptance.</strong> By using MiataDyno, you agree to these terms.</p>
-<p><strong>Permitted Use.</strong> MiataDyno is provided for personal use. Acceleration runs must be performed only on private property, closed courses, or roads where it is safe and legal.</p>
-<p><strong>No Warranty.</strong> Results are estimates derived from physics models applied to OBD log data. They are not certified dyno measurements.</p>
-<p><strong>No Liability.</strong> MiataDyno is not responsible for any property damage, personal injury, traffic violations, or other consequences from use of this tool.</p>
-<p><strong>No Affiliation.</strong> MiataDyno is independent. Not affiliated with Mazda Motor Corporation, BlueDriver, or any other company.</p>
-<p><strong>Beta Software.</strong> Features may change, break, or be removed without notice.</p>
-<p><strong>Last updated:</strong> April 28, 2026</p>`
-  },
-  privacy: {
-    title: 'Privacy Policy',
-    body: `<p><strong>What We Collect.</strong> MiataDyno currently runs entirely in your browser. CSV files you upload are processed locally and not sent to any server.</p>
-<p><strong>Weather API.</strong> If you provide GPS coordinates for atmospheric correction, those coordinates are sent to Open-Meteo to retrieve current weather. We do not store them.</p>
-<p><strong>Feedback.</strong> If you submit feedback, your message is sent via your email client to thuvhoang19@gmail.com. We do not collect through any third party.</p>
-<p><strong>Analytics.</strong> We use GoatCounter (or Plausible, depending which you pick) for basic page-view counts. No cookies, no personal data, no tracking across sites. We see total visits and where users came from. We do not see individual users.</p>
-<p><strong>Local Storage.</strong> We use browser localStorage only to remember your light/dark theme preference.</p>
-<p><strong>Future Changes.</strong> When user accounts launch, this policy will be updated. You will be notified before any change.</p>
-<p><strong>Last updated:</strong> April 28, 2026</p>`
-  },
-  disclaimer: {
-    title: 'Accuracy Disclaimer',
-    body: `<p>MiataDyno measures the difference between two acceleration runs performed on the same road in similar conditions. The delta (before vs after) is the reliable output. The absolute power number is an estimate.</p>
-<p><strong>What This Means.</strong> Use this tool to answer "did my mod work, and by how much" with confidence. Do not use it as a substitute for a certified dyno when absolute power numbers matter (insurance, sale, sanctioned competition).</p>
-<p><strong>Sources of Variance.</strong> Atmospheric conditions, road surface, road grade, OBD scanner polling rate, vehicle configuration accuracy, and pull quality all affect the absolute number.</p>
-<p><strong>Validation.</strong> The physics engine has been validated against a stock NC2 PRHT producing approximately 126 WHP, which falls within the 118-128 WHP Dynojet reference range for that platform.</p>`
-  }
-};
-function openLegal(key){
-  const c = LEGAL_CONTENT[key];
-  document.getElementById('legalTitle').textContent = c.title;
-  document.getElementById('legalContent').innerHTML = c.body;
-  document.getElementById('legalModal').classList.add('vis');
-}
-function closeLegal(){ document.getElementById('legalModal').classList.remove('vis'); }
-
-// ═══ INITIALIZE ═══
-initWheelSelectors();
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+setRim(17);
 setWeightMode('total');
 setAnalysisMode('same');
 calcW();
 updateProgress();
-
+if(isMobile()) updateMobileVehicleCard();
 </script>
 
 </body>
