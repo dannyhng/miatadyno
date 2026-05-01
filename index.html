@@ -496,7 +496,6 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <span class="badge on">No Dyno Required</span>
     <span class="badge on">Stock vs Modded</span>
     <span class="badge on">Multi-Run Averaging</span>
-    <span class="badge on">Free in Beta</span>
     <span class="badge">Pro Tier (coming)</span>
   </div>
 </div>
@@ -527,17 +526,26 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div class="sec-bd">
         <div class="fl">
           <label class="lbl">Miata Generation</label>
-          <select id="ncGen" onchange="calcW()">
+          <select id="ncGen" onchange="syncTotalWt();calcW()">
             <option value="nc1">NC1 (2006-2008)</option>
             <option value="nc2" selected>NC2 (2009-2012)</option>
             <option value="nc3">NC3 (2013-2015)</option>
           </select>
         </div>
         <div class="fl">
+          <label class="lbl">Transmission</label>
+          <select id="trans">
+            <option value="6mt" selected>6-Speed Manual</option>
+            <option value="5mt" disabled>5-Speed Manual — coming soon</option>
+            <option value="6at" disabled>6-Speed Automatic — coming soon</option>
+          </select>
+          <p style="font-size:10px;color:var(--amber);margin-top:5px;line-height:1.5;"><strong>6MT only for now.</strong> If your car is 5MT or 6AT, results will be off by ~5-8% (different drivetrain loss and final drive). Support coming.</p>
+        </div>
+        <div class="fl">
           <label class="lbl">Top Type</label>
           <div class="trow" id="tTop">
-            <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);calcW()">Soft Top</div>
-            <div class="tbtn" data-v="prht" onclick="setT('tTop',this);calcW()">PRHT</div>
+            <div class="tbtn on" data-v="soft" onclick="setT('tTop',this);syncTotalWt();calcW()">Soft Top</div>
+            <div class="tbtn" data-v="prht" onclick="setT('tTop',this);syncTotalWt();calcW()">PRHT</div>
           </div>
         </div>
         <div class="fl">
@@ -552,6 +560,15 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
           <label class="lbl">Driver Weight (lbs)</label>
           <input type="number" id="drvWt" value="170" min="100" max="350" onchange="calcW()">
           <p style="font-size:10px;color:var(--amber);margin-top:6px;line-height:1.5;"><strong>Solo runs only.</strong> Passengers reduce data accuracy.</p>
+        </div>
+        <div class="fl">
+          <label class="lbl">Correction Standard</label>
+          <div class="trow" id="tCorr">
+            <div class="tbtn on" data-v="sae" onclick="setT('tCorr',this)">SAE J1349</div>
+            <div class="tbtn" data-v="din" onclick="setT('tCorr',this)">DIN 70020</div>
+            <div class="tbtn" data-v="none" onclick="setT('tCorr',this)">Uncorrected</div>
+          </div>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">SAE = US dyno default (25°C, 99 kPa). DIN = European default (20°C, 1013 mbar) — runs ~3% higher. Match the standard your dyno shop uses.</p>
         </div>
       </div>
     </div>
@@ -865,10 +882,14 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     </div>
 
     <!-- RESULTS -->
-    <div id="results">
+     <div id="results">
       <div class="res-banner" id="resBanner">
         <p class="res-banner-t" id="resBannerT"></p>
         <p class="res-banner-b" id="resBannerB"></p>
+      </div>
+      <div class="res-banner" id="gearBanner" style="border-left-color:var(--red2);background:rgba(214,48,49,.08);">
+        <p class="res-banner-t" id="gearBannerT" style="color:var(--red2);"></p>
+        <p class="res-banner-b" id="gearBannerB"></p>
       </div>
       <div class="stats-g" id="statsLabels">
         <div class="sbox"><div class="slbl">WHP</div><div class="sval">.</div><div class="sunit">wheel hp</div></div>
@@ -1095,9 +1116,9 @@ function promptAccessCode(){
 // VEHICLE DATA
 // ═══════════════════════════════════════════════════════════════
 const NCP = {
-  nc1:{name:'NC1 MX-5 (2006-2008)',short:'NC1',wt:2480,swl:15.0,stl:19.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
-  nc2:{name:'NC2 MX-5 (2009-2012)',short:'NC2',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
-  nc3:{name:'NC3 MX-5 (2013-2015)',short:'NC3',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15},
+  nc1:{name:'NC1 MX-5 (2006-2008)',short:'NC1',wt:2480,swl:15.0,stl:19.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6014,gears:[3.136,1.888,1.330,1.000,0.814,0],fd:4.100},
+  nc2:{name:'NC2 MX-5 (2009-2012)',short:'NC2',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
+  nc3:{name:'NC3 MX-5 (2013-2015)',short:'NC3',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
 };
 const CD_MAP = { up_soft:.36, up_prht:.34, down:.44 };
 
@@ -1286,6 +1307,25 @@ function checkCustomExh(id){
   if(inp) inp.style.display = sel?.value === 'custom' ? 'block' : 'none';
 }
 
+// When the user changes generation or top type while in 'total' mode,
+// auto-update the totalWt placeholder to match. Only fires if the field still
+// holds an unmodified default (so manual scale-weight entries are preserved).
+function syncTotalWt(){
+  const mode = document.querySelector('#tWtMode .tbtn.on')?.dataset.v;
+  if(mode !== 'total') return;
+  const gen = document.getElementById('ncGen').value;
+  const topType = document.querySelector('#tTop .tbtn.on')?.dataset.v || 'soft';
+  const base = NCP[gen];
+  const expected = base.wt + (topType === 'prht' ? 78 : 0);
+  const field = document.getElementById('totalWt');
+  // Only auto-update if current value matches a known default (user hasn't customized it)
+  const knownDefaults = [2480, 2509, 2515, 2545, 2558, 2587, 2593, 2480+78, 2509+78];
+  const current = parseFloat(field.value);
+  if(knownDefaults.includes(current)){
+    field.value = expected;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // WEIGHT CALC
 // ═══════════════════════════════════════════════════════════════
@@ -1357,7 +1397,7 @@ function calcW(){
     tot_kg: totalWeightLbs * 0.453592,
     eff: (totalWeightLbs * 0.453592) * (1 + base.rot),
     base, gen, Cd, dia_m,
-    spd_corr: dia_m / 0.6325,
+    spd_corr: dia_m / base.stock_dia_m,
     topType, topPos, drvWeight
   };
 }
@@ -1423,7 +1463,12 @@ function calcHP(seg, prof){
   const t = seg.map(r => r.time);
   const sv = savgol(seg.map(r => r.speed_mph * prof.spd_corr * 0.44704), Math.max(7, Math.floor(seg.length/6)*2+1));
   const ac = grad(sv, t);
-  const corr = (99.0/baro) * Math.sqrt(iat_k/298.0);
+  // Correction standard: SAE J1349 (25C/99kPa), DIN 70020 (20C/1013mbar), or uncorrected
+  const corrStd = document.querySelector('#tCorr .tbtn.on')?.dataset.v || 'sae';
+  let corr;
+  if(corrStd === 'din')      corr = (101.3/baro) * Math.sqrt(iat_k/293.15);
+  else if(corrStd === 'none') corr = 1.0;
+  else                        corr = (99.0/baro) * Math.sqrt(iat_k/298.0);
   return seg.map((r,i) => {
     const v = sv[i], a = ac[i];
     const RHO_STD = 1.225;
@@ -1723,6 +1768,13 @@ function detectPulls(data){
             // If avg is > 60, assume Fahrenheit; otherwise Celsius
             pullIAT_C = iat_avg > 60 ? (iat_avg - 32) * 5/9 : iat_avg;
           }
+          // Median speed/RPM ratio across the pull — used for gear-vs-tire sanity check
+          const _ratios = seg
+            .filter(r => r.rpm > 1500 && r.speed_mph > 5)
+            .map(r => r.speed_mph * 1000 / r.rpm)
+            .sort((a,b) => a-b);
+          const mph_per_krpm = _ratios.length ? _ratios[Math.floor(_ratios.length/2)] : 0;
+
           out.push({
             si: st, ei: i-1, st: stt, dur,
             maxRPM: rpmMax,
@@ -1730,6 +1782,7 @@ function detectPulls(data){
             maxThr: Math.max(...seg.map(r => r.throttle)),
             q: Math.max(0, Math.min(100, 100 - drops*15)),
             iat_c: pullIAT_C,
+            mph_per_krpm,
             rows: seg
           });
         }
@@ -1920,13 +1973,57 @@ function checkReady(){
 // ═══════════════════════════════════════════════════════════════
 document.getElementById('goBtn').addEventListener('click', () => triggerRun());
 
+// Compare observed mph/krpm against predicted for the user's tire+gen+gear config.
+// Returns {gear, predicted, observed, delta_pct} for the best-matching gear, or null.
+function gearSanityCheck(prof, observed_mph_per_krpm){
+  if(!observed_mph_per_krpm || !prof.base.gears || !prof.base.fd) return null;
+  const tire_dia_in = prof.dia_m / 0.0254;
+  // mph/krpm = (1000 wheel rev × tire_circ_in / 12 in/ft × 60 min/hr) / (5280 ft/mi × gear × fd)
+  // simplified: factor / (gear × fd)
+  const factor = (Math.PI * tire_dia_in * 60 * 1000) / (12 * 5280);
+  let best = null;
+  for(let i = 0; i < prof.base.gears.length; i++){
+    const g = prof.base.gears[i];
+    if(!g) continue;
+    const predicted = factor / (g * prof.base.fd);
+    const delta_pct = (observed_mph_per_krpm - predicted) / predicted * 100;
+    if(!best || Math.abs(delta_pct) < Math.abs(best.delta_pct)){
+      best = { gear: i+1, predicted, observed: observed_mph_per_krpm, delta_pct };
+    }
+  }
+  return best;
+}
+
 function runAnalysis(){
   const w = calcW();
-  const prof = { eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr };
+  const prof = { eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr, dia_m:w.dia_m };
   const mod = document.getElementById('modDesc').value || 'Current Setup';
   const vn = w.base.name;
   if(analysisMode === 'compare') runCompareAnalysis(prof, w, mod, vn);
   else runSameSetupAnalysis(prof, w, mod, vn);
+  // Gear-vs-tire sanity check against the primary selected pull
+  const primaryPullIdx = analysisMode === 'compare' ? selA : (selPulls[0] !== undefined ? selPulls[0] : null);
+  const gearBanner = document.getElementById('gearBanner');
+  if(primaryPullIdx !== null && pulls[primaryPullIdx]){
+    const sanity = gearSanityCheck(prof, pulls[primaryPullIdx].mph_per_krpm);
+    if(sanity && Math.abs(sanity.delta_pct) > 3){
+      const dir = sanity.delta_pct > 0 ? 'higher' : 'lower';
+      const realPctSign = sanity.delta_pct > 0 ? '+' : '';
+      const realImpact = (Math.pow(1 + sanity.delta_pct/100, 2) - 1) * 100;
+      document.getElementById('gearBannerT').textContent =
+        `Speed reading off by ${sanity.delta_pct.toFixed(1)}% from ${sanity.gear === 1 ? '1st' : sanity.gear === 2 ? '2nd' : sanity.gear === 3 ? '3rd' : sanity.gear+'th'} gear math`;
+      document.getElementById('gearBannerB').innerHTML =
+        `Pull was in ${sanity.gear === 1 ? '1st' : sanity.gear === 2 ? '2nd' : sanity.gear === 3 ? '3rd' : sanity.gear+'th'} gear (best fit). ` +
+        `Observed <strong>${sanity.observed.toFixed(2)}</strong> mph/krpm, predicted <strong>${sanity.predicted.toFixed(2)}</strong> mph/krpm for your tire size. ` +
+        `Either your tires are ${dir} than entered, or your tune has a speedo offset. ` +
+        `<strong>Real WHP is approximately ${realPctSign}${realImpact.toFixed(0)}% from displayed</strong> — current shown number under-reads if speed reading is high.`;
+      gearBanner.classList.add('vis');
+    } else {
+      gearBanner.classList.remove('vis');
+    }
+  } else {
+    gearBanner.classList.remove('vis');
+  }
   document.getElementById('results').classList.add('vis');
   if(typeof incrementUsage === 'function') incrementUsage();
   if(window.goatcounter) window.goatcounter.count({path:'/event/analysis-completed', event:true});
