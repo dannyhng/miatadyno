@@ -237,6 +237,23 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .sval.a{color:var(--amber);text-shadow:0 0 30px rgba(232,160,32,.25);}
 .sunit{font-size:11px;color:var(--dim);letter-spacing:.05em;margin-top:2px;}
 
+/* Speed trap cards (same-setup mode) reuse .sbox; only "unreached" needs custom dimming */
+.trap-card.unreached .sval{color:var(--dim);}
+/* Speed trap table (compare mode) — before/after/delta layout */
+.trap-table{display:flex;flex-direction:column;border:1px solid var(--b1);}
+.trap-row{display:grid;grid-template-columns:140px 1fr 1fr 1fr;align-items:center;padding:14px 18px;border-bottom:1px solid var(--b1);background:var(--s1);}
+.trap-row:last-child{border-bottom:none;}
+.trap-bracket{font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);}
+.trap-cell{display:flex;flex-direction:column;gap:3px;}
+.trap-cell-l{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);}
+.trap-cell-v{font-family:var(--disp);font-size:22px;font-weight:700;line-height:1;}
+@media(max-width:880px){
+  .trap-row{grid-template-columns:1fr;gap:8px;padding:12px 14px;}
+  .trap-bracket{font-size:12px;}
+  .trap-cell{flex-direction:row;justify-content:space-between;align-items:baseline;}
+  .trap-cell-v{font-size:18px;}
+}
+
 .chart-w{padding:30px;background:var(--s1);border-bottom:1px solid var(--b1);}
 .chart-w canvas{max-height:400px !important;}
 @media(max-width:600px){
@@ -598,15 +615,17 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <div class="fl">
           <label class="lbl">Tire Size</label>
           <select id="tireSel" onchange="checkCustomTire();calcW()"></select>
-          <p style="font-size:10px;color:var(--dim);margin-top:5px;">Stock NC1: 195/50R16 · Stock NC2/3: 205/45R17</p>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;">Stock NC1: 195/50R16 (~18.5 lbs each) · Stock NC2/3: 205/45R17 (~21 lbs each). Listed weights are ±2 lb estimates.</p>
         </div>
         <div class="fl" id="customTireRow" style="display:none;">
           <label class="lbl">Custom Tire Size</label>
-          <div class="g3">
+          <div class="g3" style="grid-template-columns:1fr 1fr 1fr 1fr;">
             <div><label class="lbl" style="font-size:9px;">Width</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
             <div><label class="lbl" style="font-size:9px;">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
             <div><label class="lbl" style="font-size:9px;">Rim</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
+            <div><label class="lbl" style="font-size:9px;">Wt (lbs)</label><input type="number" id="tireWtCustom" value="" min="8" max="35" step="0.1" placeholder="~18-22" onchange="calcW()"></div>
           </div>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">Tire weight per tire. Common range 17-22 lbs for 16-17" street tires. Leave blank to use stock weight.</p>
         </div>
       </div>
     </div>
@@ -894,6 +913,13 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div class="stats-g" id="statsLabels">
         <div class="sbox"><div class="slbl">WHP</div><div class="sval">.</div><div class="sunit">wheel hp</div></div>
       </div>
+      <div class="cpanel" id="trapSection" style="display:none;">
+        <div class="plabel">Speed Trap Times · Direct Measurement</div>
+        <p style="font-size:11px;color:var(--mid);margin-bottom:18px;line-height:1.7;">
+          Pure timer reading — no physics model, no mass or aero assumptions. <strong style="color:var(--text);">Most trustworthy metric for comparing pulls.</strong>
+        </p>
+        <div class="stats-g" id="trapGrid"></div>
+      </div>
       <div class="chart-w">
         <div class="plabel" style="margin-bottom:16px;">Power Curve</div>
         <div style="position:relative;height:380px;">
@@ -1116,9 +1142,9 @@ function promptAccessCode(){
 // VEHICLE DATA
 // ═══════════════════════════════════════════════════════════════
 const NCP = {
-  nc1:{name:'NC1 MX-5 (2006-2008)',short:'NC1',wt:2480,swl:15.0,stl:19.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6014,gears:[3.136,1.888,1.330,1.000,0.814,0],fd:4.100},
-  nc2:{name:'NC2 MX-5 (2009-2012)',short:'NC2',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
-  nc3:{name:'NC3 MX-5 (2013-2015)',short:'NC3',wt:2509,swl:19.0,stl:18.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
+  nc1:{name:'NC1 MX-5 (2006-2008)',short:'NC1',wt:2480,swl:15.0,stl:19.0,stock_tire_lbs:18.5,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6014,gears:[3.136,1.888,1.330,1.000,0.814,0],fd:4.100},
+  nc2:{name:'NC2 MX-5 (2009-2012)',short:'NC2',wt:2509,swl:19.0,stl:18.0,stock_tire_lbs:21.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
+  nc3:{name:'NC3 MX-5 (2013-2015)',short:'NC3',wt:2509,swl:19.0,stl:18.0,stock_tire_lbs:21.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
 };
 const CD_MAP = { up_soft:.36, up_prht:.34, down:.44 };
 
@@ -1130,8 +1156,8 @@ const WHEEL_OPTIONS = {
 };
 const TIRE_OPTIONS = {
   15: [{label:'205/50R15 ~18.5 lbs', wt:18.5, w:205,a:50,r:15},{label:'195/55R15 ~17 lbs', wt:17.0, w:195,a:55,r:15},{label:'225/50R15 ~20.5 lbs', wt:20.5, w:225,a:50,r:15},{label:'Custom size...', wt:'custom', w:205,a:50,r:15}],
-  16: [{label:'195/50R16 ~19 lbs (stock NC1)', wt:19.0, w:195,a:50,r:16},{label:'205/45R16 ~18 lbs', wt:18.0, w:205,a:45,r:16},{label:'205/50R16 ~20 lbs', wt:20.0, w:205,a:50,r:16},{label:'205/55R16 ~19.5 lbs', wt:19.5, w:205,a:55,r:16},{label:'Custom size...', wt:'custom', w:195,a:50,r:16}],
-  17: [{label:'205/45R17 ~17.5 lbs (stock NC2/3)', wt:17.5, w:205,a:45,r:17},{label:'215/45R17 ~18.7 lbs', wt:18.7, w:215,a:45,r:17},{label:'225/45R17 ~21 lbs', wt:21.0, w:225,a:45,r:17},{label:'235/40R17 ~21.5 lbs', wt:21.5, w:235,a:40,r:17},{label:'Custom size...', wt:'custom', w:205,a:45,r:17}],
+  16: [{label:'195/50R16 ~18.5 lbs (stock NC1)', wt:18.5, w:195,a:50,r:16},{label:'205/45R16 ~18 lbs', wt:18.0, w:205,a:45,r:16},{label:'205/50R16 ~20 lbs', wt:20.0, w:205,a:50,r:16},{label:'205/55R16 ~19.5 lbs', wt:19.5, w:205,a:55,r:16},{label:'Custom size...', wt:'custom', w:195,a:50,r:16}],
+  17: [{label:'205/45R17 ~21 lbs (stock NC2/3)', wt:21.0, w:205,a:45,r:17},{label:'215/45R17 ~18.7 lbs', wt:18.7, w:215,a:45,r:17},{label:'225/45R17 ~21 lbs', wt:21.0, w:225,a:45,r:17},{label:'235/40R17 ~21.5 lbs', wt:21.5, w:235,a:40,r:17},{label:'Custom size...', wt:'custom', w:205,a:45,r:17}],
   18: [{label:'205/40R18 ~18.5 lbs', wt:18.5, w:205,a:40,r:18},{label:'225/40R18 ~20 lbs', wt:20.0, w:225,a:40,r:18},{label:'235/40R18 ~21.5 lbs', wt:21.5, w:235,a:40,r:18},{label:'Custom size...', wt:'custom', w:225,a:40,r:18}],
 };
 
@@ -1276,8 +1302,8 @@ function setRim(size){
   whlSel.innerHTML = opts + '<option value="custom">Custom weight (enter below)</option>';
   const tireSel = document.getElementById('tireSel');
   tireSel.innerHTML = TIRE_OPTIONS[size].map(o => `<option value="${o.wt}" data-w="${o.w}" data-a="${o.a}" data-r="${o.r}">${o.label}</option>`).join('');
-  if(size===16){ tireSel.value = 19.0; }
-  else if(size===17){ tireSel.value = 17.5; whlSel.value = 19.0; }
+  if(size===16){ tireSel.value = 18.5; }
+  else if(size===17){ tireSel.value = 21.0; whlSel.value = 19.0; }
   checkCustomTire();
   checkCustomWheel();
   const note = document.getElementById('whl-note');
@@ -1369,11 +1395,28 @@ function calcW(){
     if(whlEl?.value === 'custom') whlVal = parseFloat(document.getElementById('whlCustom')?.value) || base.swl;
     else whlVal = whlEl ? parseFloat(whlEl.value) : base.swl;
     const wheels = 4 * (whlVal - base.swl);
+
+    // Tire mass delta — wired into Estimate mode. Pulls weight from
+    // TIRE_OPTIONS' wt: field for preset selections, tireWtCustom for custom
+    // sizes. Falls back to base.stock_tire_lbs (defensive default 21.0)
+    // when nothing is selected or custom field is blank/out-of-range.
+    const tireSelEl2 = document.getElementById('tireSel');
+    const stockTireLbs = base.stock_tire_lbs || 21.0;
+    let tireWt = stockTireLbs;
+    if(tireSelEl2 && tireSelEl2.value !== 'custom' && tireSelEl2.options.length){
+      const tw = parseFloat(tireSelEl2.value);
+      if(!isNaN(tw)) tireWt = tw;
+    } else if(tireSelEl2?.value === 'custom'){
+      const customWt = parseFloat(document.getElementById('tireWtCustom')?.value);
+      if(!isNaN(customWt) && customWt >= 8 && customWt <= 35) tireWt = customWt;
+    }
+    const tires = 4 * (tireWt - stockTireLbs);
+
     const exh = getVal('catback') + getVal('midpipe') + getVal('headers');
     const others = getVal('rollbar') + getVal('forced') +
       (parseFloat(document.getElementById('xDelta')?.value) || 0) +
       (parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v) || 0);
-    vehicleWeight = base.wt + exh + wheels + others;
+    vehicleWeight = base.wt + exh + wheels + tires + others;
   }
 
   if(topType === 'prht' && mode !== 'total') vehicleWeight += 78;
@@ -1384,13 +1427,6 @@ function calcW(){
   if(wsTot) wsTot.textContent = Math.round(totalWeightLbs) + ' lbs';
 
   if(isMobile()) updateMobileVehicleCard();
-
-  // Update mobile vehicle card whenever any form input changes
-  document.addEventListener('change', (e) => {
-    if(e.target.matches('input,select') && isMobile()){
-      setTimeout(updateMobileVehicleCard, 50);
-    }
-  });
 
   return {
     tot: totalWeightLbs,
@@ -1492,6 +1528,59 @@ function bin(data, bs=500){
       WTQ: inn.reduce((s,r)=>s+r.WTQ, 0)/inn.length,
     });
   }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SPEED TRAP TIMING — direct measurement, no physics model.
+// Most trustworthy metric in the tool. Uses CORRECTED speed
+// (raw OBD * spd_corr, kept in mph) so brackets reflect real-world
+// mph regardless of aftermarket tire diameter. Do NOT apply 0.44704
+// here — the m/s conversion belongs only in calcHP where F·v needs SI.
+// Note: Python reference uses raw OBD speed; this JS path corrects.
+// Both internally consistent but answer different questions —
+// JS answer (real-world delta) is product behavior; Python should follow.
+// ═══════════════════════════════════════════════════════════════
+const SPEED_TRAPS = [[30,50],[40,60],[50,70],[60,80]];
+
+function calcSpeedTrap(rows, vLo, vHi, spdCorr){
+  // Returns elapsed seconds between vLo and vHi crossings (corrected mph),
+  // or null if the pull never reached the bracket. Linear interpolation
+  // between samples for sub-sample precision.
+  const speeds = rows.map(r => r.speed_mph * spdCorr);
+  const times = rows.map(r => r.time);
+
+  // Find first vLo crossing (going up)
+  let iStart = -1, tStart = null;
+  for(let i = 0; i < speeds.length - 1; i++){
+    if(speeds[i] <= vLo && speeds[i+1] >= vLo){
+      const denom = speeds[i+1] - speeds[i];
+      const frac = denom !== 0 ? (vLo - speeds[i]) / denom : 0;
+      tStart = times[i] + frac * (times[i+1] - times[i]);
+      iStart = i;
+      break;
+    }
+  }
+  if(iStart < 0) return null;
+
+  // Find first vHi crossing (going up) at or after iStart
+  for(let j = iStart; j < speeds.length - 1; j++){
+    if(speeds[j] <= vHi && speeds[j+1] >= vHi){
+      const denom = speeds[j+1] - speeds[j];
+      const frac = denom !== 0 ? (vHi - speeds[j]) / denom : 0;
+      const tEnd = times[j] + frac * (times[j+1] - times[j]);
+      return tEnd - tStart;
+    }
+  }
+  return null;
+}
+
+function speedTrapsForPull(rows, spdCorr){
+  // Returns { "30-50": seconds|null, "40-60": ..., ... }
+  const out = {};
+  SPEED_TRAPS.forEach(([lo, hi]) => {
+    out[`${lo}-${hi}`] = calcSpeedTrap(rows, lo, hi, spdCorr);
+  });
   return out;
 }
 
@@ -1697,6 +1786,24 @@ function parseCSV(txt){
 
   rho = (baro * 1000) / (RDA * iat_k);
 
+  // Polling rate: median time between consecutive samples. Median is robust to
+  // OBD hiccups (paused recording, dropped samples) — mean would be biased.
+  let polling_hz = null;
+  if(data.length >= 2){
+    const dts = [];
+    for(let i = 1; i < data.length; i++){
+      const dt = data[i].time - data[i-1].time;
+      if(dt > 0) dts.push(dt);
+    }
+    if(dts.length){
+      dts.sort((a,b) => a-b);
+      const median_dt = dts.length % 2
+        ? dts[(dts.length-1)/2]
+        : (dts[dts.length/2-1] + dts[dts.length/2]) / 2;
+      polling_hz = median_dt > 0 ? 1.0 / median_dt : null;
+    }
+  }
+
   // Stash diagnostic info for the user
   window.__lastParseInfo = {
     columns: {time:tC, rpm:rC, speed:sC, throttle:thC, baro:bC, iat:iC, map:mapC},
@@ -1704,6 +1811,7 @@ function parseCSV(txt){
     baroSource,
     headerCount: hs.length,
     rowCount: data.length,
+    polling_hz,
   };
 
   return {ok:true, data};
@@ -1768,6 +1876,7 @@ function detectPulls(data){
             // If avg is > 60, assume Fahrenheit; otherwise Celsius
             pullIAT_C = iat_avg > 60 ? (iat_avg - 32) * 5/9 : iat_avg;
           }
+
           // Median speed/RPM ratio across the pull — used for gear-vs-tire sanity check
           const _ratios = seg
             .filter(r => r.rpm > 1500 && r.speed_mph > 5)
@@ -1775,14 +1884,38 @@ function detectPulls(data){
             .sort((a,b) => a-b);
           const mph_per_krpm = _ratios.length ? _ratios[Math.floor(_ratios.length/2)] : 0;
 
+          // Speed/RPM coefficient of variation — detects mid-pull shifts.
+          // A real shift produces a step change in the ratio; CV captures it.
+          // Mask matches Python score_quality(): rpm > 500 AND speed > 10 mph.
+          // Min 4 samples (Python's `mask.sum() > 3`). Population stddev to match np.std().
+          // CV is invariant to spd_corr (multiplicative scaling cancels in σ/μ),
+          // so raw speed_mph here gives the same answer as corrected speed.
+          const _cvSamples = seg
+            .filter(r => r.rpm > 500 && r.speed_mph > 10)
+            .map(r => r.speed_mph / r.rpm);
+          let shift_cv = null;
+          if(_cvSamples.length > 3){
+            const cvMean = _cvSamples.reduce((a,b) => a+b, 0) / _cvSamples.length;
+            const cvVar = _cvSamples.reduce((a,b) => a + (b-cvMean)*(b-cvMean), 0) / _cvSamples.length;
+            shift_cv = cvMean > 0 ? Math.sqrt(cvVar) / cvMean : null;
+          }
+
+          // Quality score: speed-drop penalty + shift CV penalty (matches Python score_quality).
+          // CV > 0.05 deducts floor(cv * 200). Strict > matches Python's `if cv > 0.05`.
+          let qScore = 100 - drops*15;
+          if(shift_cv !== null && shift_cv > 0.05){
+            qScore -= Math.floor(shift_cv * 200);
+          }
+
           out.push({
             si: st, ei: i-1, st: stt, dur,
             maxRPM: rpmMax,
             maxSpd: Math.max(...seg.map(r => r.speed_mph)),
             maxThr: Math.max(...seg.map(r => r.throttle)),
-            q: Math.max(0, Math.min(100, 100 - drops*15)),
+            q: Math.max(0, Math.min(100, qScore)),
             iat_c: pullIAT_C,
             mph_per_krpm,
+            shift_cv,
             rows: seg
           });
         }
@@ -1870,7 +2003,8 @@ async function handleFile(f){
     const baroNote = info.baroSource && !['kpa sensor','inhg sensor','auto sensor'].includes(info.baroSource)
       ? ` (${info.baroSource})` : '';
     const thrNote = detect.peakThrottle ? ` · WOT @ ${detect.wotThreshold}%+` : '';
-    showSt(`${res.data.length} rows · ${pulls.length} pulls${thrNote} · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C`, pulls.length ? 'ok' : 'err');
+    const pollNote = info.polling_hz ? ` · ${info.polling_hz.toFixed(1)} Hz` : '';
+    showSt(`${res.data.length} rows${pollNote} · ${pulls.length} pulls${thrNote} · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C`, pulls.length ? 'ok' : 'err');
     console.log('[MiataDyno parse]', info);
     console.log('[MiataDyno detect]', detect);
     selB = null; selA = null; selPulls = [];
@@ -2077,21 +2211,30 @@ function runCompareAnalysis(prof, w, mod, vn){
     bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> is above stock (${ref.lo}-${ref.hi} WHP). Either mods are working or weight/tire input is off.`;
     banner.classList.add('vis');
   }
+  // Speed traps for before and after — uses corrected speed (real-world mph).
+  // Per Principle 2, this is the most trustworthy comparison signal.
+  const trapsB = speedTrapsForPull(pulls[selB].rows, prof.spd_corr);
+  const trapsA = speedTrapsForPull(pulls[selA].rows, prof.spd_corr);
+  renderSpeedTraps('compare', [trapsB, trapsA]);
+
   drawCompareChart(bB, bA);
   genCompareInterp(pB, pA, hg, tg, mod, vn, w.gen);
 }
 
 function runSameSetupAnalysis(prof, w, mod, vn){
   if(!selPulls.length){ alert('Select at least one pull.'); return; }
-  const allBinnedRaw = selPulls.map(idx => {
+  // Track pull index alongside binned HP so speed traps can use the same
+  // kept pulls (post-outlier-rejection) as HP averaging.
+  const pullsHP = selPulls.map(idx => {
     const calc = calcHP(pulls[idx].rows, prof);
-    return calc ? bin(calc) : null;
-  }).filter(b => b && b.length);
+    return { idx, binned: (calc && calc.length) ? bin(calc) : null };
+  }).filter(p => p.binned && p.binned.length);
+  const allBinnedRaw = pullsHP.map(p => p.binned);
   if(!allBinnedRaw.length){ alert('No selected pulls had enough clean data.'); return; }
 
-  // Outlier rejection: drop pulls more than 10 WHP from the median peak.
+  // Outlier rejection: drop pulls more than 5 WHP from the median peak.
   // Catches partial-throttle bursts, headwind/uphill pulls, mid-pull lifts.
-  const OUTLIER_THRESHOLD = 10.0;
+  const OUTLIER_THRESHOLD = 5.0;
   const peaksRaw = allBinnedRaw.map(b => Math.max(...b.map(r => r.WHP)));
   const sorted = [...peaksRaw].sort((a,b) => a-b);
   const median = sorted.length % 2
@@ -2100,12 +2243,14 @@ function runSameSetupAnalysis(prof, w, mod, vn){
   const keepMask = peaksRaw.map(p => Math.abs(p - median) <= OUTLIER_THRESHOLD);
   const numRejected = keepMask.filter(k => !k).length;
 
-  let allBinned, rejectedNote = '';
+ let allBinned, keptPullsHP, rejectedNote = '';
   if(allBinnedRaw.length > 1 && numRejected > 0 && numRejected < allBinnedRaw.length){
     allBinned = allBinnedRaw.filter((_, i) => keepMask[i]);
+    keptPullsHP = pullsHP.filter((_, i) => keepMask[i]);
     rejectedNote = `${numRejected} pull${numRejected>1?'s':''} rejected as outlier${numRejected>1?'s':''}`;
   } else {
     allBinned = allBinnedRaw;
+    keptPullsHP = pullsHP;
   }
 
   const peaks = allBinned.map(b => Math.max(...b.map(r=>r.WHP)));
@@ -2201,6 +2346,11 @@ function runSameSetupAnalysis(prof, w, mod, vn){
     banner.classList.add('vis');
   }
 
+  // Speed traps from the same kept pulls used for HP averaging.
+  // Uses prof.spd_corr so brackets reflect real-world mph, not OBD-reported mph.
+  const keptTraps = keptPullsHP.map(p => speedTrapsForPull(pulls[p.idx].rows, prof.spd_corr));
+  renderSpeedTraps('same', keptTraps);
+
   drawSameSetupChart(allBinned, avgCurve);
   genSameSetupInterp(bestPeak, avgPeak, bestCrankHP, consistencyScore, meanStd, w.gen, mod);
 }
@@ -2237,6 +2387,80 @@ function drawCompareChart(bef, aft){
       }
     }
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SPEED TRAP RENDERING
+// Per Principle 2 (comparison beats absolute), traps get visual weight.
+// Same-setup: 4 cards (reuses .sbox), mean ± stddev across kept pulls.
+// Compare:    4 rows, before/after/delta side-by-side.
+// Display format matches Python: mean .2f, σ .3f, range .2f–.2f.
+// ═══════════════════════════════════════════════════════════════
+function renderSpeedTraps(mode, pullTraps){
+  const sec = document.getElementById('trapSection');
+  if(!sec) return;
+  if(!pullTraps.length){ sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+
+  const grid = document.getElementById('trapGrid');
+  if(mode === 'compare' && pullTraps.length === 2){
+    // Before vs After
+    const rows = SPEED_TRAPS.map(([lo, hi]) => {
+      const key = `${lo}-${hi}`;
+      const tB = pullTraps[0][key], tA = pullTraps[1][key];
+      if(tB === null && tA === null) return null;
+      const bs = tB !== null ? `${tB.toFixed(2)}s` : 'n/a';
+      const as = tA !== null ? `${tA.toFixed(2)}s` : 'n/a';
+      let dStr = '—', dCol = 'var(--mid)';
+      if(tB !== null && tA !== null){
+        const d = tA - tB;
+        dStr = (d > 0 ? '+' : '') + d.toFixed(2) + 's';
+        // Faster (negative delta) is good — green. Slower is red.
+        dCol = d < 0 ? 'var(--green)' : (d > 0 ? 'var(--red2)' : 'var(--mid)');
+      }
+      return `<div class="trap-row">
+        <div class="trap-bracket">${lo}-${hi} MPH</div>
+        <div class="trap-cell"><div class="trap-cell-l">Before</div><div class="trap-cell-v">${bs}</div></div>
+        <div class="trap-cell"><div class="trap-cell-l">After</div><div class="trap-cell-v">${as}</div></div>
+        <div class="trap-cell"><div class="trap-cell-l">Δ</div><div class="trap-cell-v" style="color:${dCol}">${dStr}</div></div>
+      </div>`;
+    }).filter(r => r !== null);
+    grid.innerHTML = rows.length
+      ? `<div class="trap-table">${rows.join('')}</div>`
+      : '<p style="color:var(--dim);font-size:12px;padding:14px;">No brackets reached in either pull.</p>';
+  } else {
+    // Same-setup aggregation: mean ± stddev across all kept pulls
+    const cards = SPEED_TRAPS.map(([lo, hi]) => {
+      const key = `${lo}-${hi}`;
+      const times = pullTraps.map(t => t[key]).filter(t => t !== null);
+      if(!times.length){
+        return `<div class="sbox trap-card unreached">
+          <div class="slbl">${lo}-${hi} MPH</div>
+          <div class="sval">—</div>
+          <div class="sunit">not reached</div>
+        </div>`;
+      }
+      if(times.length === 1){
+        return `<div class="sbox trap-card">
+          <div class="slbl">${lo}-${hi} MPH</div>
+          <div class="sval">${times[0].toFixed(2)}<span style="font-size:.5em;">s</span></div>
+          <div class="sunit">1 pull</div>
+        </div>`;
+      }
+      const mean = times.reduce((a,b) => a+b, 0) / times.length;
+      // Population stddev (divisor N) to match Python's np.std()
+      const variance = times.reduce((a,b) => a + (b-mean)*(b-mean), 0) / times.length;
+      const stddev = Math.sqrt(variance);
+      const minT = Math.min(...times);
+      const maxT = Math.max(...times);
+      return `<div class="sbox trap-card">
+        <div class="slbl">${lo}-${hi} MPH</div>
+        <div class="sval">${mean.toFixed(2)}<span style="font-size:.5em;">s</span></div>
+        <div class="sunit">±${stddev.toFixed(3)}s · ${times.length} pulls · ${minT.toFixed(2)}–${maxT.toFixed(2)}s</div>
+      </div>`;
+    });
+    grid.innerHTML = cards.join('');
+  }
 }
 
 function drawSameSetupChart(allBinned, avgCurve){
@@ -2286,7 +2510,7 @@ function genSameSetupInterp(bestPeak, avgPeak, bestCrankHP, consistencyScore, me
   parts.push(`<strong>Your best pull:</strong> ${bestPeak.toFixed(1)} WHP at the wheels. That's roughly ${bestCrankHP.toFixed(0)} crank HP after typical 15% drivetrain loss.`);
 
   if(numRej > 0){
-    parts.push(`<strong>Outlier rejection:</strong> ${numRej} pull${numRej>1?"s were":" was"} dropped because ${numRej>1?"they":"it"} fell more than 10 WHP from the median. Common causes: slight uphill grade, headwind, mid-pull throttle lift, or wheel slip. The rejected pull${numRej>1?"s aren't":" isn't a"} reflection of your engine's actual power.`);
+    parts.push(`<strong>Outlier rejection:</strong> ${numRej} pull${numRej>1?"s were":" was"} dropped because ${numRej>1?"they":"it"} fell more than 5 WHP from the median. Common causes: slight uphill grade, headwind, mid-pull throttle lift, or wheel slip. The rejected pull${numRej>1?"s aren't":" isn't a"} reflection of your engine's actual power.`);
   }
 
   if(numKept > 1){
@@ -2446,7 +2670,8 @@ const LEGAL_CONTENT = {
 <p><strong>Analytics.</strong> We use GoatCounter for basic page-view counts. No cookies, no personal data, no tracking.</p>
 <p><strong>Local Storage.</strong> Used only for theme preference and usage limit tracking.</p>`},
   disclaimer: {title:'Accuracy Disclaimer', body:`<p>MiataDyno measures the difference between two acceleration runs on the same road. The delta is the reliable output. Absolute power is an estimate.</p>
-<p><strong>Validation.</strong> Physics engine validated against a stock NC2 PRHT producing approximately 126 WHP, within the 118-128 WHP Dynojet reference range.</p>`}
+<p><strong>Validation.</strong> Physics engine validated against a stock NC2 PRHT producing approximately 126 WHP, within the 118-128 WHP Dynojet reference range.</p>
+<p><strong>Tire weight precision.</strong> Tire weights from the dropdown are ±2 lb estimates. For precision, weigh one of your tires and enter the value in Custom Tire Size mode.</p>`}
 };
 function openLegal(key){
   const c = LEGAL_CONTENT[key];
@@ -2504,6 +2729,13 @@ setAnalysisMode('same');
 calcW();
 updateProgress();
 if(isMobile()) updateMobileVehicleCard();
+
+// Mobile vehicle card auto-update on any form change. Registered once at init.
+document.addEventListener('change', (e) => {
+  if(e.target.matches('input,select') && isMobile()){
+    setTimeout(updateMobileVehicleCard, 50);
+  }
+});
 </script>
 
 </body>

@@ -148,6 +148,16 @@ if missing:
 profile = build_vehicle_profile(**VEHICLE_CONFIG)
 profile['road_grade'] = ROAD_GRADE_PCT
 
+# Stock tire rolling diameter for spd_corr — must match JS NCP[gen].stock_dia_m.
+# Source: 195/50R16 (NC1) and 205/45R17 (NC2/3) computed via
+# calc_tire_diameter_m(width, aspect, wheel_in). Backport ticket: lift these
+# into vehicle_profiles.py once SSoT lands so JS and Python share the constant.
+STOCK_TIRE_DIA_M = {
+    'nc1':  0.6014,   # 195/50R16
+    'nc23': 0.6163,   # 205/45R17
+}
+profile['spd_corr'] = profile['tire_dia_m'] / STOCK_TIRE_DIA_M[profile['generation']]
+
 vehicle_name = (
     f"{'NC1' if profile['generation']=='nc1' else 'NC2/3'} MX-5 "
     f"{'Soft Top' if profile['top_type']=='soft' else 'PRHT'} "
@@ -329,7 +339,7 @@ def rpm_bin(seg):
 
 # ═══ FEATURE 3: SPEED TRAP TIMING ═════════════════════════════════════════════
 
-def calc_speed_trap(seg_df, v_start_mph, v_end_mph):
+def calc_speed_trap(seg_df, v_start_mph, v_end_mph, spd_corr=1.0):
     """
     Direct measurement of elapsed time between two speed thresholds.
     No physics model — just timer reading.
@@ -337,8 +347,13 @@ def calc_speed_trap(seg_df, v_start_mph, v_end_mph):
 
     This is the most trustworthy metric in the entire tool because it makes
     zero assumptions about mass, aero, or any other vehicle parameter.
+
+    spd_corr applies the JS-side speed correction (dia_m / stock_dia_m) so
+    bracket thresholds are real-world mph rather than OBD-reported (stock-tire)
+    mph. Default 1.0 preserves prior behavior; pass profile['tire_dia_m'] /
+    base_stock_dia_m to match the JS path exactly.
     """
-    speeds = seg_df['speed_num'].values
+    speeds = seg_df['speed_num'].values * spd_corr
     times  = seg_df['time_num'].values
 
     # Find first crossing of v_start (going up)
@@ -363,10 +378,10 @@ def calc_speed_trap(seg_df, v_start_mph, v_end_mph):
 
     return None  # didn't reach v_end
 
-def speed_traps_for_pull(seg_df):
+def speed_traps_for_pull(seg_df, spd_corr=1.0):
     """Return dict of all speed trap timings for a single pull."""
     return {
-        f"{lo}-{hi}": calc_speed_trap(seg_df, lo, hi)
+        f"{lo}-{hi}": calc_speed_trap(seg_df, lo, hi, spd_corr)
         for lo, hi in SPEED_TRAPS
     }
 
@@ -398,8 +413,9 @@ for i, p in enumerate(pulls_found):
     result_filt = result[result['speed_ms'] > 3.0].copy()
     binned = rpm_bin(result_filt)
 
-    # Speed traps from raw segment (before HP filtering)
-    traps = speed_traps_for_pull(result.reset_index(drop=True))
+    # Speed traps from raw segment (before HP filtering).
+    # spd_corr brings OBD speed to real-world mph for non-stock tire diameters.
+    traps = speed_traps_for_pull(result.reset_index(drop=True), profile['spd_corr'])
 
     results_binned.append(binned)
     quality_scores.append(q)
