@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check c:/Users/User/Desktop/miatadyno/index.html)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

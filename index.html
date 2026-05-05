@@ -508,7 +508,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 <div class="hero-wrap fi d1">
   <div class="h-tag">Virtual Dyno · NC Miata</div>
   <h1>Did your mod<br>actually do<em>anything?</em></h1>
-  <p class="hero-sub">Upload a CSV file. Configure your build. Get a before/after wheel horsepower comparison without a dyno visit.</p>
+  <p class="hero-sub">Drop in a log from your OBD scanner. Get wheel horsepower numbers without a dyno visit.</p>
   <div class="badges">
     <span class="badge on">No Dyno Required</span>
     <span class="badge on">Stock vs Modded</span>
@@ -585,7 +585,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             <div class="tbtn" data-v="din" onclick="setT('tCorr',this)">DIN 70020</div>
             <div class="tbtn" data-v="none" onclick="setT('tCorr',this)">Uncorrected</div>
           </div>
-          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">SAE = US dyno default (25°C, 99 kPa). DIN = European default (20°C, 1013 mbar) — runs ~3% higher. Match the standard your dyno shop uses.</p>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">SAE is the US dyno default (25°C, 99 kPa). DIN is the European default (20°C, 1013 mbar), which reads about 3 percent higher. Pick whichever matches the dyno shop you'd compare against.</p>
         </div>
       </div>
     </div>
@@ -593,7 +593,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <div class="sec">
       <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Wheels &amp; Tires</span><span class="sec-c">▸</span></div>
       <div class="sec-bd">
-        <div class="callout"><strong>Critical for accuracy.</strong> OBD reads speed based on stock tire size. Even a 5% tire diameter change creates a 5% power error.</div>
+        <div class="callout"><strong>Critical for accuracy.</strong> Your scanner reads speed assuming stock tires. Wrong tire size means wrong power numbers, by the same percent.</div>
         <div class="fl">
           <label class="lbl">Rim Size</label>
           <div class="trow" id="tRim">
@@ -603,19 +603,21 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             <div class="tbtn" data-v="18" onclick="setT('tRim',this);setRim(18)">18"</div>
           </div>
         </div>
-        <div class="fl">
-          <label class="lbl">Wheel Weight per Corner</label>
-          <select id="whlWt" onchange="checkCustomWheel();calcW()"></select>
-          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;" id="whl-note">Weigh one wheel on a bathroom scale for accuracy.</p>
-        </div>
-        <div class="fl" id="customWheelRow" style="display:none;">
-          <label class="lbl">Custom Wheel Weight (lbs)</label>
-          <input type="number" id="whlCustom" value="15" min="6" max="35" step="0.1" onchange="calcW()">
+        <div id="wheel-weight-group">
+          <div class="fl">
+            <label class="lbl">Wheel Weight per Corner</label>
+            <select id="whlWt" onchange="checkCustomWheel();calcW()"></select>
+            <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;" id="whl-note">Weigh one wheel on a bathroom scale for accuracy.</p>
+          </div>
+          <div class="fl" id="customWheelRow" style="display:none;">
+            <label class="lbl">Custom Wheel Weight (lbs)</label>
+            <input type="number" id="whlCustom" value="15" min="6" max="35" step="0.1" onchange="calcW()">
+          </div>
         </div>
         <div class="fl">
           <label class="lbl">Tire Size</label>
           <select id="tireSel" onchange="checkCustomTire();calcW()"></select>
-          <p style="font-size:10px;color:var(--dim);margin-top:5px;">Stock NC1: 195/50R16 (~18.5 lbs each) · Stock NC2/3: 205/45R17 (~21 lbs each). Listed weights are ±2 lb estimates.</p>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;">Stock sizes: NC1 is 195/50R16, NC2/3 is 205/45R17. Listed tire weights are rough estimates, plus or minus 2 lbs.</p>
         </div>
         <div class="fl" id="customTireRow" style="display:none;">
           <label class="lbl">Custom Tire Size</label>
@@ -623,7 +625,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             <div><label class="lbl" style="font-size:9px;">Width</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
             <div><label class="lbl" style="font-size:9px;">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
             <div><label class="lbl" style="font-size:9px;">Rim</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
-            <div><label class="lbl" style="font-size:9px;">Wt (lbs)</label><input type="number" id="tireWtCustom" value="" min="8" max="35" step="0.1" placeholder="~18-22" onchange="calcW()"></div>
+            <div id="tire-weight-group"><label class="lbl" style="font-size:9px;">Wt (lbs)</label><input type="number" id="tireWtCustom" value="" min="8" max="35" step="0.1" placeholder="~18-22" onchange="calcW()"></div>
           </div>
           <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">Tire weight per tire. Common range 17-22 lbs for 16-17" street tires. Leave blank to use stock weight.</p>
         </div>
@@ -636,26 +638,18 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <div class="fl">
           <label class="lbl">Which weight do you know?</label>
           <div class="trow" id="tWtMode">
-            <div class="tbtn on" data-v="total" onclick="setT('tWtMode',this);setWeightMode('total')">Total Car</div>
-            <div class="tbtn" data-v="mods" onclick="setT('tWtMode',this);setWeightMode('mods')">Just Mods</div>
-            <div class="tbtn" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate</div>
+            <div class="tbtn" data-v="total" onclick="setT('tWtMode',this);setWeightMode('total')">Total Car</div>
+            <div class="tbtn on" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate</div>
           </div>
         </div>
-        <div id="path-total" style="margin-top:14px;">
+        <div id="path-total" style="display:none;margin-top:14px;">
           <div class="fl">
             <label class="lbl">Total Car Weight (lbs)</label>
             <input type="number" id="totalWt" value="2509" min="2000" max="3500" step="10" onchange="calcW()">
             <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">Your scale weight (CAT scale, vehicle inspection, etc.) including any aftermarket parts. Don't add yourself or fuel — we handle those automatically.</p>
           </div>
         </div>
-        <div id="path-mods" style="display:none;margin-top:14px;">
-          <div class="fl">
-            <label class="lbl">Weight Change From Mods (lbs)</label>
-            <input type="number" id="modWt" value="0" min="-500" max="500" step="1" placeholder="-25 if you removed weight" onchange="calcW()">
-            <p style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6;">Negative if your mods made the car lighter.</p>
-          </div>
-        </div>
-        <div id="path-estimate" style="display:none;margin-top:14px;">
+        <div id="path-estimate" style="margin-top:14px;">
           <p style="font-size:11px;color:var(--mid);line-height:1.7;">We'll start with stock curb weight and apply your mods from below.</p>
         </div>
         <div class="wsum">
@@ -842,7 +836,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <div class="plabel">How to Get Good Data</div>
         <div class="golden-grid">
           <div>
-            <div class="golden-h">The Golden Pull</div>
+            <div class="golden-h">How to Do a Clean Run</div>
             <ol>
               <li><strong>Warmup.</strong> Drive 10-15 min before logging.</li>
               <li><strong>Pick 3rd gear</strong> (long, safe stretch). 2nd if not.</li>
@@ -850,14 +844,14 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
               <li><strong>Floor it instantly.</strong> No rolling into throttle.</li>
               <li><strong>Hold to 7,100 RPM.</strong> Peak is at 6,700-7,000.</li>
               <li><strong>Lift and coast</strong> 3 seconds before braking.</li>
-              <li><strong>Pull twice</strong> in opposite directions to cancel grade and wind.</li>
+              <li><strong>Do the run twice</strong> , once in each direction, to cancel out hill grade and wind.</li>
             </ol>
           </div>
           <div>
             <div class="golden-h">What to Avoid</div>
             <ul>
-              <li><strong>No mid-pull shifts.</strong> One gear start to redline.</li>
-              <li><strong>No hills.</strong> 1% grade adds/removes 5 WHP.</li>
+              <li><strong>No shifting mid-run.</strong> Start in one gear and hold it to redline.</li>
+              <li><strong>No hills.</strong> A 1 percent grade can add or remove 5 wheel horsepower.</li>
               <li><strong>No headwind.</strong> 10 mph headwind costs real power.</li>
               <li><strong>No wet roads.</strong> Below 40°F or wet = traction loss.</li>
               <li><strong>No traffic.</strong> Wait for fully clear road.</li>
@@ -865,7 +859,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             </ul>
             <div class="safety-note">
               <p>Safety Check</p>
-              <small>3rd gear pulls hit 85-90 MPH. Closed course or private property only. If you can't access one, stick to 2nd gear (~60 MPH).</small>
+              <small>3rd gear runs reach 85 to 90 mph. Use a closed course or private property only. If you don't have access to either, stick to 2nd gear and you'll top out around 60 mph.</small>
             </div>
           </div>
         </div>
@@ -878,15 +872,15 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div class="amode-row">
         <div class="amode-btn on" data-mode="same" onclick="setAnalysisMode('same')">
           <strong>Same Setup</strong>
-          <span>Multiple pulls, same car. Best run + average + consistency.</span>
+          <span>Multiple runs, same car. Best run + average + consistency.</span>
         </div>
         <div class="amode-btn" data-mode="compare" onclick="setAnalysisMode('compare')">
           <strong>Before vs After</strong>
-          <span>Compare a pull from before a mod vs after.</span>
+          <span>Compare a run from before a mod vs after.</span>
         </div>
       </div>
-      <div class="ptitle" id="modeTitle" style="margin-top:18px;">Select Pulls to Analyze</div>
-      <p style="font-size:11px;color:var(--mid);" id="modeHelp">Tap pulls to include them. We'll average all selected pulls and show your best individual run.</p>
+      <div class="ptitle" id="modeTitle" style="margin-top:18px;">Tap runs to include</div>
+      <p style="font-size:11px;color:var(--mid);" id="modeHelp">Tap runs to include them. We'll average all selected pulls and show your best individual run.</p>
     </div>
 
     <!-- PULLS LIST -->
@@ -894,8 +888,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div id="pullSec">
         <div class="empty-st">
           <span class="big">.</span>
-          Upload a CSV file to detect full-throttle pulls.<br>
-          Requires <strong>Throttle Position</strong> and <strong>Vehicle Speed</strong> PIDs.
+          Upload a CSV log to find your acceleration runs.<br>
+          Your file needs <strong>Throttle Position</strong> and <strong>Vehicle Speed.</strong> 
         </div>
       </div>
     </div>
@@ -1263,11 +1257,11 @@ function setAnalysisMode(mode){
   const title = document.getElementById('modeTitle');
   const help = document.getElementById('modeHelp');
   if(mode === 'same'){
-    title.textContent = 'Select Pulls to Average';
-    help.innerHTML = "Tap pulls to include them. We'll show your best run + average + consistency. Best for single-session uploads.";
+    title.textContent = 'Tap the runs to average';
+    help.innerHTML = "Tap runs to include them. We'll show your best run + average + consistency. Best for single-session uploads.";
   } else {
     title.textContent = 'Select Before & After';
-    help.innerHTML = 'Tap once for BEFORE (red). Tap again for AFTER (blue). Use when comparing pulls from different mod stages.';
+    help.innerHTML = 'Tap once for Before. Tap again for After. Use this when comparing two runs from different mod stages.';
   }
   selPulls = []; selB = null; selA = null;
   renderPulls();
@@ -1285,14 +1279,21 @@ function exhDelta(sid, lid){
 }
 
 function setWeightMode(mode){
-  const isEstimate = mode === 'estimate';
-  document.getElementById('path-total').style.display = mode === 'total' ? 'block' : 'none';
-  document.getElementById('path-mods').style.display = mode === 'mods' ? 'block' : 'none';
-  document.getElementById('path-estimate').style.display = isEstimate ? 'block' : 'none';
-  ['sec-exhaust','sec-other'].forEach(id => {
+  const isTotal = mode === 'total';
+  document.getElementById('path-total').style.display    = isTotal ? 'block' : 'none';
+  document.getElementById('path-estimate').style.display = isTotal ? 'none'  : 'block';
+  // Build-up sections: visible in 'estimate' mode only. Hidden in 'total'
+  // mode where a scale weight makes the per-part deltas irrelevant.
+  ['sec-exhaust','sec-other','wheel-weight-group','tire-weight-group'].forEach(id => {
     const el = document.getElementById(id);
-    if(el) el.style.display = isEstimate ? 'block' : 'none';
+    if(el) el.style.display = isTotal ? 'none' : '';
   });
+  // Collapse the customTireRow grid from 4 → 3 columns in total mode so
+  // the hidden Wt column doesn't leave an empty slot.
+  const tireGrid = document.querySelector('#customTireRow .g3');
+  if(tireGrid){
+    tireGrid.style.gridTemplateColumns = isTotal ? '1fr 1fr 1fr' : '1fr 1fr 1fr 1fr';
+  }
   calcW();
 }
 
@@ -1380,9 +1381,6 @@ function calcW(){
 
   if(mode === 'total'){
     vehicleWeight = parseFloat(document.getElementById('totalWt').value) || base.wt;
-  } else if(mode === 'mods'){
-    const modDelta = parseFloat(document.getElementById('modWt').value) || 0;
-    vehicleWeight = base.wt + modDelta;
   } else {
     const getVal = (id) => {
       const sel = document.getElementById(id);
@@ -1494,17 +1492,25 @@ function grad(y, x){
   }
   return o;
 }
-function calcHP(seg, prof){
+function calcHP(seg, prof, pullIatC){
   if(seg.length<5) return null;
   const t = seg.map(r => r.time);
   const sv = savgol(seg.map(r => r.speed_mph * prof.spd_corr * 0.44704), Math.max(7, Math.floor(seg.length/6)*2+1));
   const ac = grad(sv, t);
-  // Correction standard: SAE J1349 (25C/99kPa), DIN 70020 (20C/1013mbar), or uncorrected
+  // LOCKED per ENGINEERING.md: temperature term uses ambient, not measured IAT.
+  // SAE J1349 normalizes to standard AMBIENT conditions. On a dyno, fans hold
+  // IAT ≈ ambient. On a street pull, heat-soak makes IAT 20-30°C above ambient,
+  // so using measured IAT over-corrects by exactly the heat-soak gain.
+  // 25°C is the locked default; follow-up is weather API or user-input ambient.
+  // Per-pull iat_c stays on the pull object for the heat-soak banner — only the
+  // correction math stops reading it. The pullIatC parameter is intentionally
+  // retained on the signature for that future ambient input to plug into.
+  const ambientK = 298.15;  // 25°C — locked default per ENGINEERING.md
   const corrStd = document.querySelector('#tCorr .tbtn.on')?.dataset.v || 'sae';
   let corr;
-  if(corrStd === 'din')      corr = (101.3/baro) * Math.sqrt(iat_k/293.15);
+  if(corrStd === 'din')      corr = (101.3/baro) * Math.sqrt(ambientK/293.15);
   else if(corrStd === 'none') corr = 1.0;
-  else                        corr = (99.0/baro) * Math.sqrt(iat_k/298.0);
+  else                        corr = (99.0/baro) * Math.sqrt(ambientK/298.0);
   return seg.map((r,i) => {
     const v = sv[i], a = ac[i];
     const RHO_STD = 1.225;
@@ -1714,33 +1720,43 @@ function parseCSV(txt){
   const presUnit = bC ? detectUnit(bC) : null;
   const mapUnit = mapC ? detectUnit(mapC) : 'kpa';  // assume kPa if MAP exists
 
-  // Parse rows with unit conversion
-  const data = p.data.map(r => {
-    const rawSpeed = parseFloat(r[sC]) || 0;
-    const rawThrottle = parseFloat(r[thC]) || 0;
-    const rawIAT = iC ? parseFloat(r[iC]) : null;
-    const rawBaro = bC ? parseFloat(r[bC]) : null;
-    const rawMAP = mapC ? parseFloat(r[mapC]) : null;
+  // FIX #1: Decide speed unit ONCE per file, not per row.
+  // Per-row decisions caused mixed units within a single trace.
+  // Pass 1: collect raw rows without converting speed.
+  const rawRows = p.data.map(r => ({
+    time: parseFloat(r[tC]) || 0,
+    rpm: parseFloat(r[rC]) || 0,
+    speed_raw: parseFloat(r[sC]) || 0,
+    throttle: parseFloat(r[thC]) || 0,
+    iat_r: iC ? parseFloat(r[iC]) : null,
+    baro_r: bC ? parseFloat(r[bC]) : null,
+    map_r: mapC ? parseFloat(r[mapC]) : null,
+  })).filter(r => !isNaN(r.time));
 
-    // Speed → MPH (internal standard)
-    let speed_mph;
-    if(speedUnit === 'kph') speed_mph = rawSpeed * 0.621371;
-    else if(speedUnit === 'mph') speed_mph = rawSpeed;
-    else {
-      // Heuristic: if values >> typical MPH on road, probably km/h
-      speed_mph = rawSpeed > 130 ? rawSpeed * 0.621371 : rawSpeed;
-    }
+  // Decide speed unit at file level. NCs in 2nd/3rd gear pulls peak around
+  // 60-90 mph (96-145 km/h). Anything > 130 raw is almost certainly km/h
+  // because no NC reaches 130 mph in a typical road pull.
+  let speedConv = 1.0;
+  let speedSource;
+  const fileMaxRaw = rawRows.length ? Math.max(...rawRows.map(r => r.speed_raw)) : 0;
+  if(speedUnit === 'kph'){
+    speedConv = 0.621371;
+    speedSource = 'header (km/h)';
+  } else if(speedUnit === 'mph'){
+    speedSource = 'header (mph)';
+  } else if(fileMaxRaw > 130){
+    speedConv = 0.621371;
+    speedSource = `inferred km/h (file peak ${fileMaxRaw.toFixed(0)} too high for NC mph)`;
+  } else if(fileMaxRaw < 60){
+    speedSource = `assumed mph (file peak ${fileMaxRaw.toFixed(0)})`;
+  } else {
+    speedSource = `AMBIGUOUS — defaulted to mph (file peak ${fileMaxRaw.toFixed(0)} could be either; check upload status)`;
+  }
 
-    return {
-      time: parseFloat(r[tC]) || 0,
-      rpm: parseFloat(r[rC]) || 0,
-      speed_mph,
-      throttle: rawThrottle,
-      iat_r: rawIAT,
-      baro_r: rawBaro,
-      map_r: rawMAP,
-    };
-  }).filter(r => !isNaN(r.time));
+  const data = rawRows.map(r => ({
+    ...r,
+    speed_mph: r.speed_raw * speedConv,
+  }));
 
   // ATMOSPHERIC: try baro column first, then estimate from MAP, then fallback
   let baroSource = 'default';
@@ -1755,15 +1771,20 @@ function parseCSV(txt){
     else baro = br < 50 ? br * 3.38639 : br;  // heuristic: inHg vs kPa
     baroSource = `${presUnit||'auto'} sensor`;
   } else if(mapC){
-    // Estimate baro from MAP at idle (closed throttle, low RPM)
-    // At idle, MAP ≈ atmospheric - vacuum offset (~30-60 kPa vacuum)
-    // BETTER: at WOT, MAP ≈ atmospheric (NA engine) since manifold is wide open
+    // FIX MAP: median (not peak) of WOT MAP samples is closer to true atmospheric
+    // for NA engines. Peak MAP can briefly exceed atmospheric (intake runner
+    // resonance ~2-6 kPa above atm near torque peak). For FI engines, NEITHER
+    // peak nor median is atmospheric — boost makes manifold pressure > atm. The
+    // FI override happens at analysis time in runAnalysis (FI status not known
+    // at parse time).
     const wot = data.filter(r => r.throttle >= 80 && r.rpm > 2000 && r.map_r);
     if(wot.length > 5){
-      // At WOT in NA car, peak MAP ~= atmospheric (within a few kPa)
-      const peakMap = Math.max(...wot.map(r => r.map_r));
-      baro = peakMap;
-      baroSource = 'estimated from MAP at WOT';
+      const sorted = wot.map(r => r.map_r).sort((a,b) => a-b);
+      const medianMap = sorted.length % 2
+        ? sorted[(sorted.length-1)/2]
+        : (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
+      baro = medianMap;
+      baroSource = 'estimated from MAP at WOT (median)';
     } else {
       baro = 99.9;
       baroSource = 'default 99.9 kPa (no baro data)';
@@ -1773,14 +1794,31 @@ function parseCSV(txt){
     baroSource = 'default 99.9 kPa (no baro data)';
   }
 
+  // FIX #3: Sanity bound on baro. Realistic terrestrial range 80–105 kPa
+  // (Death Valley to high-elevation cities). Catches hPa-as-kPa misdetection
+  // (~1013 → would give ~10% of true WHP) and any other unit mishap.
+  if(baro < 80 || baro > 105){
+    baroSource = `out-of-range ${baro.toFixed(1)} kPa fallback (was ${baroSource})`;
+    baro = 99.9;
+  }
+
   // IAT
+  let iatSource = 'default 25°C (no IAT data)';
+  iat_k = 298.15;  // explicit default if no data
   const iv = data.map(r => r.iat_r).filter(v => v !== null && !isNaN(v));
   if(iv.length){
     const ir = iv.reduce((a,b) => a+b) / iv.length;
     let ic;
-    if(tempUnit === 'fahrenheit') ic = (ir - 32) * 5/9;
-    else if(tempUnit === 'celsius') ic = ir;
-    else ic = ir > 60 ? (ir - 32) * 5/9 : ir;  // heuristic: F if >60
+    if(tempUnit === 'fahrenheit'){ ic = (ir - 32) * 5/9; iatSource = 'header (°F)'; }
+    else if(tempUnit === 'celsius'){ ic = ir; iatSource = 'header (°C)'; }
+    else { ic = ir > 60 ? (ir - 32) * 5/9 : ir; iatSource = `inferred ${ir > 60 ? '°F' : '°C'} (raw avg ${ir.toFixed(1)})`; }
+    // FIX #2: Sanity bound. Realistic IAT range -10°C to 100°C (cold winter
+    // morning to severely heat-soaked summer engine). Anything outside that
+    // range almost certainly means unit detection failed.
+    if(ic < -10 || ic > 100){
+      iatSource = `out-of-range ${ic.toFixed(1)}°C fallback to 25°C (was ${iatSource})`;
+      ic = 25;
+    }
     iat_k = ic + 273.15;
   }
 
@@ -1809,15 +1847,17 @@ function parseCSV(txt){
     columns: {time:tC, rpm:rC, speed:sC, throttle:thC, baro:bC, iat:iC, map:mapC},
     units: {speed:speedUnit, temp:tempUnit, pressure:presUnit, map:mapUnit},
     baroSource,
+    speedSource,
+    iatSource,
     headerCount: hs.length,
     rowCount: data.length,
     polling_hz,
   };
 
-  return {ok:true, data};
+  return {ok:true, data, tempUnit};
 }
 
-function detectPulls(data){
+function detectPulls(data, tempUnit){
   // ADAPTIVE WOT detection — different OBD scanners report differently:
   //   BlueDriver "Absolute Throttle Position": maxes around 85-92%
   //   "Accelerator Pedal Position": goes to 100%+
@@ -1873,8 +1913,28 @@ function detectPulls(data){
           let pullIAT_C = null;
           if(iats.length){
             const iat_avg = iats.reduce((a,b) => a+b) / iats.length;
-            // If avg is > 60, assume Fahrenheit; otherwise Celsius
-            pullIAT_C = iat_avg > 60 ? (iat_avg - 32) * 5/9 : iat_avg;
+            // P1 FIX: Use file-level tempUnit (detected from header) when known.
+            // The standalone >60 heuristic mis-classified heat-soaked Celsius
+            // pulls as Fahrenheit (e.g. 65°C → 18.3°C), which silently disabled
+            // the heat-soak banner in the very scenarios it was designed for.
+            if(tempUnit === 'fahrenheit'){
+              pullIAT_C = (iat_avg - 32) * 5/9;
+            } else if(tempUnit === 'celsius'){
+              pullIAT_C = iat_avg;
+            } else {
+              // Header didn't specify; fall back to >60 heuristic (still buggy
+              // on heat-soaked °C without a header, but unavoidable without it).
+              pullIAT_C = iat_avg > 60 ? (iat_avg - 32) * 5/9 : iat_avg;
+            }
+            // Bounds safety net. If the unit was KNOWN from the header and the
+            // value is still OOB, that's not unit ambiguity — it's a sensor
+            // fault or a wrong-unit header. Warn so the trail survives, then null.
+            if(pullIAT_C < -10 || pullIAT_C > 100){
+              if(tempUnit){
+                console.warn(`[MiataDyno] IAT out of bounds: ${pullIAT_C.toFixed(1)}°C from ${tempUnit} header. Sensor fault or incorrect header.`);
+              }
+              pullIAT_C = null;
+            }
           }
 
           // Median speed/RPM ratio across the pull — used for gear-vs-tire sanity check
@@ -1946,6 +2006,26 @@ if(upzMobile){
   upzMobile.addEventListener('drop', e => { e.preventDefault(); upzMobile.classList.remove('dov'); handleFile(e.dataTransfer.files[0]); });
 }
 
+// Inline atmospheric warning banner (created lazily, lives inside #results).
+// Used by runAnalysis to surface the MAP-FI override and similar atmospheric
+// fallbacks. Pass null to hide.
+function showAtmoWarning(msg){
+  let el = document.getElementById('atmoWarn');
+  if(!msg){
+    if(el) el.style.display = 'none';
+    return;
+  }
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'atmoWarn';
+    el.style.cssText = 'padding:14px 30px;background:rgba(214,48,49,.08);border-bottom:1px solid var(--b1);border-left:3px solid var(--red2);font-size:12px;color:var(--mid);line-height:1.6;';
+    const results = document.getElementById('results');
+    results.insertBefore(el, results.firstChild);
+  }
+  el.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px;">Atmospheric warning</strong>${msg}`;
+  el.style.display = 'block';
+}
+
 function showSt(msg, type){
   ['upst','upstMobile'].forEach(id => {
     const el = document.getElementById(id);
@@ -1996,15 +2076,24 @@ async function handleFile(f){
     const res = parseCSV(text);
     if(!res.ok){ showSt(res.msg, 'err'); return; }
     rows = res.data;
-    pulls = detectPulls(rows);
+    pulls = detectPulls(rows, res.tempUnit);
     if(window.goatcounter) window.goatcounter.count({path:'/event/csv-uploaded', event:true});
     const info = window.__lastParseInfo || {};
     const detect = window.__lastDetectInfo || {};
     const baroNote = info.baroSource && !['kpa sensor','inhg sensor','auto sensor'].includes(info.baroSource)
       ? ` (${info.baroSource})` : '';
+    const speedNote = info.speedSource && !info.speedSource.startsWith('header')
+      ? ` · Speed: ${info.speedSource}` : '';
+    const iatNote = info.iatSource && !info.iatSource.startsWith('header')
+      ? ` · IAT: ${info.iatSource}` : '';
     const thrNote = detect.peakThrottle ? ` · WOT @ ${detect.wotThreshold}%+` : '';
     const pollNote = info.polling_hz ? ` · ${info.polling_hz.toFixed(1)} Hz` : '';
-    showSt(`${res.data.length} rows${pollNote} · ${pulls.length} pulls${thrNote} · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C`, pulls.length ? 'ok' : 'err');
+    // Status type: 'err' if no pulls OR if any source had ambiguity/fallback warning
+    const hasWarnings = (info.speedSource || '').includes('AMBIGUOUS')
+                     || (info.iatSource || '').includes('out-of-range')
+                     || (info.baroSource || '').includes('out-of-range');
+    const statusType = pulls.length ? (hasWarnings ? 'err' : 'ok') : 'err';
+    showSt(`${res.data.length} rows${pollNote} · ${pulls.length} pulls${thrNote} · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C${speedNote}${iatNote}`, statusType);
     console.log('[MiataDyno parse]', info);
     console.log('[MiataDyno detect]', detect);
     selB = null; selA = null; selPulls = [];
@@ -2026,7 +2115,7 @@ async function handleFile(f){
 function renderPulls(){
   const sec = document.getElementById('pullSec');
   if(!pulls.length){
-    sec.innerHTML = '<div class="empty-st"><span class="big">!</span>No full-throttle pulls detected.<br>Ensure Throttle Position PID is logged and you did a WOT run.</div>';
+    sec.innerHTML = '<div class="empty-st"><span class="big">!</span>No acceleration runs found in this log.<br>Make sure your scanner was logging Throttle Position, and that you did a wide-open-throttle run.</div>';
     return;
   }
 
@@ -2035,6 +2124,16 @@ function renderPulls(){
   const heatSoaked = pulls.map(p => {
     if(firstIAT === null || p.iat_c === null) return false;
     return (p.iat_c - firstIAT) >= 5;
+  });
+  // P1 follow-up: detect physically-impossible IAT drops across pulls.
+  // Back-to-back WOT runs cannot make intake air *colder* by 10°C+ — that's
+  // unit-detection failure on the heuristic-fallback branch (no header tag),
+  // where readings >60 in a Celsius file get false-converted to ~18-23°C.
+  // When this fires, heat-soak counts can't be trusted, so we suppress the
+  // heat-soak banner and surface a "fix your CSV header" banner instead.
+  const inverted = pulls.some(p => {
+    if(firstIAT === null || p.iat_c === null) return false;
+    return (p.iat_c - firstIAT) <= -10;
   });
 
   sec.innerHTML = '';
@@ -2052,19 +2151,27 @@ function renderPulls(){
     sec.appendChild(div);
   });
 
-  // Heat soak banner if any pull is heat-soaked
+  // Banner: inverted IAT trend takes priority over heat-soak. If detection
+  // failed (untagged header + heat-soaked Celsius file), the heat-soak
+  // counts are based on false-cool readings and shouldn't be shown.
   const numHeatSoaked = heatSoaked.filter(x => x).length;
-  if(numHeatSoaked > 0){
+  if(inverted){
     const banner = document.createElement('div');
     banner.style.cssText = 'padding:14px 18px;background:rgba(214,48,49,.08);border-left:3px solid var(--red);margin-bottom:14px;font-size:12px;color:var(--mid);line-height:1.6;';
-    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">Heat soak detected</strong>${numHeatSoaked} pull${numHeatSoaked>1?'s':''} had intake air temps 5°C+ above your first pull. Hot air is less dense, so the engine makes less power on heat-soaked pulls. Real dynos blow fans at the intake to prevent this — on the street you need to wait between pulls. <strong style="color:var(--text);">For accurate results, use only your cooler pulls.</strong>`;
+    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">IAT readings inconsistent</strong>Intake air temperature appears to drop sharply across runs, which isn't physically possible during back-to-back wide-open-throttle runs. This usually means your CSV's Intake Temps column doesn't specify units in the header. <strong style="color:var(--text);">Re-export your log with (°C) or (°F) in the IAT column name for accurate heat-soak detection.</strong> Power calculations are unaffected.`;
+    sec.parentNode.insertBefore(banner, sec);
+  } else if(numHeatSoaked > 0){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'padding:14px 18px;background:rgba(214,48,49,.08);border-left:3px solid var(--red);margin-bottom:14px;font-size:12px;color:var(--mid);line-height:1.6;';
+    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">Heat soak detected</strong>${numHeatSoaked} pull${numHeatSoaked>1?'s':''} had intake air 5°C or more above your first run. Hot intake air makes less power. Real dyno shops blow fans at the engine to prevent this; on the street you need to wait longer between runs. For the cleanest result, use your cooler runs only.</strong>`;
     sec.parentNode.insertBefore(banner, sec);
   }
 
   if(analysisMode === 'same'){
-    // Auto-select: in same setup mode, prefer non-heat-soaked pulls
+    // Auto-select: in same setup mode, prefer non-heat-soaked pulls.
+    // When inverted, IAT data isn't trustworthy → don't filter on it.
     pulls.forEach((_, i) => {
-      if(numHeatSoaked > 0 && heatSoaked[i]) return;  // skip heat-soaked
+      if(!inverted && numHeatSoaked > 0 && heatSoaked[i]) return;  // skip heat-soaked
       selPull(i, sec.children[i]);
     });
   } else {
@@ -2129,6 +2236,28 @@ function gearSanityCheck(prof, observed_mph_per_krpm){
 }
 
 function runAnalysis(){
+  // FIX MAP-FI: If forced induction is selected AND baro was MAP-derived,
+  // override to default. MAP at WOT for an FI engine is post-throttle pressure
+  // including boost (could be 150-250 kPa), not atmospheric. Using it would
+  // give correction factor ~99/200 = 0.5 → WHP shown is half of reality.
+  // FI status isn't known at parse time, so we check here.
+  const forcedSel = document.getElementById('forced');
+  const isFI = forcedSel && forcedSel.value !== '0' && forcedSel.value !== '';
+  const baroSrc = window.__lastParseInfo?.baroSource || '';
+  let mapFiOverride = false;
+  if(isFI && baroSrc.includes('MAP')){
+    baro = 99.9;
+    mapFiOverride = true;
+    if(window.__lastParseInfo){
+      window.__lastParseInfo.baroSource = 'forced 99.9 kPa (FI selected, MAP-derived baro rejected)';
+    }
+    console.warn('[MiataDyno] FI selected with MAP-derived baro. Overriding to 99.9 kPa.');
+  }
+  // Surface the override visibly to the user
+  showAtmoWarning(mapFiOverride
+    ? 'Forced induction selected and barometric pressure was estimated from MAP. MAP under boost is far above atmospheric, so the estimate has been replaced with the standard 99.9 kPa fallback. For accurate readings on a boosted car, use a CSV that includes a barometric pressure (PID 0x33) channel.'
+    : null);
+
   const w = calcW();
   const prof = { eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr, dia_m:w.dia_m };
   const mod = document.getElementById('modDesc').value || 'Current Setup';
@@ -2167,8 +2296,8 @@ function runAnalysis(){
 
 function runCompareAnalysis(prof, w, mod, vn){
   if(selB === null || selA === null){ alert('Select both BEFORE and AFTER pulls.'); return; }
-  const rB = calcHP(pulls[selB].rows, prof);
-  const rA = calcHP(pulls[selA].rows, prof);
+  const rB = calcHP(pulls[selB].rows, prof, pulls[selB].iat_c);
+  const rA = calcHP(pulls[selA].rows, prof, pulls[selA].iat_c);
   if(!rB || !rA){ alert('Not enough clean data.'); return; }
   const bB = bin(rB), bA = bin(rA);
   if(!bB.length || !bA.length){ alert('Not enough binned data.'); return; }
@@ -2226,7 +2355,7 @@ function runSameSetupAnalysis(prof, w, mod, vn){
   // Track pull index alongside binned HP so speed traps can use the same
   // kept pulls (post-outlier-rejection) as HP averaging.
   const pullsHP = selPulls.map(idx => {
-    const calc = calcHP(pulls[idx].rows, prof);
+    const calc = calcHP(pulls[idx].rows, prof, pulls[idx].iat_c);
     return { idx, binned: (calc && calc.length) ? bin(calc) : null };
   }).filter(p => p.binned && p.binned.length);
   const allBinnedRaw = pullsHP.map(p => p.binned);
@@ -2724,7 +2853,7 @@ window.addEventListener('resize', () => {
 // INIT
 // ═══════════════════════════════════════════════════════════════
 setRim(17);
-setWeightMode('total');
+setWeightMode('estimate');
 setAnalysisMode('same');
 calcW();
 updateProgress();
