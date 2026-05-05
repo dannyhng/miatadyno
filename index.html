@@ -651,13 +651,23 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         </div>
         <div id="path-estimate" style="margin-top:14px;">
           <p style="font-size:11px;color:var(--mid);line-height:1.7;">We'll start with stock curb weight and apply your mods from below.</p>
+          <div class="fl" style="margin-top:14px;">
+            <label class="lbl">Fuel Level During Run</label>
+            <div class="trow" id="tFuel">
+              <div class="tbtn" data-v="0.25" onclick="setT('tFuel',this);calcW()">Quarter</div>
+              <div class="tbtn on" data-v="0.5" onclick="setT('tFuel',this);calcW()">Half</div>
+              <div class="tbtn" data-v="0.75" onclick="setT('tFuel',this);calcW()">Three Quarter</div>
+              <div class="tbtn" data-v="1.0" onclick="setT('tFuel',this);calcW()">Full</div>
+            </div>
+            <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">A full tank of 12.7 gallons weighs about 77 lbs. Half tank is the default.</p>
+          </div>
         </div>
         <div class="wsum">
           <div class="wsrow tot">
             <span>Total weight</span>
             <span class="wv n" id="ws-tot">.</span>
           </div>
-          <p style="font-size:9px;color:var(--dim);margin-top:4px;text-align:right;">(Car + half-tank fuel + driver)</p>
+          <p style="font-size:9px;color:var(--dim);margin-top:4px;text-align:right;">(Car + fuel + driver)</p>
         </div>
       </div>
     </div>
@@ -844,7 +854,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
               <li><strong>Floor it instantly.</strong> No rolling into throttle.</li>
               <li><strong>Hold to 7,100 RPM.</strong> Peak is at 6,700-7,000.</li>
               <li><strong>Lift and coast</strong> 3 seconds before braking.</li>
-              <li><strong>Do the run twice</strong> , once in each direction, to cancel out hill grade and wind.</li>
+              <li><strong>Do the run twice</strong>, once in each direction, to cancel out hill grade and wind.</li>
             </ol>
           </div>
           <div>
@@ -1419,7 +1429,8 @@ function calcW(){
 
   if(topType === 'prht' && mode !== 'total') vehicleWeight += 78;
 
-  const fuelWeight = 0.5 * 12.7 * 6.1;
+  const fuelLevel = parseFloat(document.querySelector('#tFuel .tbtn.on')?.dataset.v) || 0.5;
+  const fuelWeight = fuelLevel * 12.7 * 6.1;
   const totalWeightLbs = vehicleWeight + fuelWeight + drvWeight;
   const wsTot = document.getElementById('ws-tot');
   if(wsTot) wsTot.textContent = Math.round(totalWeightLbs) + ' lbs';
