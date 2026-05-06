@@ -475,9 +475,11 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
   /* Mobile padding tweaks */
   .hero-wrap{padding:32px 20px 24px;}
   .hero-wrap::before{display:none;}
-  .hero-wrap h1{font-size:36px;line-height:1;}
   /* Mobile: 2-line headline. The m-only <br> breaks after "Did your mod";
-     em stays inline so "actually do anything?" reads as one line below. */
+     em stays inline so "actually do anything?" reads as one line below.
+     Font dropped from 36px so "actually do anything?" fits on one line
+     even when Barlow Condensed hasn't loaded and fallback sans is wider. */
+  .hero-wrap h1{font-size:30px;line-height:1;}
   .hero-wrap h1 br.m-only{display:inline;}
   .hero-sub{font-size:13px;}
   .cpanel{padding:24px 18px;}
@@ -516,8 +518,11 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
 }
 
 @media(max-width:380px){
-  .h-meta{display:none;}
-  .hero-wrap h1{font-size:32px;}
+  /* Keep .h-meta visible so the "0/2 free" badge stays — just hide the
+     "NC 2006-2015 · Beta" prefix text to save horizontal space. */
+  .h-meta-prefix{display:none;}
+  .h-meta{padding:0 8px;}
+  .hero-wrap h1{font-size:26px;}
   .badges{display:none;}
   .sval{font-size:28px;}
 }
@@ -650,7 +655,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <div class="h-dot"></div>
     <div class="h-name">Miata<span>Dyno</span></div>
   </div>
-  <div class="h-meta">NC 2006-2015 · Beta <span class="limit-counter" title="Free analyses used"><span id="usageCount">0/2</span> free</span></div>
+  <div class="h-meta"><span class="h-meta-prefix">NC 2006-2015 · Beta</span> <span class="limit-counter" title="Free analyses used"><span id="usageCount">0/2</span> free</span></div>
   <nav>
     <a onclick="toggleTheme()" id="themeToggle" title="Toggle theme">☀</a>
     <a onclick="openFeedback()">Feedback</a>
