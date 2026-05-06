@@ -130,7 +130,7 @@ const CONFIG = {
 
 // NCP[nc2] values (from current index.html, post-drift-fix)
 const BASE = {
-  wt:        2509,    // NC2 base curb (Python says 2515 — open drift)
+  wt:        2515,    // NC2 base curb (matches NCP[nc2].wt in index.html)
   swl:       19.0,    // NC2 stock wheel (Python says 18.8 — open drift)
   Cd:        0.36,    // (overridden by topType/topPos)
   A:         1.78,
