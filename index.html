@@ -92,7 +92,10 @@ header nav a:last-child{border-right:none;}
 .h-tag{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
 .h-tag::before{content:'';display:block;width:28px;height:1px;background:var(--amber);}
 .hero-wrap h1{font-family:var(--disp);font-size:clamp(38px,5vw,64px);font-weight:800;letter-spacing:-.01em;line-height:.98;text-transform:uppercase;margin-bottom:18px;}
-.hero-wrap h1 em{font-style:normal;color:var(--amber);display:block;}
+/* Default (desktop): one-line headline. The mobile @media block below
+   restores the 3-line layout via em→block and showing the m-only <br>. */
+.hero-wrap h1 em{font-style:normal;color:var(--amber);}
+.hero-wrap h1 br.m-only{display:none;}
 .hero-sub{font-size:13px;color:var(--mid);max-width:480px;line-height:1.7;margin-bottom:18px;}
 .badges{display:flex;gap:6px;flex-wrap:wrap;}
 .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid var(--b2);color:var(--mid);background:var(--s1);}
@@ -391,7 +394,7 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
 .golden-grid ol,.golden-grid ul{font-size:12px;color:var(--mid);line-height:1.85;padding-left:16px;}
 .golden-grid li{margin-bottom:4px;}
 .golden-grid strong{color:var(--text);}
-.safety-note{margin-top:14px;padding:10px 12px;background:var(--s2);border-left:2px solid var(--amber);}
+.safety-note{margin-top:20px;padding:12px 14px;background:var(--s2);border-left:2px solid var(--amber);}
 .safety-note p{font-size:11px;color:var(--text);font-weight:600;margin-bottom:4px;}
 .safety-note small{font-size:11px;color:var(--mid);line-height:1.6;display:block;}
 
@@ -400,7 +403,7 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
 .hw-num{font-family:var(--disp);font-size:32px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:10px;}
 .hw-title{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px;}
 .hw-text{font-size:11px;color:var(--mid);line-height:1.7;}
-.hw-pids{margin-top:10px;padding:10px 12px;background:var(--adim);border-left:2px solid var(--amber);}
+.hw-pids{margin-top:20px;padding:12px 14px;background:var(--adim);border-left:2px solid var(--amber);}
 .hw-pids p{font-size:10px;color:var(--amber);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
 .hw-pids span{font-size:11px;color:var(--text);line-height:1.6;}
 
@@ -470,6 +473,9 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
   .hero-wrap{padding:32px 20px 24px;}
   .hero-wrap::before{display:none;}
   .hero-wrap h1{font-size:36px;line-height:1;}
+  /* Mobile: restore 3-line headline (em on its own line, m-only <br> active). */
+  .hero-wrap h1 em{display:block;}
+  .hero-wrap h1 br.m-only{display:inline;}
   .hero-sub{font-size:13px;}
   .cpanel{padding:24px 18px;}
   .upzone{padding:38px 22px;}
@@ -519,7 +525,10 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
 @media(min-width:1024px){
   /* Hero block: cap width, center, scale headline up. */
   .hero-wrap{max-width:1200px;margin:0 auto;}
-  .hero-wrap h1{font-size:clamp(38px, 5vw, 80px);}
+  /* Wide desktop: cap font-size so the headline fits on one line within the
+     1200px hero container. No nowrap — if a narrow laptop can't fit it on
+     one line, gracefully wrap rather than clip. */
+  .hero-wrap h1{font-size:clamp(52px, 4.6vw, 68px);}
   .hero-sub{max-width:640px;}
 
   /* Cards: switch from vertical stack to side-by-side grid. The 1200px
@@ -630,7 +639,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <div class="h-dot"></div>
     <div class="h-name">Miata<span>Dyno</span></div>
   </div>
-  <div class="h-meta">NC 2006-2015 · Beta <span class="limit-counter" id="usageCount">0/2</span></div>
+  <div class="h-meta">NC 2006-2015 · Beta <span class="limit-counter" title="Free analyses used"><span id="usageCount">0/2</span> free</span></div>
   <nav>
     <a onclick="toggleTheme()" id="themeToggle" title="Toggle theme">☀</a>
     <a onclick="openFeedback()">Feedback</a>
@@ -639,7 +648,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 
 <div class="hero-wrap fi d1">
   <div class="h-tag">Virtual Dyno · NC Miata</div>
-  <h1>Did your mod<br>actually do<em>anything?</em></h1>
+  <h1>Did your mod <br class="m-only">actually do <em>anything?</em></h1>
   <!-- Phase G · PR 3 Part A 3.4: badge row removed. "No Dyno Required" was
        redundant with the hero h1 + tag. "Stock vs Modded" is obvious from
        context. The averaging signal moved into the subtitle below — that
@@ -681,7 +690,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Log File</span><span class="sec-c">▸</span></div>
       <div class="sec-bd" style="padding:0;">
         <!-- Phase C-1: "Before" label appears only in Compare mode (toggled by setAnalysisMode). -->
-        <div class="upzone-label" id="upzoneLabelBefore" style="display:none;padding:8px 14px 0;font-size:11px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">Before CSV</div>
+        <div class="upzone-label" id="upzoneLabelBefore" style="display:none;padding:10px 14px 8px;font-size:13px;font-weight:700;color:var(--amber);font-family:var(--disp);letter-spacing:.14em;text-transform:uppercase;">Before CSV</div>
         <div class="upzone" id="upzone">
           <input type="file" id="fileIn" accept=".csv">
           <span class="up-icon">CSV</span>
@@ -691,7 +700,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         </div>
         <div class="upst" id="upst"></div>
         <!-- Phase C-1: After zone — visibility toggled by setAnalysisMode. -->
-        <div class="upzone-label" id="upzoneLabelAfter" style="display:none;padding:14px 14px 0;font-size:11px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">After CSV</div>
+        <div class="upzone-label" id="upzoneLabelAfter" style="display:none;padding:18px 14px 8px;font-size:13px;font-weight:700;color:var(--amber);font-family:var(--disp);letter-spacing:.14em;text-transform:uppercase;">After CSV</div>
         <div class="upzone" id="upzoneAfter" style="display:none;">
           <input type="file" id="fileInAfter" accept=".csv">
           <span class="up-icon">CSV</span>
@@ -757,7 +766,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
           <!-- Phase G · Ticket 1.7: surface the locked-ambient default so users
                understand the temperature term in correction isn't using their
                actual ambient. Real-time weather is on the v2 roadmap. -->
-          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">Corrected to 25°C ambient (locked default — real-time weather coming). <a href="methodology.html#atmospheric" style="color:var(--amber);text-decoration:none;">(why?)</a></p>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">Power is calculated as if it were a standard 25°C day so your numbers can be compared to dyno results. <a href="methodology.html#atmospheric" style="color:var(--amber);text-decoration:underline;text-underline-offset:2px;font-weight:600;">(why?)</a></p>
         </div>
       </div>
     </div>
@@ -810,8 +819,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <div class="fl">
           <label class="lbl">Which weight do you know?</label>
           <div class="trow" id="tWtMode">
-            <div class="tbtn" data-v="total" onclick="setT('tWtMode',this);setWeightMode('total')">Total Car</div>
             <div class="tbtn on" data-v="estimate" onclick="setT('tWtMode',this);setWeightMode('estimate')">Estimate</div>
+            <div class="tbtn" data-v="total" onclick="setT('tWtMode',this);setWeightMode('total')">Total Car</div>
           </div>
         </div>
         <div id="path-total" style="display:none;margin-top:14px;">
@@ -994,7 +1003,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div class="cpanel" style="background:var(--s1);padding:24px 18px;">
         <div class="plabel">Step 1 · Upload Your Log</div>
         <!-- Phase C-1: "Before" label visible only in Compare mode. -->
-        <div class="upzone-label" id="upzoneLabelBeforeMobile" style="display:none;margin-top:8px;font-size:10px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">Before CSV</div>
+        <div class="upzone-label" id="upzoneLabelBeforeMobile" style="display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--amber);font-family:var(--disp);letter-spacing:.14em;text-transform:uppercase;">Before CSV</div>
         <div class="upzone" id="upzoneMobile" style="margin-top:6px;">
           <span class="up-icon">CSV</span>
           <p><strong>Drop your OBD log here</strong></p>
@@ -1003,7 +1012,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         </div>
         <div class="upst" id="upstMobile"></div>
         <!-- Phase C-1: After zone — visibility toggled by setAnalysisMode. -->
-        <div class="upzone-label" id="upzoneLabelAfterMobile" style="display:none;margin-top:14px;font-size:10px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">After CSV</div>
+        <div class="upzone-label" id="upzoneLabelAfterMobile" style="display:none;margin-top:18px;font-size:12px;font-weight:700;color:var(--amber);font-family:var(--disp);letter-spacing:.14em;text-transform:uppercase;">After CSV</div>
         <div class="upzone" id="upzoneMobileAfter" style="display:none;margin-top:6px;">
           <span class="up-icon">CSV</span>
           <p><strong>Drop your After log here</strong></p>
@@ -1028,10 +1037,6 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             <div class="hw-num">01</div>
             <div class="hw-title">Capture</div>
             <p class="hw-text">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your run.</p>
-            <div class="hw-pids">
-              <p>Required PIDs</p>
-              <span>Time · RPM · Vehicle Speed · Throttle Position</span>
-            </div>
           </div>
           <div class="hw-step">
             <div class="hw-num">02</div>
@@ -1043,6 +1048,10 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             <div class="hw-title">Compare</div>
             <p class="hw-text">Run quality scoring rejects bad data. Multi-run averaging reduces noise. Stock reference shows where you land.</p>
           </div>
+        </div>
+        <div class="hw-pids">
+          <p>Required PIDs</p>
+          <span>Time · RPM · Vehicle Speed · Throttle Position</span>
         </div>
       </div>
 
@@ -1071,11 +1080,11 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
               <li><strong>No traffic.</strong> Wait for fully clear road.</li>
               <li><strong>No passengers.</strong> Solo runs only.</li>
             </ul>
-            <div class="safety-note">
-              <p>Safety Check</p>
-              <small>3rd gear runs reach 85 to 90 mph. Use a closed course or private property only. If you don't have access to either, stick to 2nd gear and you'll top out around 60 mph.</small>
-            </div>
           </div>
+        </div>
+        <div class="safety-note">
+          <p>Safety Check</p>
+          <small>3rd gear runs reach 85 to 90 mph. Use a closed course or private property only. If you don't have access to either, stick to 2nd gear and you'll top out around 60 mph.</small>
         </div>
       </div>
     </div>
