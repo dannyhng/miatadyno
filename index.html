@@ -476,8 +476,8 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
   .hero-wrap{padding:32px 20px 24px;}
   .hero-wrap::before{display:none;}
   .hero-wrap h1{font-size:36px;line-height:1;}
-  /* Mobile: restore 3-line headline (em on its own line, m-only <br> active). */
-  .hero-wrap h1 em{display:block;}
+  /* Mobile: 2-line headline. The m-only <br> breaks after "Did your mod";
+     em stays inline so "actually do anything?" reads as one line below. */
   .hero-wrap h1 br.m-only{display:inline;}
   .hero-sub{font-size:13px;}
   .cpanel{padding:24px 18px;}
@@ -498,6 +498,10 @@ body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
   #shareCard{padding:18px 14px;max-width:100%;}
   .sc-v{font-size:26px;}
   .sc-l{font-size:9px;}
+  /* On mobile, the sticky action bar already provides Download PNG (primary
+     button). The in-card .btn-dl becomes redundant and gets hidden under
+     the action bar — drop it here, keep it visible on laptop. */
+  .btn-dl{display:none;}
   .golden-grid,.howitworks-grid{grid-template-columns:1fr;gap:20px;}
 
   /* Form inputs 14px to prevent iOS zoom */
@@ -594,7 +598,7 @@ body.light .modal-bg{background:rgba(40,50,70,.55);}
 .modal-close{background:transparent;border:none;color:var(--mid);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-family:inherit;}
 .modal-close:hover{color:var(--amber);}
 .modal-body{padding:20px 26px;flex:1;}
-.modal-foot{padding:14px 26px;border-top:1px solid var(--b1);display:flex;gap:10px;justify-content:flex-end;background:var(--s1);position:sticky;bottom:0;}
+.modal-foot{padding:14px 26px;border-top:1px solid var(--b1);display:flex;gap:10px;justify-content:flex-end;background:var(--s1);position:sticky;bottom:0;z-index:5;}
 .modal-body p{font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:14px;}
 
 /* Mobile modal full-screen */
@@ -602,6 +606,10 @@ body.light .modal-bg{background:rgba(40,50,70,.55);}
   .modal-bg{padding:0;align-items:stretch;}
   .modal-box{max-height:100vh;border-left:none;border-top:3px solid var(--amber);}
   .modal-box.wide{max-width:100%;}
+  /* Reserve space at the bottom of scrollable body so highlighted/expanded
+     content can scroll fully past the sticky Done button instead of layering
+     under it. */
+  .modal-body{padding-bottom:80px;}
 }
 
 .limit-icon{font-family:var(--disp);font-size:42px;font-weight:800;color:var(--amber);line-height:1;margin-bottom:14px;text-align:center;}
