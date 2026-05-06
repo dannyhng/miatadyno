@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>How It Works · MiataDyno</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07090c; --s1:#0d1018; --s2:#131820; --s3:#181f2a;
+  --b1:#1e2535; --b2:#2a3347;
+  --amber:#e8a020; --adim:rgba(232,160,32,0.10);
+  --red:#d63031; --red2:#ff4757; --rdim:rgba(214,48,49,0.10);
+  --green:#00b894;
+  --text:#eaf0fc; --mid:#96a8c4; --dim:#8898b8;
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Barlow Condensed',sans-serif;
+  --serif:Georgia, 'Charter', 'Iowan Old Style', serif;
+}
+
+body.light {
+  --bg:#fafbfd; --s1:#ffffff; --s2:#f3f5f9; --s3:#e6eaf1;
+  --b1:#d4dae5; --b2:#a8b1c0;
+  --amber:#8a4e00; --adim:rgba(138,78,0,0.10);
+  --red:#931c1f; --red2:#b32426;
+  --green:#055f4c;
+  --text:#0a0e18; --mid:#2d3548; --dim:#3d4658;
+}
+body.light header{background:rgba(255,255,255,.96);}
+body.light .h-dot{box-shadow:0 0 8px rgba(156,92,0,0.6);}
+body.light .btn-primary{color:#fff;}
+body.light .modal-bg{background:rgba(40,50,70,.55);}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;scroll-padding-top:80px;}
+body{background:var(--bg);color:var(--text);font-family:var(--serif);font-size:16px;line-height:1.7;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(232,160,32,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,160,32,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+header,main,footer{position:relative;z-index:2;}
+
+/* ═══ HEADER ═══ */
+header{display:flex;align-items:center;border-bottom:1px solid var(--b1);background:rgba(7,9,12,.96);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100;}
+.h-logo{display:flex;align-items:center;gap:14px;padding:16px 28px;border-right:1px solid var(--b1);cursor:pointer;text-decoration:none;color:inherit;}
+.h-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);flex-shrink:0;}
+.h-name{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.h-name span{color:var(--amber);}
+.h-meta{padding:0 24px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;}
+header nav{margin-left:auto;display:flex;border-left:1px solid var(--b1);}
+header nav a{display:block;padding:20px 18px;font-size:10px;color:var(--mid);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--b1);transition:color .2s,background .2s;cursor:pointer;}
+header nav a:hover{color:var(--amber);background:var(--adim);}
+header nav a:last-child{border-right:none;}
+
+/* ═══ MAIN — CENTERED COLUMN ═══ */
+main{max-width:760px;margin:0 auto;padding:64px 32px 96px;}
+
+.page-tag{font-family:var(--disp);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.page-tag::before{content:'';display:block;width:28px;height:1px;background:var(--amber);}
+
+h1.page-title{font-family:var(--disp);font-size:48px;font-weight:800;letter-spacing:-.01em;line-height:1;text-transform:uppercase;color:var(--text);margin-bottom:18px;}
+.page-lede{font-family:var(--serif);font-size:17px;color:var(--mid);line-height:1.65;margin-bottom:48px;font-style:italic;}
+
+section{margin-bottom:56px;}
+section:last-child{margin-bottom:0;}
+section h2{
+  font-family:var(--disp);font-size:24px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--text);
+  margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--b1);
+}
+section h2 .anchor-link{color:var(--dim);text-decoration:none;font-size:14px;font-weight:400;letter-spacing:.04em;margin-left:10px;opacity:0;transition:opacity .15s;}
+section:hover h2 .anchor-link{opacity:1;}
+
+section p{margin-bottom:18px;color:var(--text);}
+section p:last-child{margin-bottom:0;}
+section p strong{color:var(--text);font-weight:600;}
+section a{color:var(--amber);text-decoration:underline;text-underline-offset:3px;}
+section a:hover{color:var(--text);}
+
+ul.tight, ol.tight{padding-left:24px;margin-bottom:18px;}
+ul.tight li, ol.tight li{margin-bottom:10px;color:var(--text);}
+ul.tight li:last-child, ol.tight li:last-child{margin-bottom:0;}
+ul.tight strong{color:var(--text);}
+
+/* Section callout — same pattern as the in-app callout */
+.callout{
+  padding:16px 20px;background:var(--adim);border-left:3px solid var(--amber);
+  font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.6;
+  margin:24px 0;
+}
+.callout strong{color:var(--text);}
+
+/* Validation table — designed to grow. Add a row by adding one <tr>. */
+.validation-table{
+  width:100%;border-collapse:collapse;margin-top:14px;font-family:var(--mono);font-size:12px;
+  border:1px solid var(--b1);
+}
+.validation-table th{
+  background:var(--s2);color:var(--mid);
+  font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:11px 12px;text-align:left;border-bottom:1px solid var(--b1);
+}
+.validation-table td{
+  padding:13px 12px;border-bottom:1px solid var(--b1);color:var(--text);vertical-align:top;
+}
+.validation-table tr:last-child td{border-bottom:none;}
+.validation-table tr:nth-child(even) td{background:var(--s1);}
+.validation-table .delta-good{color:var(--green);}
+
+/* Mobile */
+@media(max-width:640px){
+  main{padding:36px 20px 64px;}
+  h1.page-title{font-size:36px;}
+  .page-lede{font-size:15px;margin-bottom:32px;}
+  section{margin-bottom:40px;}
+  section h2{font-size:20px;}
+  body{font-size:15px;}
+  .validation-table{font-size:11px;display:block;overflow-x:auto;}
+  .h-meta{display:none;}
+  .h-logo{padding:12px 16px;gap:10px;}
+  .h-name{font-size:16px;}
+  header nav a{padding:14px 10px;}
+}
+
+/* ═══ FOOTER ═══ */
+footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:11px;color:var(--dim);}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;padding:36px 40px 28px;font-family:var(--mono);}
+.ft-col{display:flex;flex-direction:column;}
+.ft-title{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text);margin-bottom:12px;}
+.ft-link{color:var(--mid);text-decoration:none;font-size:11px;padding:4px 0;cursor:pointer;}
+.ft-link:hover{color:var(--amber);}
+.ft-text{font-size:11px;color:var(--dim);line-height:1.7;}
+.ft-bottom{display:flex;justify-content:space-between;padding:16px 40px;border-top:1px solid var(--b1);font-size:10px;color:var(--dim);flex-wrap:wrap;gap:8px;font-family:var(--mono);}
+@media(max-width:880px){
+  .ft-grid{grid-template-columns:1fr 1fr;gap:24px;padding:28px 20px 20px;}
+  .ft-bottom{padding:14px 20px;}
+}
+@media(max-width:480px){.ft-grid{grid-template-columns:1fr;}}
+
+/* ═══ FEEDBACK MODAL (mirrors the app's modal so the page is self-contained) ═══ */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(7,9,12,.92);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;font-family:var(--mono);}
+.modal-bg.vis{display:flex;}
+.modal-box{background:var(--s1);border:1px solid var(--b2);border-left:3px solid var(--amber);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
+.modal-head{padding:22px 26px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:var(--disp);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);}
+.modal-close{background:transparent;border:none;color:var(--mid);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-family:inherit;}
+.modal-close:hover{color:var(--amber);}
+.modal-body{padding:20px 26px;flex:1;}
+.modal-foot{padding:14px 26px;border-top:1px solid var(--b1);display:flex;gap:10px;justify-content:flex-end;}
+.modal-body p{font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:14px;font-family:var(--mono);}
+.modal-body .fl{margin-bottom:12px;}
+.modal-body label.lbl{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;font-family:var(--mono);}
+.modal-body select,.modal-body input,.modal-body textarea{
+  width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);
+  font-family:var(--mono);font-size:13px;padding:9px 11px;outline:none;
+}
+.modal-body select:focus,.modal-body input:focus,.modal-body textarea:focus{border-color:var(--amber);}
+.btn-primary{padding:11px 22px;background:var(--amber);color:#07090c;font-family:var(--disp);font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;}
+.btn-primary:hover{background:#f0b030;}
+.btn-secondary{padding:11px 22px;background:transparent;color:var(--mid);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--b2);cursor:pointer;}
+.btn-secondary:hover{border-color:var(--amber);color:var(--amber);}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="h-logo" href="index.html">
+    <div class="h-dot"></div>
+    <div class="h-name">Miata<span>Dyno</span></div>
+  </a>
+  <div class="h-meta">NC 2006-2015 · Beta</div>
+  <nav>
+    <a onclick="toggleTheme()" id="themeToggle" title="Toggle theme">☀</a>
+    <a onclick="openFeedback()">Feedback</a>
+    <a href="index.html">Back to App</a>
+  </nav>
+</header>
+
+<main>
+
+  <div class="page-tag">How It Works · v1</div>
+  <h1 class="page-title">How It Works</h1>
+  <p class="page-lede">A short technical document for users who want to understand the math behind the numbers before they trust them.</p>
+
+  <section id="what-this-tool-does">
+    <h2>What this tool does <a class="anchor-link" href="#what-this-tool-does">#</a></h2>
+    <p>MiataDyno estimates wheel horsepower from a CSV log captured by an OBD scanner during an acceleration run. It applies a road-load physics model to the speed and time data in your log and returns a power curve, peak WHP, and an estimated crank HP after typical drivetrain losses.</p>
+    <p>It is not a chassis dyno. The numbers are estimates derived from physics, not measurements taken with a dynamometer. The output is most reliable when used as a comparison signal. The difference in WHP between two pulls of the same car on the same road tells you whether your mod did anything. The absolute number is useful as a sanity check against published reference values for your generation, but a chassis dyno reading and a MiataDyno reading on the same car will not match exactly, and shouldn't be expected to.</p>
+  </section>
+
+  <section id="how-the-math-works">
+    <h2>How the math works <a class="anchor-link" href="#how-the-math-works">#</a></h2>
+    <p>MiataDyno estimates wheel horsepower from a road-load model. It's the same physics any dyno simulation uses. The tool computes the force your engine produces at the wheels by accounting for vehicle mass and acceleration, the rolling resistance of your tires on the road, and the aerodynamic drag of your car at speed. The model is calibrated to the specific NC Miata platform: chassis aerodynamics, drivetrain characteristics, and rotational inertia values are tuned to the NC1 / NC2 / NC3 generations rather than a generic vehicle.</p>
+    <p>Generic road-load models assume average values for drag coefficient, frontal area, and tire dynamics. That's fine for ballpark estimates but introduces 5-15% error for any specific car. MiataDyno uses values validated against measured NC behavior, which is why the tool only supports NC Miatas. Extending to other platforms means redoing the calibration work, not just changing a config file.</p>
+  </section>
+
+  <section id="atmospheric">
+    <h2>Atmospheric correction <a class="anchor-link" href="#atmospheric">#</a></h2>
+    <p>Engine power varies with air density: cooler, denser air at lower altitude makes more power than hot, thin air at altitude. To compare runs across different conditions, the calculated WHP is normalized to a standard reference using one of two published correction standards.</p>
+    <p>The default is <strong>SAE J1349</strong>, which normalizes to 25°C and 99 kPa (the US dyno-shop default). <strong>DIN 70020</strong> is also available, which normalizes to 20°C and 1013 mbar (the European default) and reads roughly 3% higher. Pick the standard that matches whichever dyno-shop reading you'd want to compare against.</p>
+    <p><strong>About the temperature term:</strong> the correction uses a default ambient temperature, not the intake-air temp from your CSV. This is deliberate. Real chassis dynos blow fans at the intake to keep IAT close to ambient throughout the pull, so dyno-corrected numbers are essentially "what the engine would make at standard ambient conditions." On a street pull, intake air heat-soaks 20 to 30°C above ambient under the hood. Feeding that heat-soaked IAT into the correction formula would scale the answer up by exactly the heat-soak gain, over-stating the power. Using a default ambient produces a number that's directly comparable to a chassis-dyno reading instead of an artifact of how hot your engine bay was.</p>
+    <p>This is a known limitation, not a missing feature. A future version will pull real ambient temperature from a weather API based on the timestamp and location of your run, replacing the default. The current behavior is conservative and consistent. The same conditions today will produce the same number tomorrow, which is what matters for comparison.</p>
+  </section>
+
+  <section id="tires">
+    <h2>What your tire size does to the numbers <a class="anchor-link" href="#tires">#</a></h2>
+    <p>Your OBD scanner reports vehicle speed assuming stock tire diameter. If you're running a different tire size than stock, every speed reading is off by the same percentage your tire diameter is off, and because horsepower is proportional to force times velocity, your WHP number is off by the same percentage. MiataDyno corrects for this if you tell it your actual tire size. If you don't, the numbers will be wrong in a predictable direction.</p>
+    <p>The tool also runs a sanity check comparing your pull's speed-to-RPM ratio against what your configured gear and tire size predict. If they disagree by more than 5%, you'll get a warning before analysis runs. Usually it means the tire size in the configuration doesn't match the tires actually on the car, but it can also surface speedo offsets from a tune.</p>
+  </section>
+
+  <section id="validation">
+    <h2>Validation <a class="anchor-link" href="#validation">#</a></h2>
+    <p>The tool is validated by comparing MiataDyno output against a chassis-dyno reading on the same car. The methodology: same vehicle, same configuration, dyno sheet from a recent session compared against MiataDyno output from a CSV captured during a separate WOT pull on a flat road in similar atmospheric conditions.</p>
+    <table class="validation-table">
+      <thead>
+        <tr>
+          <th>Car</th>
+          <th>Conditions</th>
+          <th>Dyno reading</th>
+          <th>MiataDyno</th>
+          <th>Δ</th>
+          <th>Contributor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NC2 PRHT, stock</td>
+          <td>Sea level, 13°C ambient</td>
+          <td>118-128 WHP (Dynojet range)</td>
+          <td>~126 WHP</td>
+          <td class="delta-good">within range</td>
+          <td>Danny</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Have a recent dyno sheet and a CSV from the same session?</strong> Send both via the <a onclick="openFeedback()" style="cursor:pointer;">feedback form</a> and we'll add it here. Validations from the community sharpen the calibration over time.
+    </div>
+  </section>
+
+  <section id="limitations">
+    <h2>Known limitations <a class="anchor-link" href="#limitations">#</a></h2>
+    <p>The tool produces an estimate from a physics model. The model has assumptions, and the assumptions break down in specific situations. These are the known failure modes:</p>
+    <ul class="tight">
+      <li><strong>Forced-induction cars without a barometric pressure PID.</strong> When the log doesn't include a baro channel, MiataDyno falls back to estimating atmospheric pressure from manifold pressure at WOT, which works on a naturally-aspirated engine but fails on a boosted one (manifold pressure under boost is far above atmospheric). For these cars, the tool falls back to a default 99.9 kPa and surfaces a warning. Accuracy improves significantly if your scanner can log a barometric pressure PID.</li>
+      <li><strong>Pulls with mid-run gear changes.</strong> The model assumes a single gear throughout the pull. If you shifted, the speed/RPM relationship breaks at the shift, and the calculated power curve will have a discontinuity. Quality scoring catches the worst of these and flags them, but a clean single-gear pull is always preferred.</li>
+      <li><strong>Heat-soaked back-to-back pulls.</strong> When you do multiple WOT runs in quick succession, intake air temperature climbs each pull. The tool detects this (any pull's IAT 5°C above the first) and surfaces a heat-soak banner. The corrected math is still consistent, but the underlying engine output is genuinely lower on the hot pulls. Picking your coolest pull as the reference produces the cleanest answer.</li>
+      <li><strong>6AT in Drive mode.</strong> The automatic in Drive will choose its own gear and may upshift mid-pull. The tool supports 6AT physics (different drivetrain loss, different final drive), but the cleanest 6AT reading comes from manual mode or a sport-mode gear hold.</li>
+      <li><strong>Hilly or windy roads.</strong> A 1% grade can add or remove ~5 WHP. A 10 mph headwind shifts the answer noticeably. The road-load model has no way to detect or correct for either. For trustworthy numbers, run on flat ground in calm conditions, ideally doing the same pull in both directions and averaging, which cancels grade and wind effects.</li>
+      <li><strong>Single-pull analyses have no σ.</strong> The confidence interval (the ± lines on the headline stats) requires at least two clean pulls to compute run-to-run variance. A single-pull analysis still produces a number, but you don't know how reproducible it is. Two or three pulls in the same session is the minimum to get a meaningful confidence band.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  <div class="ft-grid">
+    <div class="ft-col">
+      <div class="ft-title">MiataDyno</div>
+      <p class="ft-text">Virtual dyno analysis built for the NC Miata community.</p>
+    </div>
+    <div class="ft-col">
+      <div class="ft-title">Product</div>
+      <a class="ft-link" href="index.html">Back to App</a>
+      <a class="ft-link" onclick="openFeedback()">Send Feedback</a>
+    </div>
+    <div class="ft-col">
+      <div class="ft-title">Contact</div>
+      <a class="ft-link" href="mailto:thuvhoang19@gmail.com">thuvhoang19@gmail.com</a>
+      <p class="ft-text" style="margin-top:8px;">Portland, OR</p>
+    </div>
+    <div class="ft-col">
+      <div class="ft-title">Legal</div>
+      <a class="ft-link" href="index.html">Terms of Use</a>
+      <a class="ft-link" href="index.html">Privacy</a>
+      <a class="ft-link" href="index.html">Accuracy Disclaimer</a>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <span>&copy; 2026 MiataDyno</span>
+    <span>Estimates only. Not affiliated with Mazda.</span>
+  </div>
+</footer>
+
+<!-- FEEDBACK MODAL — mirrors the in-app modal so the methodology page is self-contained -->
+<div class="modal-bg" id="fbModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">Send Feedback</span>
+      <button class="modal-close" onclick="closeFeedback()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Found a bug, have a feature request, or want to send a dyno sheet for the validation table?</p>
+      <div class="fl">
+        <label class="lbl">Type</label>
+        <select id="fbType">
+          <option value="bug">Bug Report</option>
+          <option value="feature">Feature Request</option>
+          <option value="validation">Dyno Sheet for Validation</option>
+          <option value="general">General Feedback</option>
+        </select>
+      </div>
+      <div class="fl">
+        <label class="lbl">Your Email (optional)</label>
+        <input type="email" id="fbEmail" placeholder="you@example.com">
+      </div>
+      <div class="fl">
+        <label class="lbl">Message</label>
+        <textarea id="fbMsg" rows="4" placeholder="What's on your mind?"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeFeedback()">Cancel</button>
+      <button class="btn-primary" onclick="sendFeedback()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light');
+  document.getElementById('themeToggle').textContent = isLight ? '☾' : '☀';
+  try { localStorage.setItem('miatadyno_theme', isLight ? 'light' : 'dark'); } catch(e){}
+}
+try {
+  if(localStorage.getItem('miatadyno_theme') === 'light'){
+    document.body.classList.add('light');
+    document.getElementById('themeToggle').textContent = '☾';
+  }
+} catch(e){}
+
+function openFeedback(){ document.getElementById('fbModal').classList.add('vis'); }
+function closeFeedback(){ document.getElementById('fbModal').classList.remove('vis'); }
+function sendFeedback(){
+  const type = document.getElementById('fbType').value;
+  const email = document.getElementById('fbEmail').value;
+  const msg = document.getElementById('fbMsg').value;
+  if(!msg.trim()){ alert('Please enter a message.'); return; }
+  const subject = `MiataDyno Feedback: ${type}`;
+  const body = `Type: ${type}\nFrom: ${email||'(not provided)'}\n\n${msg}`;
+  window.location.href = `mailto:thuvhoang19@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  closeFeedback();
+  document.getElementById('fbMsg').value = '';
+}
+</script>
+
+</body>
+</html>

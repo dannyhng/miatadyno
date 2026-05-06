@@ -15,7 +15,7 @@
   --amber:#e8a020; --adim:rgba(232,160,32,0.10);
   --red:#d63031; --red2:#ff4757; --rdim:rgba(214,48,49,0.10);
   --blue:#4488ff; --green:#00b894;
-  --text:#eaf0fc; --mid:#96a8c4; --dim:#6478a0;
+  --text:#eaf0fc; --mid:#96a8c4; --dim:#8898b8;
   --mono:'JetBrains Mono',monospace;
   --disp:'Barlow Condensed',sans-serif;
   --bar-h: env(safe-area-inset-bottom, 0px);
@@ -28,7 +28,7 @@ body.light {
   --amber:#8a4e00; --adim:rgba(138,78,0,0.10);
   --red:#931c1f; --red2:#b32426; --rdim:rgba(179,36,38,0.08);
   --blue:#1746b8; --green:#055f4c;
-  --text:#0a0e18; --mid:#2d3548; --dim:#4f586c;
+  --text:#0a0e18; --mid:#2d3548; --dim:#3d4658;
 }
 
 body.light::before{display:none;}
@@ -44,12 +44,11 @@ body.light .upzone.error{background:rgba(192,40,42,.08);}
 body.light .tbtn.on,body.light .badge.on{background:rgba(156,92,0,0.10);}
 body.light .pull-item.isel{background:rgba(156,92,0,0.06);}
 body.light .sval.a{text-shadow:none;}
-body.light .amode-btn.on{background:rgba(156,92,0,0.08);}
 body.light #shareCard{background:#0d1018;border-color:#2a3347;}
 body.light #shareCard .sc-logo,body.light #shareCard .sc-v{color:#eaf0fc;}
 body.light #shareCard .sc-v.g{color:#e8a020;}
 body.light #shareCard .sc-veh,body.light #shareCard .sc-mod{color:#96a8c4;}
-body.light #shareCard .sc-l,body.light #shareCard .sc-ft{color:#6478a0;}
+body.light #shareCard .sc-l,body.light #shareCard .sc-ft{color:#8898b8;}
 body.light #shareCard .sc-top,body.light #shareCard .sc-nums,body.light #shareCard .sc-n{border-color:#1e2535;}
 body.light .actionbar{background:rgba(255,255,255,0.96);}
 body.light .vehicle-card{background:var(--s1);}
@@ -60,7 +59,6 @@ html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
 
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(232,160,32,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,160,32,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
-body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:1;}
 
 header,main,footer,.actionbar{position:relative;z-index:2;}
 
@@ -71,8 +69,10 @@ header,main,footer,.actionbar{position:relative;z-index:2;}
 /* ═══ HEADER ═══ */
 header{display:flex;align-items:center;border-bottom:1px solid var(--b1);background:rgba(7,9,12,.96);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100;}
 .h-logo{display:flex;align-items:center;gap:14px;padding:16px 28px;border-right:1px solid var(--b1);}
-.h-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:dp 2s ease-in-out infinite;flex-shrink:0;}
-@keyframes dp{0%,100%{opacity:1}50%{opacity:.3}}
+/* Phase G · Ticket 1.9: dot animation removed. Glow stays so the dot still
+   reads as a status element. Processing indication, if needed later, gets
+   its own ticket against actual user-perceived latency. */
+.h-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);flex-shrink:0;}
 .h-name{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
 .h-name span{color:var(--amber);}
 .h-meta{padding:0 24px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;}
@@ -80,7 +80,7 @@ header nav{margin-left:auto;display:flex;border-left:1px solid var(--b1);}
 header nav a{display:block;padding:20px 18px;font-size:10px;color:var(--mid);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--b1);transition:color .2s,background .2s;cursor:pointer;}
 header nav a:hover{color:var(--amber);background:var(--adim);}
 header nav a:last-child{border-right:none;}
-.limit-counter{display:inline-block;padding:3px 8px;background:var(--adim);border:1px solid var(--amber);color:var(--amber);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:10px;font-weight:700;}
+.limit-counter{display:inline-block;padding:3px 8px;background:var(--adim);border:1px solid var(--amber);color:var(--amber);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-left:10px;font-weight:700;}
 
 /* ═══════════════════════════════════════════════════════════ */
 /* DESKTOP DEFAULT: sidebar layout (>880px) */
@@ -100,6 +100,30 @@ header nav a:last-child{border-right:none;}
 
 /* Main layout grid: sidebar + content */
 .layout{display:grid;grid-template-columns:370px 1fr;}
+/* Landing state — desktop shows header + hero + cards + education panels +
+   footer. Mobile landing shows only header + hero + cards + footer (the
+   education panels hide via the mobile @media rule). Hidden on landing:
+   sidebar (desktop upload), #upload-section (mobile upload), progress
+   indicator, disclaimer, in-flow panels (pull/results), mobile vehicle card.
+   #education-panels uses its own visibility rule below — it should appear
+   on desktop landing, so it's deliberately NOT in this hide list. */
+body[data-state="landing"] .sidebar,
+body[data-state="landing"] #upload-section,
+body[data-state="landing"] #mobile-vehicle-card,
+body[data-state="landing"] #pull-section,
+body[data-state="landing"] #results,
+body[data-state="landing"] .prog-wrap,
+body[data-state="landing"] .disc{display:none;}
+body[data-state="landing"] .layout{grid-template-columns:1fr;}
+
+/* Pre-upload education panels (How It Works + How to Get Good Data).
+   Companion content for the upload zone — visible only in drop state on
+   both desktop and mobile. Hidden on landing (cards-only), configure
+   (config UI takes over), and result (results take over). */
+#education-panels{display:block;}
+body[data-state="landing"] #education-panels,
+body[data-state="configure"] #education-panels,
+body[data-state="result"] #education-panels{display:none;}
 
 /* SIDEBAR */
 .sidebar{border-right:1px solid var(--b1);position:sticky;top:61px;height:calc(100vh - 61px);overflow-y:auto;display:flex;flex-direction:column;}
@@ -125,9 +149,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .tbtn:first-child{margin-left:0;}
 .tbtn:hover{color:var(--text);background:var(--s3);}
 .tbtn.on{background:var(--adim);border-color:var(--amber);color:var(--amber);z-index:1;position:relative;font-weight:600;}
+.tbtn.disabled{opacity:0.4;pointer-events:none;cursor:not-allowed;}
 
 .exh-comp{border:1px solid var(--b1);margin-bottom:7px;background:var(--s2);}
-.exh-lbl{padding:7px 11px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.exh-lbl{padding:7px 11px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
 .exh-d{font-size:10px;font-weight:600;color:var(--green);}
 .exh-comp select{border:none;background:transparent;font-size:11px;padding:8px 11px;padding-right:28px;}
 
@@ -149,7 +174,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .disc{padding:11px 26px;font-size:10px;color:var(--dim);border-bottom:1px solid var(--b1);letter-spacing:.04em;background:var(--s1);}
 .cpanel{padding:32px 36px;border-bottom:1px solid var(--b1);}
 .cpanel.full{padding:0;}
-.plabel{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.plabel{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
 .plabel::after{content:'';flex:1;height:1px;background:var(--b1);}
 .ptitle{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
 
@@ -199,9 +224,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .pdata strong{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:1px;color:var(--text);}
 .pdata span{font-size:11px;color:var(--mid);}
 .pq-num{font-family:var(--disp);font-size:30px;font-weight:700;line-height:1;text-align:right;}
-.pq-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:right;}
+.pq-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:right;}
 .ptag-w{text-align:right;}
-.ptag{display:inline-block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border:1px solid;}
+.ptag{display:inline-block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border:1px solid;}
 .ptag.b{color:var(--red2);border-color:var(--red);background:var(--rdim);}
 .ptag.a{color:var(--blue);border-color:#1d4ed8;background:rgba(68,136,255,.08);}
 .ptag.s{color:var(--amber);border-color:var(--amber);background:var(--adim);}
@@ -210,14 +235,89 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .empty-st .big{font-family:var(--disp);font-size:52px;font-weight:700;color:var(--b2);display:block;margin-bottom:12px;}
 
 /* ANALYSIS MODE TOGGLE */
-.amode-row{display:flex;border:1px solid var(--b2);}
-.amode-btn{flex:1;padding:14px 18px;background:var(--s2);cursor:pointer;border-right:1px solid var(--b2);transition:all .15s;}
-.amode-btn:last-child{border-right:none;}
-.amode-btn:hover{background:var(--s3);}
-.amode-btn.on{background:var(--adim);}
-.amode-btn strong{display:block;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mid);margin-bottom:4px;}
-.amode-btn.on strong{color:var(--amber);}
-.amode-btn span{display:block;font-size:11px;color:var(--dim);line-height:1.4;}
+/* Phase G · PR 3 Part A: landing cards as buttons.
+   - Subtle vertical gradient + top-edge highlight read as raised, pressable.
+   - Hover: lift + amber glow (replaces background tint). Active: press down.
+   - Big amber number on the left (drops the previous .qcard-tag).
+   - Arrow on the right is now in a circular container — a real button affordance.
+   - Mobile (no hover): :active scale press for tap feedback.
+   Cards live INSIDE .hero-wrap after .badges so they left-align with the hero
+   column. Stacked vertically (.flex-direction:column). */
+.qcard-row{display:none;flex-direction:column;gap:10px;max-width:560px;margin-top:14px;}
+body[data-state="landing"] .qcard-row{display:flex;}
+.qcard{
+  display:flex;align-items:center;gap:18px;
+  background:linear-gradient(180deg, var(--s2) 0%, var(--s1) 100%);
+  border:1px solid var(--b1);border-left:3px solid var(--amber);
+  padding:18px 22px;cursor:pointer;position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.qcard:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 4px 16px rgba(232,160,32,.15);border-color:var(--amber);}
+.qcard:active{transform:translateY(0);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+.qcard:focus{outline:none;}
+.qcard:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+.qcard-num{
+  font-family:var(--disp);font-size:40px;font-weight:800;color:var(--amber);
+  line-height:1;flex-shrink:0;width:32px;text-align:center;
+}
+.qcard-body{flex:1;min-width:0;}
+.qcard-q{font-family:var(--disp);font-size:18px;font-weight:700;color:var(--text);line-height:1.3;letter-spacing:.01em;margin-bottom:4px;}
+.qcard-sub{font-size:12px;color:var(--mid);line-height:1.5;}
+.qcard-arrow{
+  flex-shrink:0;width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;
+  color:var(--amber);font-family:var(--disp);font-size:28px;font-weight:700;line-height:1;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.qcard:hover .qcard-arrow{border-color:var(--amber);transform:translateX(3px);}
+
+@media(max-width:880px){
+  /* Cards inherit .hero-wrap mobile padding (20px sides). Stack vertically.
+     Drop hover-lift on touch — replace with :active scale press for tap
+     feedback. Sizes stay generous because mobile has more vertical space. */
+  .qcard-row{max-width:100%;margin-top:14px;}
+  .qcard{padding:14px 18px;gap:14px;}
+  .qcard:hover{transform:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+  .qcard:active{transform:scale(.98);}
+  .qcard-num{font-size:36px;width:28px;}
+  .qcard-q{font-size:16px;}
+  .qcard-sub{font-size:11.5px;}
+  .qcard-arrow{width:32px;height:32px;font-size:24px;}
+}
+
+/* Exit-ramp links — small text below upload zones that switches modes
+   without losing already-uploaded files. data-show-mode controls visibility:
+   "compare" link shows only when current mode is 'same' (offering the switch),
+   "same" link shows only when current mode is 'compare'. */
+.exit-ramp{display:none;font-size:12px;color:var(--mid);cursor:pointer;padding:12px 18px;text-decoration:underline;text-underline-offset:3px;transition:color .15s;}
+.exit-ramp:hover{color:var(--amber);}
+body[data-mode="same"] .exit-ramp[data-show-mode="same"]{display:block;}
+body[data-mode="compare"] .exit-ramp[data-show-mode="compare"]{display:block;}
+
+/* Logo is now clickable (returns to landing). */
+.h-logo{cursor:pointer;}
+
+/* Phase G · Ticket 1.2: tabular numerals on display-font numeric values so
+   stacked numbers (e.g. compare-mode before/after columns) align vertically. */
+.sval, .pq-num, .sc-v, .trap-cell-v, .vc-num, .hw-num, .sval-ci{
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Phase G · Ticket 1.1: confidence interval line below the main stat number.
+   Same display family as .sval, smaller, dim color, tabular for alignment. */
+.sval-ci{
+  font-family: var(--disp);
+  font-size: 18px;
+  color: var(--dim);
+  font-weight: 600;
+  margin-top: 4px;
+  letter-spacing: .02em;
+}
+@media(max-width:880px){
+  .sval-ci{font-size:14px;}
+}
 
 /* RESULTS */
 #results{display:none;}
@@ -232,7 +332,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .sbox:last-child{border-right:none;}
 .sbox::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--b1);}
 .sbox.hl::after{background:var(--amber);}
-.slbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.slbl{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
 .sval{font-family:var(--disp);font-size:50px;font-weight:800;line-height:1;letter-spacing:-.02em;}
 .sval.a{color:var(--amber);text-shadow:0 0 30px rgba(232,160,32,.25);}
 .sunit{font-size:11px;color:var(--dim);letter-spacing:.05em;margin-top:2px;}
@@ -245,7 +345,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .trap-row:last-child{border-bottom:none;}
 .trap-bracket{font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);}
 .trap-cell{display:flex;flex-direction:column;gap:3px;}
-.trap-cell-l{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);}
+.trap-cell-l{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);}
 .trap-cell-v{font-family:var(--disp);font-size:22px;font-weight:700;line-height:1;}
 @media(max-width:880px){
   .trap-row{grid-template-columns:1fr;gap:8px;padding:12px 14px;}
@@ -280,8 +380,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .sc-n:last-child{border-right:none;}
 .sc-v{font-family:var(--disp);font-size:34px;font-weight:800;line-height:1;color:#eaf0fc;}
 .sc-v.g{color:var(--amber);}
-.sc-l{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#6478a0;margin-top:3px;}
-.sc-ft{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.07em;color:#6478a0;}
+.sc-l{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8898b8;margin-top:3px;}
+.sc-ft{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.07em;color:#8898b8;}
 .btn-dl{display:inline-block;margin-top:14px;padding:11px 18px;border:1px solid var(--b2);color:var(--mid);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .2s;}
 .btn-dl:hover{border-color:var(--amber);color:var(--amber);background:var(--adim);}
 
@@ -307,6 +407,11 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 /* MOBILE-ONLY ELEMENTS (hidden on desktop) */
 #mobile-vehicle-card{display:none;}
 #mobile-action-bar{display:none;}
+/* Phase G · PR 3.5.1: #upload-section is mobile-only by intent. Without an
+   explicit desktop default, it leaked through (showing inline upload zone
+   alongside the sidebar one). The mobile @media block's state-based show
+   rules override this default at the right breakpoint. */
+#upload-section{display:none;}
 
 /* ═══════════════════════════════════════════════════════════ */
 /* MOBILE LAYOUT (≤880px) */
@@ -317,7 +422,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   .sidebar{display:none;}
   .layout{grid-template-columns:1fr;}
 
-  /* Hide hero on mobile EXCEPT in drop state */
+  /* Hide hero on mobile EXCEPT in drop and landing states */
+  body[data-state="landing"] .hero-wrap,
   body[data-state="drop"] .hero-wrap{display:block;}
   body[data-state="configure"] .hero-wrap,
   body[data-state="result"] .hero-wrap{display:none;}
@@ -330,26 +436,20 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   /* Progress indicator hidden on mobile (action bar handles this) */
   .prog-wrap{display:none;}
 
-  /* Hide the desktop "How It Works" + "Golden Pull" panels in non-drop states */
-  body[data-state="configure"] .cpanel:has(#how-it-works),
-  body[data-state="result"] .cpanel:has(#how-it-works){display:none;}
-  body[data-state="configure"] .cpanel:has(.golden-grid),
-  body[data-state="result"] .cpanel:has(.golden-grid){display:none;}
-
   /* Show/hide upload section based on state */
+  body[data-state="landing"] #upload-section{display:none;}
   body[data-state="drop"] #upload-section{display:block;}
   body[data-state="configure"] #upload-section{display:none;}
   body[data-state="result"] #upload-section{display:none;}
 
   /* Show pulls only in configure state */
-  body[data-state="drop"] #pull-section,
-  body[data-state="drop"] #amode-section{display:none;}
-  body[data-state="configure"] #pull-section,
-  body[data-state="configure"] #amode-section{display:block;}
-  body[data-state="result"] #pull-section,
-  body[data-state="result"] #amode-section{display:none;}
+  body[data-state="landing"] #pull-section,
+  body[data-state="drop"] #pull-section{display:none;}
+  body[data-state="configure"] #pull-section{display:block;}
+  body[data-state="result"] #pull-section{display:none;}
 
   /* Show results only in result state */
+  body[data-state="landing"] #results,
   body[data-state="drop"] #results,
   body[data-state="configure"] #results{display:none !important;}
   body[data-state="result"] #results.vis{display:block !important;}
@@ -377,21 +477,18 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   .stats-g{grid-template-columns:1fr 1fr;}
   .sbox{padding:18px 14px;}
   .sval{font-size:32px;}
-  .slbl{font-size:8px;}
+  .slbl{font-size:9px;}
   .sunit{font-size:10px;}
   .chart-w,.interp-w,.card-w{padding:18px 14px;}
   #dynoChart{max-height:280px;}
   .pull-item{grid-template-columns:36px 1fr auto;gap:10px;padding:12px 14px;}
   .ptag-w{display:none;}
   .pq-num{font-size:24px;}
-  .pq-lbl{font-size:8px;}
-  .amode-btn{padding:11px 12px;}
-  .amode-btn strong{font-size:12px;letter-spacing:.04em;margin-bottom:3px;}
-  .amode-btn span{font-size:10px;line-height:1.35;}
+  .pq-lbl{font-size:9px;}
   .interp-bar{display:none;}
   #shareCard{padding:18px 14px;max-width:100%;}
   .sc-v{font-size:26px;}
-  .sc-l{font-size:8px;}
+  .sc-l{font-size:9px;}
   .golden-grid,.howitworks-grid{grid-template-columns:1fr;gap:20px;}
 
   /* Form inputs 14px to prevent iOS zoom */
@@ -401,8 +498,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   /* Header tweaks */
   .h-logo{padding:12px 16px;gap:10px;}
   .h-name{font-size:16px;letter-spacing:.08em;}
-  .h-meta{padding:0 12px;font-size:9px;}
-  header nav a{padding:14px 10px;font-size:9px;}
+  .h-meta{padding:0 12px;font-size:10px;}
+  header nav a{padding:14px 10px;font-size:10px;}
 }
 
 @media(max-width:380px){
@@ -410,6 +507,41 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   .hero-wrap h1{font-size:32px;}
   .badges{display:none;}
   .sval{font-size:28px;}
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* PR 4 — WIDE-DESKTOP LANDING (≥1024px) */
+/* Hero centered + larger; question cards side-by-side as confident pickers.
+   Mobile (<880px) and narrow-desktop (880–1023px) layouts unchanged — net-zero
+   contract. Watermark "NC" stays anchored to .hero-wrap's right edge, which
+   now floats with the centered max-width — verified visually upper-right. */
+/* ═══════════════════════════════════════════════════════════ */
+@media(min-width:1024px){
+  /* Hero block: cap width, center, scale headline up. */
+  .hero-wrap{max-width:1200px;margin:0 auto;}
+  .hero-wrap h1{font-size:clamp(38px, 5vw, 80px);}
+  .hero-sub{max-width:640px;}
+
+  /* Cards: switch from vertical stack to side-by-side grid. The 1200px
+     hero-wrap parent constrains the row width; each card lands ~580px wide. */
+  .qcard-row{display:none;flex-direction:row;gap:32px;max-width:none;margin-top:18px;}
+  body[data-state="landing"] .qcard-row{display:grid;grid-template-columns:1fr 1fr;}
+
+  /* Card internals: switch from flex (default) to grid for clean alignment
+     between the bigger number, body, and arrow circle. 96px reserved on the
+     left for the numeral, 48px on the right for the arrow. */
+  .qcard{
+    display:grid;grid-template-columns:96px 1fr 48px;align-items:center;gap:0;
+    padding:32px 36px;
+  }
+  .qcard-num{font-size:64px;width:auto;text-align:left;}
+  .qcard-q{font-size:22px;margin-bottom:6px;}
+  .qcard-sub{font-size:14px;}
+  .qcard-arrow{width:48px;height:48px;font-size:24px;}
+
+  /* Hover/active tuned for larger surface. */
+  .qcard:hover{transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 6px 24px rgba(232,160,32,.18);border-color:var(--amber);}
+  .qcard:active{transform:translateY(0);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
 }
 
 /* ═══════════════════════════════════════════════════════════ */
@@ -494,7 +626,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 <body data-state="drop">
 
 <header class="fi">
-  <div class="h-logo">
+  <div class="h-logo" onclick="goLanding()" role="link" tabindex="0" onkeydown="if(event.key==='Enter')goLanding()" title="Back to start">
     <div class="h-dot"></div>
     <div class="h-name">Miata<span>Dyno</span></div>
   </div>
@@ -508,12 +640,33 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 <div class="hero-wrap fi d1">
   <div class="h-tag">Virtual Dyno · NC Miata</div>
   <h1>Did your mod<br>actually do<em>anything?</em></h1>
-  <p class="hero-sub">Drop in a log from your OBD scanner. Get wheel horsepower numbers without a dyno visit.</p>
-  <div class="badges">
-    <span class="badge on">No Dyno Required</span>
-    <span class="badge on">Stock vs Modded</span>
-    <span class="badge on">Multi-Run Averaging</span>
-    <span class="badge">Pro Tier (coming)</span>
+  <!-- Phase G · PR 3 Part A 3.4: badge row removed. "No Dyno Required" was
+       redundant with the hero h1 + tag. "Stock vs Modded" is obvious from
+       context. The averaging signal moved into the subtitle below — that
+       was the only badge with non-redundant content. -->
+  <p class="hero-sub">Drop in a log from your OBD scanner. Averages multiple runs for accuracy.</p>
+  <!-- Landing-state primary CTA, inside the hero column so it left-aligns
+       with the headline / subtitle. Shown only on landing.
+       Phase G · PR 3 Part A: cards now look like buttons — gradient surface,
+       big amber number on left, arrow circle on right. .qcard-tag dropped;
+       the question titles + numbers communicate the same ordering. -->
+  <div class="qcard-row fi d2">
+    <div class="qcard" tabindex="0" role="button" onclick="pickFlow('same')" onkeydown="if(event.key==='Enter'||event.key===' ')pickFlow('same')">
+      <div class="qcard-num">1</div>
+      <div class="qcard-body">
+        <div class="qcard-q">Power output from a single run</div>
+        <div class="qcard-sub">Upload one log from your OBD scanner.</div>
+      </div>
+      <div class="qcard-arrow">→</div>
+    </div>
+    <div class="qcard" tabindex="0" role="button" onclick="pickFlow('compare')" onkeydown="if(event.key==='Enter'||event.key===' ')pickFlow('compare')">
+      <div class="qcard-num">2</div>
+      <div class="qcard-body">
+        <div class="qcard-q">Before vs after a mod</div>
+        <div class="qcard-sub">Upload two logs to compare.</div>
+      </div>
+      <div class="qcard-arrow">→</div>
+    </div>
   </div>
 </div>
 
@@ -527,6 +680,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <div class="sec">
       <div class="sec-hd" onclick="toggleSec(this)"><span class="sec-t">Log File</span><span class="sec-c">▸</span></div>
       <div class="sec-bd" style="padding:0;">
+        <!-- Phase C-1: "Before" label appears only in Compare mode (toggled by setAnalysisMode). -->
+        <div class="upzone-label" id="upzoneLabelBefore" style="display:none;padding:8px 14px 0;font-size:11px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">Before CSV</div>
         <div class="upzone" id="upzone">
           <input type="file" id="fileIn" accept=".csv">
           <span class="up-icon">CSV</span>
@@ -535,6 +690,19 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
           <small>BlueDriver · OBD Fusion · Torque Pro</small>
         </div>
         <div class="upst" id="upst"></div>
+        <!-- Phase C-1: After zone — visibility toggled by setAnalysisMode. -->
+        <div class="upzone-label" id="upzoneLabelAfter" style="display:none;padding:14px 14px 0;font-size:11px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">After CSV</div>
+        <div class="upzone" id="upzoneAfter" style="display:none;">
+          <input type="file" id="fileInAfter" accept=".csv">
+          <span class="up-icon">CSV</span>
+          <p><strong>Drop your After log here</strong></p>
+          <p>or click to browse</p>
+          <small>Same car, post-mod session</small>
+        </div>
+        <div class="upst" id="upstAfter" style="display:none;"></div>
+        <!-- Phase F: exit-ramp links. CSS shows the right one based on body[data-mode]. -->
+        <div class="exit-ramp" data-show-mode="same"  onclick="setAnalysisMode('compare')">Actually, I want to compare two logs →</div>
+        <div class="exit-ramp" data-show-mode="compare" onclick="setAnalysisMode('same')">Actually, I just want to see one log's power →</div>
       </div>
     </div>
 
@@ -543,7 +711,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       <div class="sec-bd">
         <div class="fl">
           <label class="lbl">Miata Generation</label>
-          <select id="ncGen" onchange="syncTotalWt();calcW()">
+          <select id="ncGen" onchange="syncTotalWt();calcW();on5MTGenChange()">
             <option value="nc1">NC1 (2006-2008)</option>
             <option value="nc2" selected>NC2 (2009-2012)</option>
             <option value="nc3">NC3 (2013-2015)</option>
@@ -551,12 +719,12 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         </div>
         <div class="fl">
           <label class="lbl">Transmission</label>
-          <select id="trans">
+          <select id="trans" onchange="onTransChange()">
             <option value="6mt" selected>6-Speed Manual</option>
-            <option value="5mt" disabled>5-Speed Manual — coming soon</option>
-            <option value="6at" disabled>6-Speed Automatic — coming soon</option>
+            <option value="6at">6-Speed Automatic</option>
+            <option value="5mt">5-Speed Manual (NC1 only)</option>
           </select>
-          <p style="font-size:10px;color:var(--amber);margin-top:5px;line-height:1.5;"><strong>6MT only for now.</strong> If your car is 5MT or 6AT, results will be off by ~5-8% (different drivetrain loss and final drive). Support coming.</p>
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">5MT was only offered on NC1 soft top. NC2 and NC3 had 6MT or 6AT only.</p>
         </div>
         <div class="fl">
           <label class="lbl">Top Type</label>
@@ -566,7 +734,7 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
           </div>
         </div>
         <div class="fl">
-          <label class="lbl">Top Position During Pull</label>
+          <label class="lbl">Top Position During Run</label>
           <div class="trow" id="tPos">
             <div class="tbtn on" data-v="up" onclick="setT('tPos',this);calcW()">Top Up</div>
             <div class="tbtn" data-v="down" onclick="setT('tPos',this);calcW()">Top Down</div>
@@ -586,6 +754,10 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             <div class="tbtn" data-v="none" onclick="setT('tCorr',this)">Uncorrected</div>
           </div>
           <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">SAE is the US dyno default (25°C, 99 kPa). DIN is the European default (20°C, 1013 mbar), which reads about 3 percent higher. Pick whichever matches the dyno shop you'd compare against.</p>
+          <!-- Phase G · Ticket 1.7: surface the locked-ambient default so users
+               understand the temperature term in correction isn't using their
+               actual ambient. Real-time weather is on the v2 roadmap. -->
+          <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">Corrected to 25°C ambient (locked default — real-time weather coming). <a href="methodology.html#atmospheric" style="color:var(--amber);text-decoration:none;">(why?)</a></p>
         </div>
       </div>
     </div>
@@ -622,10 +794,10 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <div class="fl" id="customTireRow" style="display:none;">
           <label class="lbl">Custom Tire Size</label>
           <div class="g3" style="grid-template-columns:1fr 1fr 1fr 1fr;">
-            <div><label class="lbl" style="font-size:9px;">Width</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
-            <div><label class="lbl" style="font-size:9px;">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
-            <div><label class="lbl" style="font-size:9px;">Rim</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
-            <div id="tire-weight-group"><label class="lbl" style="font-size:9px;">Wt (lbs)</label><input type="number" id="tireWtCustom" value="" min="8" max="35" step="0.1" placeholder="~18-22" onchange="calcW()"></div>
+            <div><label class="lbl" style="font-size:10px;">Width</label><input type="number" id="tW" value="205" min="155" max="275" onchange="calcW()"></div>
+            <div><label class="lbl" style="font-size:10px;">Aspect</label><input type="number" id="tA" value="45" min="30" max="80" onchange="calcW()"></div>
+            <div><label class="lbl" style="font-size:10px;">Rim</label><input type="number" id="tR" value="17" min="13" max="18" onchange="calcW()"></div>
+            <div id="tire-weight-group"><label class="lbl" style="font-size:10px;">Wt (lbs)</label><input type="number" id="tireWtCustom" value="" min="8" max="35" step="0.1" placeholder="~18-22" onchange="calcW()"></div>
           </div>
           <p style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;">Tire weight per tire. Common range 17-22 lbs for 16-17" street tires. Leave blank to use stock weight.</p>
         </div>
@@ -665,9 +837,9 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <div class="wsum">
           <div class="wsrow tot">
             <span>Total weight</span>
-            <span class="wv n" id="ws-tot">.</span>
+            <span class="wv n" id="ws-tot"></span>
           </div>
-          <p style="font-size:9px;color:var(--dim);margin-top:4px;text-align:right;">(Car + fuel + driver)</p>
+          <p style="font-size:10px;color:var(--dim);margin-top:4px;text-align:right;">(Car + fuel + driver)</p>
         </div>
       </div>
     </div>
@@ -734,8 +906,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
           </select>
           <input type="number" id="rollbarCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
         </div>
-        <div class="fl">
-          <label class="lbl">Forced Induction</label>
+        <div class="fl" id="forcedBeforeBlock">
+          <label class="lbl" id="forcedLabel">Forced Induction</label>
           <select id="forced" onchange="checkCustomExh('forced');calcW()">
             <option value="0">None (naturally aspirated)</option>
             <option value="45">FM Supercharger Kit (+45 lbs)</option>
@@ -743,6 +915,19 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
             <option value="custom">Custom (+/- lbs)</option>
           </select>
           <input type="number" id="forcedCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
+        </div>
+        <!-- Phase D: After-file FI selector. Visible only in Compare mode.
+             Lets the user compare a NA Before vs FI'd After (e.g. supercharger
+             install) without forcing both files to share one FI value. -->
+        <div class="fl" id="forcedAfterBlock" style="display:none;">
+          <label class="lbl">Forced Induction (After)</label>
+          <select id="forcedAfter" onchange="checkCustomExh('forcedAfter');calcW()">
+            <option value="0">None (naturally aspirated)</option>
+            <option value="45">FM Supercharger Kit (+45 lbs)</option>
+            <option value="38">Other supercharger (+38 lbs)</option>
+            <option value="custom">Custom (+/- lbs)</option>
+          </select>
+          <input type="number" id="forcedAfterCustom" value="0" step="1" placeholder="Weight change (lbs)" style="display:none;width:100%;margin-top:6px;" onchange="calcW()">
         </div>
         <div class="fl">
           <label class="lbl">Custom Adjustment (lbs)</label>
@@ -808,6 +993,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     <div id="upload-section">
       <div class="cpanel" style="background:var(--s1);padding:24px 18px;">
         <div class="plabel">Step 1 · Upload Your Log</div>
+        <!-- Phase C-1: "Before" label visible only in Compare mode. -->
+        <div class="upzone-label" id="upzoneLabelBeforeMobile" style="display:none;margin-top:8px;font-size:10px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">Before CSV</div>
         <div class="upzone" id="upzoneMobile" style="margin-top:6px;">
           <span class="up-icon">CSV</span>
           <p><strong>Drop your OBD log here</strong></p>
@@ -815,18 +1002,35 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
           <small>BlueDriver · OBD Fusion · Torque Pro</small>
         </div>
         <div class="upst" id="upstMobile"></div>
+        <!-- Phase C-1: After zone — visibility toggled by setAnalysisMode. -->
+        <div class="upzone-label" id="upzoneLabelAfterMobile" style="display:none;margin-top:14px;font-size:10px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;">After CSV</div>
+        <div class="upzone" id="upzoneMobileAfter" style="display:none;margin-top:6px;">
+          <span class="up-icon">CSV</span>
+          <p><strong>Drop your After log here</strong></p>
+          <p>or tap to browse</p>
+          <small>Same car, post-mod session</small>
+        </div>
+        <div class="upst" id="upstMobileAfter" style="display:none;"></div>
+        <!-- Phase F: exit-ramp links (mobile). CSS shows the right one based on body[data-mode]. -->
+        <div class="exit-ramp" data-show-mode="same"  onclick="setAnalysisMode('compare')">Actually, I want to compare two logs →</div>
+        <div class="exit-ramp" data-show-mode="compare" onclick="setAnalysisMode('same')">Actually, I just want to see one log's power →</div>
       </div>
+    </div>
 
+    <!-- Pre-upload education panels. Visible on desktop landing+drop and mobile drop;
+         hidden in configure+result. Lifted out of #upload-section so desktop landing/
+         drop can show them without re-enabling the mobile-only upload zone. -->
+    <div id="education-panels">
       <div class="cpanel" id="how-it-works" style="background:var(--s1);">
         <div class="plabel">How It Works</div>
         <div class="howitworks-grid">
           <div class="hw-step">
             <div class="hw-num">01</div>
             <div class="hw-title">Capture</div>
-            <p class="hw-text">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your pull.</p>
+            <p class="hw-text">Use any OBD scanner (BlueDriver, OBD Fusion, Torque Pro) to log your run.</p>
             <div class="hw-pids">
               <p>Required PIDs</p>
-              <span>RPM · Vehicle Speed · Throttle Position</span>
+              <span>Time · RPM · Vehicle Speed · Throttle Position</span>
             </div>
           </div>
           <div class="hw-step">
@@ -876,30 +1080,19 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
       </div>
     </div>
 
-    <!-- ANALYSIS MODE TOGGLE (visible in configure state on mobile) -->
-    <div class="cpanel" id="amode-section">
-      <div class="plabel">Analysis Mode</div>
-      <div class="amode-row">
-        <div class="amode-btn on" data-mode="same" onclick="setAnalysisMode('same')">
-          <strong>Same Setup</strong>
-          <span>Multiple runs, same car. Best run + average + consistency.</span>
-        </div>
-        <div class="amode-btn" data-mode="compare" onclick="setAnalysisMode('compare')">
-          <strong>Before vs After</strong>
-          <span>Compare a run from before a mod vs after.</span>
-        </div>
-      </div>
-      <div class="ptitle" id="modeTitle" style="margin-top:18px;">Tap runs to include</div>
-      <p style="font-size:11px;color:var(--mid);" id="modeHelp">Tap runs to include them. We'll average all selected pulls and show your best individual run.</p>
-    </div>
-
     <!-- PULLS LIST -->
+    <!-- Phase G · Ticket 1.5: #amode-section is gone; modeTitle/modeHelp moved
+         here as the pull-list header. Same IDs, same JS writes, just rehomed
+         so the dead empty cpanel between upload and pulls disappears. -->
     <div class="cpanel full" id="pull-section">
+      <div class="pull-section-header" style="padding:22px 26px 14px;border-bottom:1px solid var(--b1);">
+        <div class="ptitle" id="modeTitle" style="margin-bottom:4px;">Tap runs to include</div>
+        <p style="font-size:11px;color:var(--mid);line-height:1.6;" id="modeHelp">Tap runs to include them. We'll average all selected runs and show your best individual run.</p>
+      </div>
       <div id="pullSec">
         <div class="empty-st">
-          <span class="big">.</span>
           Upload a CSV log to find your acceleration runs.<br>
-          Your file needs <strong>Throttle Position</strong> and <strong>Vehicle Speed.</strong> 
+          Your file needs <strong>Throttle Position</strong> and <strong>Vehicle Speed.</strong>
         </div>
       </div>
     </div>
@@ -914,13 +1107,15 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <p class="res-banner-t" id="gearBannerT" style="color:var(--red2);"></p>
         <p class="res-banner-b" id="gearBannerB"></p>
       </div>
+      <!-- Analysis context label — short confirmation of what the user is looking at. -->
+      <p id="resContext" style="font-size:12px;color:var(--dim);margin:0 0 12px;letter-spacing:.02em;"></p>
       <div class="stats-g" id="statsLabels">
-        <div class="sbox"><div class="slbl">WHP</div><div class="sval">.</div><div class="sunit">wheel hp</div></div>
+        <div class="sbox"><div class="slbl">WHP</div><div class="sval"></div><div class="sunit">wheel hp</div></div>
       </div>
       <div class="cpanel" id="trapSection" style="display:none;">
         <div class="plabel">Speed Trap Times · Direct Measurement</div>
         <p style="font-size:11px;color:var(--mid);margin-bottom:18px;line-height:1.7;">
-          Pure timer reading — no physics model, no mass or aero assumptions. <strong style="color:var(--text);">Most trustworthy metric for comparing pulls.</strong>
+          Pure timer reading — no physics model, no mass or aero assumptions. <strong style="color:var(--text);">Most trustworthy metric for comparing runs.</strong>
         </p>
         <div class="stats-g" id="trapGrid"></div>
       </div>
@@ -938,16 +1133,16 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
         <div class="plabel" style="margin-bottom:14px;">Shareable Card</div>
         <div id="shareCard">
           <div class="sc-top">
-            <div><div class="sc-logo">Miata<span>Dyno</span></div><div class="sc-veh" id="cVeh">.</div></div>
-            <div class="sc-mod" id="cMod">.</div>
+            <div><div class="sc-logo">Miata<span>Dyno</span></div><div class="sc-veh" id="cVeh"></div></div>
+            <div class="sc-mod" id="cMod"></div>
           </div>
           <div class="sc-nums">
-            <div class="sc-n"><div class="sc-v" id="cBef">.</div><div class="sc-l" id="cBefL">Before WHP</div></div>
-            <div class="sc-n"><div class="sc-v" id="cAft">.</div><div class="sc-l" id="cAftL">After WHP</div></div>
-            <div class="sc-n"><div class="sc-v g" id="cGain">.</div><div class="sc-l" id="cGainL">WHP Gain</div></div>
+            <div class="sc-n"><div class="sc-v" id="cBef"></div><div class="sc-l" id="cBefL">Before WHP</div></div>
+            <div class="sc-n"><div class="sc-v" id="cAft"></div><div class="sc-l" id="cAftL">After WHP</div></div>
+            <div class="sc-n"><div class="sc-v g" id="cGain"></div><div class="sc-l" id="cGainL">WHP Gain</div></div>
           </div>
           <div class="sc-ft">
-            <span id="cCond">.</span>
+            <span id="cCond"></span>
             <span>dannyhng.github.io/miatadyno</span>
           </div>
         </div>
@@ -966,8 +1161,8 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
     </div>
     <div class="ft-col">
       <div class="ft-title">Product</div>
+      <a class="ft-link" href="methodology.html">How It Works</a>
       <a class="ft-link" onclick="openFeedback()">Send Feedback</a>
-      <a class="ft-link" href="mailto:thuvhoang19@gmail.com?subject=MiataDyno%20Bug%20Report">Report a Bug</a>
     </div>
     <div class="ft-col">
       <div class="ft-title">Contact</div>
@@ -1076,6 +1271,27 @@ footer{border-top:1px solid var(--b1);background:var(--s1);padding:0;font-size:1
 </div>
 
 <!-- LIMIT MODAL -->
+<!-- Phase G · Ticket 2.2: pre-flight gear sanity confirmation modal.
+     Shown by triggerRun() when the primary pull's mph/krpm disagrees with
+     the gear+tire setup by more than PREFLIGHT_GEAR_THRESHOLD%. Two paths:
+     "Fix tire size" (closes modal, scrolls to Wheels & Tires section), or
+     "Run anyway" (acknowledges, suppresses post-analysis banner, runs). -->
+<div class="modal-bg" id="gearSanityModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">Speed reading mismatch detected</span>
+      <button class="modal-close" onclick="closeGearSanityModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="gearSanityBody"></p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="scrollToWheels()">Fix tire size</button>
+      <button class="btn-primary" onclick="acknowledgeGearWarning()">Run anyway</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="limitModal">
   <div class="modal-box">
     <div class="modal-head">
@@ -1146,9 +1362,29 @@ function promptAccessCode(){
 // VEHICLE DATA
 // ═══════════════════════════════════════════════════════════════
 const NCP = {
-  nc1:{name:'NC1 MX-5 (2006-2008)',short:'NC1',wt:2480,swl:15.0,stl:19.0,stock_tire_lbs:18.5,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6014,gears:[3.136,1.888,1.330,1.000,0.814,0],fd:4.100},
-  nc2:{name:'NC2 MX-5 (2009-2012)',short:'NC2',wt:2509,swl:19.0,stl:18.0,stock_tire_lbs:21.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
-  nc3:{name:'NC3 MX-5 (2013-2015)',short:'NC3',wt:2509,swl:19.0,stl:18.0,stock_tire_lbs:21.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163,gears:[3.709,2.190,1.536,1.177,1.000,0.832],fd:4.100},
+  nc1:{name:'NC1 MX-5 (2006-2008)',short:'NC1',wt:2480,swl:18.0,stl:19.0,stock_tire_lbs:18.5,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6014},
+  nc2:{name:'NC2 MX-5 (2009-2012)',short:'NC2',wt:2509,swl:19.0,stl:18.0,stock_tire_lbs:21.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163},
+  nc3:{name:'NC3 MX-5 (2013-2015)',short:'NC3',wt:2509,swl:19.0,stl:18.0,stock_tire_lbs:21.0,Cd:.36,A:1.78,Crr:.015,rot:.045,dtl:.15,stock_dia_m:0.6163},
+};
+// Transmission ratios + drivetrain loss. Values match WEIGHT_MATRIX/TRANS data
+// in vehicle_profiles.py (Python reference).
+// NC1 6MT had different ratios than NC2/3 6MT — keep NC1 separate if you want
+// full fidelity later. Currently NC1 6MT and NC2/3 6MT use the same TRANS_DATA['6mt']
+// entry; matches existing NCP behavior.
+const TRANS_DATA = {
+  '5mt': { gears:[3.136, 1.888, 1.330, 1.000, 0.814],        fd:4.100, dtl:0.15 },
+  '6mt': { gears:[3.709, 2.190, 1.536, 1.177, 1.000, 0.832], fd:4.100, dtl:0.15 },
+  '6at': { gears:[3.529, 2.042, 1.400, 1.000, 0.713, 0.582], fd:3.417, dtl:0.20 },
+};
+// Transmission curb-weight delta vs 6MT, keyed on (trans, gen, top_type).
+// Values mirror vehicle_profiles.py WEIGHT_MATRIX. PRHT cars carry less
+// 6AT delta because the PRHT itself eats more of the curb weight headroom.
+// 5MT relative to 6MT (NC1 only — 5MT was never offered with PRHT, see UI lock).
+const TRANS_WEIGHT_DELTA = {
+  '6at_nc1_soft': 40, '6at_nc1_prht': 55,
+  '6at_nc2_soft': 25, '6at_nc2_prht': 17,
+  '6at_nc3_soft': 25, '6at_nc3_prht': 17,
+  '5mt_nc1_soft': -33,
 };
 const CD_MAP = { up_soft:.36, up_prht:.34, down:.44 };
 
@@ -1171,9 +1407,33 @@ const TIRE_OPTIONS = {
 let rows = [], pulls = [];
 let analysisMode = 'same';
 let selPulls = [], selB = null, selA = null;
-let baro = 99.9, iat_k = 298, rho = 1.225;
+// Per-file struct (Phase A — Compare two-file refactor). Shape:
+// { rows, pulls, baro, iat_k, baroSource, iatSource, speedSource, tempUnit }.
+// Atmospheric values that were previously module-level globals (baro, iat_k,
+// rho) now live here. `rho` was dead — written by parseCSV, read by no one
+// — and was deleted entirely.
+//
+// Phase B (slim): fileAfter slot declared. Stays null until Phase C wires
+// the second upload zone. Single-file Compare (tag two pulls from one CSV)
+// keeps working through Phase B because no consumers read fileAfter yet —
+// the renderPulls / selPull / banner / gear-sanity changes that depend on
+// fileAfter being non-null are folded into Phase C, where they're testable
+// the moment they're written.
+let fileBefore = null;
+let fileAfter  = null;
 let chart = null;
 let termsAccepted = false;
+
+// Phase G · Ticket 2.2: gear sanity check now runs PRE-flight (in triggerRun)
+// rather than post-analysis. PREFLIGHT_THRESHOLD: above this delta we block
+// with a confirmation modal. POST_THRESHOLD: 3-5% range still surfaces the
+// post-analysis banner (no modal — user wasn't blocked, just informed).
+// gearWarningAcknowledged is reset at the start of every triggerRun so the
+// flag doesn't leak between runs; setting it true via the modal's "Run
+// anyway" suppresses the duplicate post-analysis banner.
+const PREFLIGHT_GEAR_THRESHOLD = 5;
+const POST_GEAR_THRESHOLD = 3;
+let gearWarningAcknowledged = false;
 
 // ═══════════════════════════════════════════════════════════════
 // MOBILE ACTION BAR
@@ -1184,13 +1444,13 @@ function updateMobileActionBar(){
     const ready = analysisMode === 'compare'
       ? (selB !== null && selA !== null)
       : (selPulls.length >= 1);
-    inner.innerHTML = `<button class="btn-primary" id="mobileGo" ${ready ? '' : 'disabled'}>${ready ? 'Run Analysis →' : 'Select pulls...'}</button>`;
+    inner.innerHTML = `<button class="btn-primary" id="mobileGo" ${ready ? '' : 'disabled'}>${ready ? 'Run Analysis →' : 'Select runs...'}</button>`;
     if(ready){
       document.getElementById('mobileGo').addEventListener('click', triggerRun);
     }
   } else if(appState === 'result'){
     inner.innerHTML = `
-      <button class="btn-secondary" onclick="resetToDrop()">← New Pull</button>
+      <button class="btn-secondary" onclick="resetToDrop()">← New Run</button>
       <button class="btn-primary" onclick="dlCard()">Download PNG</button>`;
   } else {
     inner.innerHTML = '';
@@ -1207,6 +1467,21 @@ function triggerRun(){
   if(!termsAccepted){
     document.getElementById('termsModal').classList.add('vis');
     return;
+  }
+  // Phase G · Ticket 2.2: pre-flight gear sanity. Reset acknowledgment so it
+  // doesn't leak between runs. If primary pull's mph/krpm disagrees with the
+  // expected for the user's gear+tire setup by more than PREFLIGHT_THRESHOLD,
+  // block with a confirmation modal — they're about to compute power from
+  // the wrong numbers. Smaller deltas (3–5%) fall through and surface the
+  // post-analysis banner instead.
+  gearWarningAcknowledged = false;
+  const primaryPull = getPrimaryPull();
+  if(primaryPull){
+    const sanity = gearSanityCheck(buildPreflightProf(), primaryPull.mph_per_krpm);
+    if(sanity && Math.abs(sanity.delta_pct) > PREFLIGHT_GEAR_THRESHOLD){
+      showGearSanityModal(sanity);
+      return;  // Modal "Run anyway" calls acknowledgeGearWarning() → runAnalysis()
+    }
   }
   runAnalysis();
 }
@@ -1261,9 +1536,148 @@ function setT(id, btn){
   btn.classList.add('on');
 }
 
+// 5MT was only offered on NC1 soft top — never with PRHT, never on NC2/NC3.
+// onTransChange enforces the PRHT lock. on5MTGenChange hides the 5MT
+// option from the dropdown when the user picks a non-NC1 gen, and reverts
+// to 6MT if they were on 5MT.
+function onTransChange(){
+  const trans = document.getElementById('trans').value;
+  const prhtBtn = document.querySelector('#tTop .tbtn[data-v="prht"]');
+
+  if(trans === '5mt'){
+    // 5MT was only offered with soft top. Lock PRHT off; auto-flip if currently on.
+    const softBtn = document.querySelector('#tTop .tbtn[data-v="soft"]');
+    if(softBtn && !softBtn.classList.contains('on')){
+      setT('tTop', softBtn);
+      syncTotalWt();
+    }
+    if(prhtBtn){
+      prhtBtn.classList.add('disabled');
+      prhtBtn.setAttribute('disabled', 'true');
+      prhtBtn.title = '5MT was only offered on NC1 soft top';
+    }
+  } else if(prhtBtn){
+    prhtBtn.classList.remove('disabled');
+    prhtBtn.removeAttribute('disabled');
+    prhtBtn.title = '';
+  }
+  calcW();
+}
+
+function on5MTGenChange(){
+  const gen = document.getElementById('ncGen').value;
+  const trans = document.getElementById('trans');
+  const opt5mt = trans.querySelector('option[value="5mt"]');
+  if(!opt5mt) return;
+
+  if(gen === 'nc1'){
+    opt5mt.style.display = '';
+  } else {
+    opt5mt.style.display = 'none';
+    if(trans.value === '5mt'){
+      trans.value = '6mt';
+      onTransChange();   // re-enables PRHT button + recalcs
+    }
+  }
+}
+
+// Phase E: file-slot migration on mode swap, plus result-tile teardown
+// (Mobile UX #7 Option A). Called at the top of setAnalysisMode.
+function migrateFilesForModeSwitch(newMode){
+  const prevMode = analysisMode;
+
+  // File slot rules:
+  //   Same → Compare with fileBefore: keep it. User uploads After to proceed.
+  //   Same → Compare empty: nothing to do.
+  //   Compare → Same with both: keep Before, discard After (with status note).
+  //   Compare → Same with only After: promote After → Before (with status note).
+  //   Compare → Same with neither: nothing to do.
+  if(prevMode === 'compare' && newMode === 'same'){
+    if(fileBefore && fileAfter){
+      fileAfter = null;
+      showSt('Switched to Same Setup — using your Before file.', 'ok', 'before');
+    } else if(!fileBefore && fileAfter){
+      // Rare: user uploaded After before Before, then switched to Same Setup.
+      fileBefore = fileAfter;
+      fileAfter = null;
+      rows = fileBefore.rows;
+      pulls = fileBefore.pulls;
+      showSt('Switched to Same Setup — using your After file.', 'ok', 'before');
+    }
+  }
+
+  // Result-tile teardown. Runs on every mode swap; idempotent when results
+  // weren't visible. Per PHILOSOPHY.md, results computed under one mode
+  // shouldn't linger when the user explicitly switches frames.
+  document.getElementById('results').classList.remove('vis');
+  if(typeof chart !== 'undefined' && chart){ chart.destroy(); chart = null; }
+  document.getElementById('gearBanner')?.classList.remove('vis');
+  showAtmoWarning(null);
+
+  // Mobile state: drop to upload zone only if the new mode is missing a file
+  // it requires. Otherwise stay where the user was (configure / pulls).
+  if(isMobile()){
+    const needsAfter = newMode === 'compare' && !fileAfter;
+    const needsBefore = !fileBefore;
+    if(needsAfter || needsBefore) setState('drop');
+  }
+}
+
+// Phase F: entry experience. The user picks WHAT they want to find out;
+// the tool figures out which analysis mode runs. pickFlow is wired to the
+// landing-state question cards. setAnalysisMode handles all the mode-
+// specific UI (visibility toggles, file migration, auto-rerun gate) and
+// also sets body.dataset.mode so the exit-ramp links know which to show.
+function pickFlow(mode){
+  // Phase G · Ticket 1.10: instrument card clicks so we can see the split
+  // between the two flows. Drives the post-launch decision about whether
+  // the entry experience is doing its job (one obvious dominant card =
+  // signal to surface that flow more, or kill the other).
+  if(window.goatcounter){
+    window.goatcounter.count({path: '/event/landing-card-' + mode, event: true});
+  }
+  setAnalysisMode(mode);
+  setState('drop');
+}
+
+// Logo click — returns to landing. Files (if any) are preserved; selections
+// are reset by setAnalysisMode on the next card click.
+function goLanding(){
+  setState('landing');
+}
+
 function setAnalysisMode(mode){
+  // If results are already visible, the user is changing their mind about
+  // how to view the data they already loaded. Reset selections, re-render
+  // pulls, and auto-rerun the analysis with the new mode. Same Setup will
+  // auto-select all non-heat-soaked pulls; Compare will auto-select highest-
+  // quality pull from each file. The user can re-tag pulls afterward.
+  const resultsVisible = document.getElementById('results').classList.contains('vis');
+
+  // Phase E: migrate file slots + tear down result tile BEFORE we update
+  // analysisMode so the helper can compare prev vs new.
+  migrateFilesForModeSwitch(mode);
+
   analysisMode = mode;
-  document.querySelectorAll('.amode-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  // Phase F: body.dataset.mode drives exit-ramp link visibility (CSS-only).
+  document.body.dataset.mode = mode;
+  // Phase G · Ticket 1.5: .amode-btn querySelector removed — those elements
+  // no longer exist in the DOM (toggle row deleted; entry is via question
+  // cards). No replacement needed; mode is set programmatically.
+  // Phase C-1b: After-zone DOM is visible only in Compare mode.
+  // Affects desktop (#upzoneAfter, #upstAfter, label) and mobile equivalents,
+  // plus the "Before CSV" labels which only make sense alongside an After zone.
+  const showAfter = mode === 'compare' ? '' : 'none';
+  ['upzoneAfter','upstAfter','upzoneMobileAfter','upstMobileAfter',
+   'upzoneLabelBefore','upzoneLabelAfter','upzoneLabelBeforeMobile','upzoneLabelAfterMobile',
+   'forcedAfterBlock']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.style.display = showAfter;
+    });
+  // Phase D-1: relabel the original FI selector to "Before" in Compare mode.
+  const forcedLabel = document.getElementById('forcedLabel');
+  if(forcedLabel) forcedLabel.textContent = mode === 'compare' ? 'Forced Induction (Before)' : 'Forced Induction';
   const title = document.getElementById('modeTitle');
   const help = document.getElementById('modeHelp');
   if(mode === 'same'){
@@ -1274,10 +1688,23 @@ function setAnalysisMode(mode){
     help.innerHTML = 'Tap once for Before. Tap again for After. Use this when comparing two runs from different mod stages.';
   }
   selPulls = []; selB = null; selA = null;
-  renderPulls();
+  renderPulls();   // this auto-selects pulls per the new mode's logic
   checkReady();
   updateProgress();
   if(isMobile()) updateMobileActionBar();
+
+  // Auto-rerun analysis if results were already showing. The auto-selection
+  // inside renderPulls() picks sensible defaults so the rerun has valid input.
+  // fromModeSwitch suppresses the free-tier usage increment — toggling views
+  // on already-loaded data is not a "new analysis" per PHILOSOPHY.md.
+  // Phase E: Compare gate now requires both files. If the gate fails, the
+  // result tile stays cleared (migrateFilesForModeSwitch already tore it down).
+  if(resultsVisible){
+    const ready = mode === 'compare'
+      ? (fileBefore && fileAfter && selB !== null && selA !== null)
+      : (selPulls.length >= 1);
+    if(ready) runAnalysis({fromModeSwitch: true});
+  }
 }
 
 function exhDelta(sid, lid){
@@ -1366,7 +1793,14 @@ function syncTotalWt(){
 // ═══════════════════════════════════════════════════════════════
 // WEIGHT CALC
 // ═══════════════════════════════════════════════════════════════
-function calcW(){
+// Phase D-2: optional `slot` param. In Compare mode, runAnalysis calls
+// calcW('before') and calcW('after') to build per-file profs. The only
+// per-slot read is the FI selector — all other car-config inputs are
+// shared between Before and After (single car, single config). When slot
+// is undefined or 'before', reads #forced (the existing dropdown). When
+// slot is 'after', reads #forcedAfter.
+function calcW(slot){
+  const fiId = slot === 'after' ? 'forcedAfter' : 'forced';
   const mode = document.querySelector('#tWtMode .tbtn.on')?.dataset.v || 'total';
   const gen = document.getElementById('ncGen').value;
   const base = NCP[gen];
@@ -1421,13 +1855,32 @@ function calcW(){
     const tires = 4 * (tireWt - stockTireLbs);
 
     const exh = getVal('catback') + getVal('midpipe') + getVal('headers');
-    const others = getVal('rollbar') + getVal('forced') +
+    // Phase D-2: FI weight delta is per-slot. fiId resolves to 'forced'
+    // for Same Setup / Compare-Before, 'forcedAfter' for Compare-After.
+    const others = getVal('rollbar') + getVal(fiId) +
       (parseFloat(document.getElementById('xDelta')?.value) || 0) +
       (parseFloat(document.querySelector('#tAC .tbtn.on')?.dataset.v) || 0);
     vehicleWeight = base.wt + exh + wheels + tires + others;
   }
 
-  if(topType === 'prht' && mode !== 'total') vehicleWeight += 78;
+  // Transmission curb-weight delta vs 6MT (the implicit baseline).
+  // Lookup keyed on (trans, gen, top_type) — see TRANS_WEIGHT_DELTA.
+  // 6MT is the baseline so it has no entry. Only applies when we're
+  // building weight up; in 'total' mode the user's scale weight already
+  // includes whatever transmission they have.
+  const trans = document.getElementById('trans').value;
+  if(trans !== '6mt' && mode !== 'total'){
+    const transDelta = TRANS_WEIGHT_DELTA[trans + '_' + gen + '_' + topType] || 0;
+    vehicleWeight += transDelta;
+  }
+
+  // PRHT curb-weight delta. NC1 PRHT adds ~65 lbs over soft (per Python
+  // WEIGHT_MATRIX: 2545 - 2480). NC2/3 PRHT adds ~78 lbs (2593 - 2515).
+  // Inline gen check is the smallest correctness fix; structural refactor
+  // to a per-gen lookup table is deferred to the data-drift sweep ticket.
+  if(topType === 'prht' && mode !== 'total'){
+    vehicleWeight += (gen === 'nc1' ? 65 : 78);
+  }
 
   const fuelLevel = parseFloat(document.querySelector('#tFuel .tbtn.on')?.dataset.v) || 0.5;
   const fuelWeight = fuelLevel * 12.7 * 6.1;
@@ -1519,9 +1972,13 @@ function calcHP(seg, prof, pullIatC){
   const ambientK = 298.15;  // 25°C — locked default per ENGINEERING.md
   const corrStd = document.querySelector('#tCorr .tbtn.on')?.dataset.v || 'sae';
   let corr;
-  if(corrStd === 'din')      corr = (101.3/baro) * Math.sqrt(ambientK/293.15);
+  // Phase A: baro now flows through prof from the file struct (per-file
+  // atmospheric in Compare mode). Same-Setup callers pass fileBefore.baro;
+  // Compare callers will pass fileBefore.baro / fileAfter.baro per pull.
+  const profBaro = prof.baro;
+  if(corrStd === 'din')      corr = (101.3/profBaro) * Math.sqrt(ambientK/293.15);
   else if(corrStd === 'none') corr = 1.0;
-  else                        corr = (99.0/baro) * Math.sqrt(ambientK/298.0);
+  else                        corr = (99.0/profBaro) * Math.sqrt(ambientK/298.0);
   return seg.map((r,i) => {
     const v = sv[i], a = ac[i];
     const RHO_STD = 1.225;
@@ -1769,8 +2226,10 @@ function parseCSV(txt){
     speed_mph: r.speed_raw * speedConv,
   }));
 
-  // ATMOSPHERIC: try baro column first, then estimate from MAP, then fallback
-  let baroSource = 'default';
+  // ATMOSPHERIC: try baro column first, then estimate from MAP, then fallback.
+  // Phase A: baro/iat_k are local to this parse, returned on the result
+  // object instead of mutating module globals. Per-file in Compare mode.
+  let baro = 99.9, iat_k = 298.15, baroSource = 'default';
   const bv = data.map(r => r.baro_r).filter(v => v && v > 0);
   if(bv.length){
     const br = bv.reduce((a,b) => a+b) / bv.length;
@@ -1795,7 +2254,7 @@ function parseCSV(txt){
         ? sorted[(sorted.length-1)/2]
         : (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
       baro = medianMap;
-      baroSource = 'estimated from MAP at WOT (median)';
+      baroSource = 'estimated from MAP at wide-open throttle (median)';
     } else {
       baro = 99.9;
       baroSource = 'default 99.9 kPa (no baro data)';
@@ -1814,8 +2273,8 @@ function parseCSV(txt){
   }
 
   // IAT
-  let iatSource = 'default 25°C (no IAT data)';
-  iat_k = 298.15;  // explicit default if no data
+  let iatSource = 'default 25°C (no intake air temp data)';
+  // iat_k already initialized to 298.15 above with the other atmospheric locals.
   const iv = data.map(r => r.iat_r).filter(v => v !== null && !isNaN(v));
   if(iv.length){
     const ir = iv.reduce((a,b) => a+b) / iv.length;
@@ -1833,7 +2292,10 @@ function parseCSV(txt){
     iat_k = ic + 273.15;
   }
 
-  rho = (baro * 1000) / (RDA * iat_k);
+  // (Removed dead `rho` assignment — global `rho` was never read by any
+  // consumer. Verified via audit: calcHP uses RHO_STD=1.225 hardcoded,
+  // not the dynamic value. The global declaration of `rho` will be
+  // removed in the final cleanup of Phase A.)
 
   // Polling rate: median time between consecutive samples. Median is robust to
   // OBD hiccups (paused recording, dropped samples) — mean would be biased.
@@ -1865,7 +2327,7 @@ function parseCSV(txt){
     polling_hz,
   };
 
-  return {ok:true, data, tempUnit};
+  return {ok:true, data, tempUnit, baro, iat_k, baroSource, iatSource, speedSource};
 }
 
 function detectPulls(data, tempUnit){
@@ -2000,21 +2462,41 @@ function detectPulls(data, tempUnit){
 // ═══════════════════════════════════════════════════════════════
 // FILE UPLOAD
 // ═══════════════════════════════════════════════════════════════
+// Phase C-1: handleFile takes a slot ('before' | 'after'). Default 'before'
+// preserves existing call-sites that don't pass the second arg.
 const upz = document.getElementById('upzone');
 const upzMobile = document.getElementById('upzoneMobile');
-document.getElementById('fileIn').addEventListener('change', e => handleFile(e.target.files[0]));
+const upzAfter = document.getElementById('upzoneAfter');
+const upzMobileAfter = document.getElementById('upzoneMobileAfter');
 
-// Desktop upzone (already has the file input inside it)
+// BEFORE zone (desktop) — existing flow.
+document.getElementById('fileIn').addEventListener('change', e => handleFile(e.target.files[0], 'before'));
 upz.addEventListener('dragover', e => { e.preventDefault(); upz.classList.add('dov'); });
 upz.addEventListener('dragleave', () => upz.classList.remove('dov'));
-upz.addEventListener('drop', e => { e.preventDefault(); upz.classList.remove('dov'); handleFile(e.dataTransfer.files[0]); });
+upz.addEventListener('drop', e => { e.preventDefault(); upz.classList.remove('dov'); handleFile(e.dataTransfer.files[0], 'before'); });
 
-// Mobile upzone — clicking it triggers the same hidden file input
+// BEFORE zone (mobile) — click delegates to the desktop input.
 if(upzMobile){
   upzMobile.addEventListener('click', () => document.getElementById('fileIn').click());
   upzMobile.addEventListener('dragover', e => { e.preventDefault(); upzMobile.classList.add('dov'); });
   upzMobile.addEventListener('dragleave', () => upzMobile.classList.remove('dov'));
-  upzMobile.addEventListener('drop', e => { e.preventDefault(); upzMobile.classList.remove('dov'); handleFile(e.dataTransfer.files[0]); });
+  upzMobile.addEventListener('drop', e => { e.preventDefault(); upzMobile.classList.remove('dov'); handleFile(e.dataTransfer.files[0], 'before'); });
+}
+
+// AFTER zone (desktop) — Phase C-1 new wiring.
+document.getElementById('fileInAfter').addEventListener('change', e => handleFile(e.target.files[0], 'after'));
+if(upzAfter){
+  upzAfter.addEventListener('dragover', e => { e.preventDefault(); upzAfter.classList.add('dov'); });
+  upzAfter.addEventListener('dragleave', () => upzAfter.classList.remove('dov'));
+  upzAfter.addEventListener('drop', e => { e.preventDefault(); upzAfter.classList.remove('dov'); handleFile(e.dataTransfer.files[0], 'after'); });
+}
+
+// AFTER zone (mobile) — click delegates to the After input.
+if(upzMobileAfter){
+  upzMobileAfter.addEventListener('click', () => document.getElementById('fileInAfter').click());
+  upzMobileAfter.addEventListener('dragover', e => { e.preventDefault(); upzMobileAfter.classList.add('dov'); });
+  upzMobileAfter.addEventListener('dragleave', () => upzMobileAfter.classList.remove('dov'));
+  upzMobileAfter.addEventListener('drop', e => { e.preventDefault(); upzMobileAfter.classList.remove('dov'); handleFile(e.dataTransfer.files[0], 'after'); });
 }
 
 // Inline atmospheric warning banner (created lazily, lives inside #results).
@@ -2037,14 +2519,19 @@ function showAtmoWarning(msg){
   el.style.display = 'block';
 }
 
-function showSt(msg, type){
-  ['upst','upstMobile'].forEach(id => {
+// Phase C-1: status bar writer is slot-aware. slot='after' writes to the
+// After zone; otherwise (default) writes to the Before zone — same set of
+// IDs that existed pre-Compare.
+function showSt(msg, type, slot){
+  const stIds   = slot === 'after' ? ['upstAfter','upstMobileAfter'] : ['upst','upstMobile'];
+  const zoneIds = slot === 'after' ? ['upzoneAfter','upzoneMobileAfter'] : ['upzone','upzoneMobile'];
+  stIds.forEach(id => {
     const el = document.getElementById(id);
     if(!el) return;
     el.textContent = msg;
     el.className = 'upst vis ' + type;
   });
-  ['upzone','upzoneMobile'].forEach(id => {
+  zoneIds.forEach(id => {
     const z = document.getElementById(id);
     if(!z) return;
     z.classList.remove('success','error');
@@ -2080,14 +2567,35 @@ function readFileSmart(file){
   });
 }
 
-async function handleFile(f){
+async function handleFile(f, slot){
   if(!f) return;
+  // Phase C-1: slot ('before' | 'after') routes the parsed result into the
+  // right struct. Default 'before' covers all existing call-sites.
+  if(slot !== 'after') slot = 'before';
   try {
     const {text} = await readFileSmart(f);
     const res = parseCSV(text);
-    if(!res.ok){ showSt(res.msg, 'err'); return; }
-    rows = res.data;
-    pulls = detectPulls(rows, res.tempUnit);
+    if(!res.ok){ showSt(res.msg, 'err', slot); return; }
+    const slotPulls = detectPulls(res.data, res.tempUnit);
+    const slotStruct = {
+      rows: res.data,
+      pulls: slotPulls,
+      baro: res.baro,
+      iat_k: res.iat_k,
+      baroSource: res.baroSource,
+      iatSource: res.iatSource,
+      speedSource: res.speedSource,
+      tempUnit: res.tempUnit,
+    };
+    if(slot === 'after'){
+      fileAfter = slotStruct;
+    } else {
+      fileBefore = slotStruct;
+      // Legacy mirrors — still used by Same Setup path's renderPulls and
+      // selPull. Phase C-2/3 will reroute them onto fileBefore.pulls.
+      rows = res.data;
+      pulls = slotPulls;
+    }
     if(window.goatcounter) window.goatcounter.count({path:'/event/csv-uploaded', event:true});
     const info = window.__lastParseInfo || {};
     const detect = window.__lastDetectInfo || {};
@@ -2096,35 +2604,180 @@ async function handleFile(f){
     const speedNote = info.speedSource && !info.speedSource.startsWith('header')
       ? ` · Speed: ${info.speedSource}` : '';
     const iatNote = info.iatSource && !info.iatSource.startsWith('header')
-      ? ` · IAT: ${info.iatSource}` : '';
-    const thrNote = detect.peakThrottle ? ` · WOT @ ${detect.wotThreshold}%+` : '';
+      ? ` · Intake air temp: ${info.iatSource}` : '';
+    const thrNote = detect.peakThrottle ? ` · Wide-open throttle detected at ${detect.wotThreshold}%+` : '';
     const pollNote = info.polling_hz ? ` · ${info.polling_hz.toFixed(1)} Hz` : '';
-    // Status type: 'err' if no pulls OR if any source had ambiguity/fallback warning
     const hasWarnings = (info.speedSource || '').includes('AMBIGUOUS')
                      || (info.iatSource || '').includes('out-of-range')
                      || (info.baroSource || '').includes('out-of-range');
-    const statusType = pulls.length ? (hasWarnings ? 'err' : 'ok') : 'err';
-    showSt(`${res.data.length} rows${pollNote} · ${pulls.length} pulls${thrNote} · Baro ${baro.toFixed(1)} kPa${baroNote} · IAT ${(iat_k-273.15).toFixed(1)}°C${speedNote}${iatNote}`, statusType);
-    console.log('[MiataDyno parse]', info);
-    console.log('[MiataDyno detect]', detect);
-    selB = null; selA = null; selPulls = [];
+    const statusType = slotPulls.length ? (hasWarnings ? 'err' : 'ok') : 'err';
+    showSt(`${res.data.length} rows${pollNote} · ${slotPulls.length} runs${thrNote} · Baro ${res.baro.toFixed(1)} kPa${baroNote} · Intake air temp ${(res.iat_k-273.15).toFixed(1)}°C${speedNote}${iatNote}`, statusType, slot);
+    console.log(`[MiataDyno parse — ${slot}]`, info);
+    console.log(`[MiataDyno detect — ${slot}]`, detect);
+    // Reset selections when the relevant file changes — invalidates any
+    // previous pick that might point into stale pull indices.
+    if(slot === 'before'){
+      selB = null; selPulls = [];
+    } else {
+      selA = null;
+    }
+    // Re-render pulls so the new file's section appears. renderPulls dispatches
+    // to renderPullsCompare in Compare mode (re-renders both sections), or to
+    // the single-section Same Setup path otherwise.
     renderPulls();
     checkReady();
     updateProgress();
     // Auto-advance to configure state on mobile
-    if(isMobile() && pulls.length){
+    // (Mobile UX #6: in Compare mode, advance only when BOTH files loaded.)
+    const readyToAdvance = analysisMode === 'compare'
+      ? (fileBefore && fileAfter && fileBefore.pulls.length && fileAfter.pulls.length)
+      : slotPulls.length;
+    if(isMobile() && readyToAdvance){
       setTimeout(() => setState('configure'), 600);
     }
   } catch(err){
-    showSt('Failed to read file: ' + err.message, 'err');
+    showSt('Failed to read file: ' + err.message, 'err', slot);
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
 // PULLS
 // ═══════════════════════════════════════════════════════════════
+
+// Phase C-4 helper: compute heat-soak / inverted-IAT info for a pulls array.
+// Used by both Same Setup (single file) and Compare (per file).
+function computeHeatSoakInfo(pullsArr){
+  const firstIAT = pullsArr.length ? pullsArr[0].iat_c : null;
+  const heatSoaked = pullsArr.map(p => {
+    if(firstIAT === null || p.iat_c === null) return false;
+    return (p.iat_c - firstIAT) >= 5;
+  });
+  const inverted = pullsArr.some(p => {
+    if(firstIAT === null || p.iat_c === null) return false;
+    return (p.iat_c - firstIAT) <= -10;
+  });
+  const numHeatSoaked = heatSoaked.filter(x => x).length;
+  return {firstIAT, heatSoaked, inverted, numHeatSoaked};
+}
+
+// Phase C-2: Compare-mode render (two stacked sections, one per file).
+// Same Setup falls through to the original single-section render below.
+function renderPullsCompare(sec){
+  sec.innerHTML = '';
+
+  // Each section gets its own header, optional banner(s), pull list,
+  // and empty state when its file slot is null.
+  renderCompareSection(sec, 'before', fileBefore);
+  renderCompareSection(sec, 'after',  fileAfter);
+
+  // Auto-select highest-quality pull as the default Before/After.
+  // User can re-tag by clicking a different pull in the same section.
+  selB = null; selA = null;
+  if(fileBefore && fileBefore.pulls.length){
+    selB = pickHighestQuality(fileBefore.pulls);
+    setSelectedTag('before', selB);
+  }
+  if(fileAfter && fileAfter.pulls.length){
+    selA = pickHighestQuality(fileAfter.pulls);
+    setSelectedTag('after', selA);
+  }
+}
+
+function pickHighestQuality(pullsArr){
+  let bestI = 0, bestQ = -1;
+  pullsArr.forEach((p, i) => { if(p.q > bestQ){ bestQ = p.q; bestI = i; } });
+  return bestI;
+}
+
+function renderCompareSection(parent, slot, file){
+  // Section header
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'padding:14px 4px 8px;font-size:11px;color:var(--mid);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;';
+  hdr.textContent = slot === 'before' ? 'Before' : 'After';
+  parent.appendChild(hdr);
+
+  if(!file || !file.pulls.length){
+    const empty = document.createElement('div');
+    empty.className = 'empty-st';
+    if(!file){
+      empty.innerHTML = `<span class="big">!</span>Upload your ${slot === 'after' ? 'After' : 'Before'} CSV.`;
+    } else {
+      empty.innerHTML = `<span class="big">!</span>No acceleration runs found in this ${slot} log.<br>Confirm your scanner logged Throttle Position and that you did a wide-open-throttle run.`;
+    }
+    parent.appendChild(empty);
+    return;
+  }
+
+  // Phase C-4: per-file heat-soak / inverted banners. Mobile gets short copy.
+  const {firstIAT, heatSoaked, inverted, numHeatSoaked} = computeHeatSoakInfo(file.pulls);
+  const slotLabel = slot === 'before' ? 'Before' : 'After';
+  const mobile = isMobile();
+  if(inverted){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'padding:10px 14px;background:rgba(214,48,49,.08);border-left:3px solid var(--red);margin:0 0 10px;font-size:12px;color:var(--mid);line-height:1.5;';
+    banner.innerHTML = mobile
+      ? `<strong style="color:var(--red2);">${slotLabel} file: Intake air temp readings inconsistent.</strong> Re-export with units in the intake air temp header.`
+      : `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px;">${slotLabel} file: Intake air temp readings inconsistent</strong>Intake air temperature appears to drop sharply across runs in this file, which isn't physically possible during back-to-back runs. <strong style="color:var(--text);">Re-export with (°C) or (°F) in the intake air temp column header.</strong> Power calculations are unaffected.`;
+    parent.appendChild(banner);
+  } else if(numHeatSoaked > 0){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'padding:10px 14px;background:rgba(214,48,49,.08);border-left:3px solid var(--red);margin:0 0 10px;font-size:12px;color:var(--mid);line-height:1.5;';
+    banner.innerHTML = mobile
+      ? `<strong style="color:var(--red2);">${slotLabel} file: ${numHeatSoaked} heat-soaked run${numHeatSoaked>1?'s':''}.</strong> Use a cooler run.`
+      : `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px;">${slotLabel} file: heat soak detected</strong>${numHeatSoaked} run${numHeatSoaked>1?'s':''} had intake air 5°C or more above the first run in this file. Pick a cooler run for the cleanest comparison.`;
+    parent.appendChild(banner);
+  }
+
+  // Pull items (slot-tagged so selPull dispatches correctly)
+  file.pulls.forEach((p, i) => {
+    const qc = p.q>=80 ? 'var(--green)' : p.q>=50 ? 'var(--amber)' : 'var(--red2)';
+    const iatStr = p.iat_c !== null ? `Intake air temp ${p.iat_c.toFixed(1)}°C` : 'Intake air temp n/a';
+    const heatBadge = heatSoaked[i]
+      ? ` <span style="color:var(--red2);font-weight:600;">· heat soaked +${(p.iat_c - firstIAT).toFixed(1)}°C</span>`
+      : '';
+    const div = document.createElement('div');
+    div.className = 'pull-item';
+    div.dataset.idx = i;
+    div.dataset.slot = slot;
+    div.innerHTML = `<div class="pnum">${i+1}</div><div class="pdata"><strong>${p.maxRPM.toFixed(0)} RPM · ${p.maxSpd.toFixed(0)} MPH · ${p.dur.toFixed(1)}s</strong><span>From ${p.st.toFixed(1)}s · Max throttle ${p.maxThr.toFixed(0)}% · ${iatStr}${heatBadge}</span></div><div><div class="pq-num" style="color:${qc}">${p.q}</div><div class="pq-lbl">/ 100 quality</div></div><div class="ptag-w" id="pt-${slot}-${i}"></div>`;
+    div.addEventListener('click', () => selPull(i, div, slot));
+    parent.appendChild(div);
+  });
+}
+
+// Phase C-3: stamp the Before/After tag on the selected pull-item without
+// re-rendering. Used by renderPullsCompare's auto-select and by selPull.
+function setSelectedTag(slot, idx){
+  // Clear any existing tag in this section
+  const sec = document.getElementById('pullSec');
+  sec.querySelectorAll(`.pull-item[data-slot="${slot}"]`).forEach(el => {
+    const i = parseInt(el.dataset.idx, 10);
+    el.classList.remove(slot === 'before' ? 'ib' : 'ia');
+    const tagEl = document.getElementById(`pt-${slot}-${i}`);
+    if(tagEl) tagEl.innerHTML = '';
+  });
+  // Apply to the selected one
+  if(idx === null || idx === undefined) return;
+  const target = sec.querySelector(`.pull-item[data-slot="${slot}"][data-idx="${idx}"]`);
+  if(!target) return;
+  target.classList.add(slot === 'before' ? 'ib' : 'ia');
+  const tagEl = document.getElementById(`pt-${slot}-${idx}`);
+  if(tagEl) tagEl.innerHTML = `<div class="ptag ${slot === 'before' ? 'b' : 'a'}">${slot === 'before' ? 'Before' : 'After'}</div>`;
+}
+
 function renderPulls(){
   const sec = document.getElementById('pullSec');
+
+  // Phase C-2: Compare mode = two stacked sections (one per file).
+  if(analysisMode === 'compare'){
+    renderPullsCompare(sec);
+    checkReady();
+    updateProgress();
+    if(isMobile()) updateMobileActionBar();
+    return;
+  }
+
+  // ── SAME SETUP path (unchanged from Phase B) ──
   if(!pulls.length){
     sec.innerHTML = '<div class="empty-st"><span class="big">!</span>No acceleration runs found in this log.<br>Make sure your scanner was logging Throttle Position, and that you did a wide-open-throttle run.</div>';
     return;
@@ -2150,7 +2803,7 @@ function renderPulls(){
   sec.innerHTML = '';
   pulls.forEach((p,i) => {
     const qc = p.q>=80 ? 'var(--green)' : p.q>=50 ? 'var(--amber)' : 'var(--red2)';
-    const iatStr = p.iat_c !== null ? `IAT ${p.iat_c.toFixed(1)}°C` : 'IAT n/a';
+    const iatStr = p.iat_c !== null ? `Intake air temp ${p.iat_c.toFixed(1)}°C` : 'Intake air temp n/a';
     const heatBadge = heatSoaked[i]
       ? ` <span style="color:var(--red2);font-weight:600;">· heat soaked +${(p.iat_c - firstIAT).toFixed(1)}°C</span>`
       : '';
@@ -2169,34 +2822,40 @@ function renderPulls(){
   if(inverted){
     const banner = document.createElement('div');
     banner.style.cssText = 'padding:14px 18px;background:rgba(214,48,49,.08);border-left:3px solid var(--red);margin-bottom:14px;font-size:12px;color:var(--mid);line-height:1.6;';
-    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">IAT readings inconsistent</strong>Intake air temperature appears to drop sharply across runs, which isn't physically possible during back-to-back wide-open-throttle runs. This usually means your CSV's Intake Temps column doesn't specify units in the header. <strong style="color:var(--text);">Re-export your log with (°C) or (°F) in the IAT column name for accurate heat-soak detection.</strong> Power calculations are unaffected.`;
+    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">Intake air temp readings inconsistent</strong>Intake air temperature appears to drop sharply across runs, which isn't physically possible during back-to-back wide-open-throttle runs. This usually means your CSV's Intake Temps column doesn't specify units in the header. <strong style="color:var(--text);">Re-export your log with (°C) or (°F) in the intake air temp column name for accurate heat-soak detection.</strong> Power calculations are unaffected.`;
     sec.parentNode.insertBefore(banner, sec);
   } else if(numHeatSoaked > 0){
     const banner = document.createElement('div');
     banner.style.cssText = 'padding:14px 18px;background:rgba(214,48,49,.08);border-left:3px solid var(--red);margin-bottom:14px;font-size:12px;color:var(--mid);line-height:1.6;';
-    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">Heat soak detected</strong>${numHeatSoaked} pull${numHeatSoaked>1?'s':''} had intake air 5°C or more above your first run. Hot intake air makes less power. Real dyno shops blow fans at the engine to prevent this; on the street you need to wait longer between runs. For the cleanest result, use your cooler runs only.</strong>`;
+    banner.innerHTML = `<strong style="color:var(--red2);font-family:var(--disp);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;">Heat soak detected</strong>${numHeatSoaked} run${numHeatSoaked>1?'s':''} had intake air 5°C or more above your first run. Hot intake air makes less power. Real dyno shops blow fans at the engine to prevent this; on the street you need to wait longer between runs. For the cleanest result, use your cooler runs only.</strong>`;
     sec.parentNode.insertBefore(banner, sec);
   }
 
-  if(analysisMode === 'same'){
-    // Auto-select: in same setup mode, prefer non-heat-soaked pulls.
-    // When inverted, IAT data isn't trustworthy → don't filter on it.
-    pulls.forEach((_, i) => {
-      if(!inverted && numHeatSoaked > 0 && heatSoaked[i]) return;  // skip heat-soaked
-      selPull(i, sec.children[i]);
-    });
-  } else {
-    if(pulls.length>=1) selPull(0, sec.children[0]);
-    if(pulls.length>=2) selPull(1, sec.children[1]);
-  }
+  // Same Setup auto-select: prefer non-heat-soaked pulls.
+  // When inverted, IAT data isn't trustworthy → don't filter on it.
+  // (Compare path returned at the top of renderPulls — its auto-select
+  //  lives in renderPullsCompare.)
+  pulls.forEach((_, i) => {
+    if(!inverted && numHeatSoaked > 0 && heatSoaked[i]) return;  // skip heat-soaked
+    selPull(i, sec.children[i]);
+  });
 }
 
-function selPull(idx, el){
+function selPull(idx, el, slot){
+  // Phase C-3: in two-file Compare, slot ('before'|'after') tells us which
+  // file the clicked pull belongs to. selB always indexes fileBefore.pulls,
+  // selA always indexes fileAfter.pulls. Each section has at most one
+  // selected pull — clicking a different pull in the same section overwrites;
+  // clicking the same pull deselects.
+  // Same Setup (no slot) keeps its multi-select behavior unchanged.
   if(analysisMode === 'compare'){
-    if(selB === idx){ selB = null; el.classList.remove('ib'); document.getElementById('pt'+idx).innerHTML=''; }
-    else if(selA === idx){ selA = null; el.classList.remove('ia'); document.getElementById('pt'+idx).innerHTML=''; }
-    else if(selB === null){ selB = idx; el.classList.add('ib'); document.getElementById('pt'+idx).innerHTML='<div class="ptag b">Before</div>'; }
-    else if(selA === null){ selA = idx; el.classList.add('ia'); document.getElementById('pt'+idx).innerHTML='<div class="ptag a">After</div>'; }
+    if(slot === 'before'){
+      selB = (selB === idx) ? null : idx;
+      setSelectedTag('before', selB);
+    } else if(slot === 'after'){
+      selA = (selA === idx) ? null : idx;
+      setSelectedTag('after', selA);
+    }
   } else {
     const i = selPulls.indexOf(idx);
     if(i>=0){
@@ -2206,7 +2865,7 @@ function selPull(idx, el){
     } else {
       selPulls.push(idx);
       el.classList.add('isel');
-      document.getElementById('pt'+idx).innerHTML=`<div class="ptag s">Pull ${selPulls.length}</div>`;
+      document.getElementById('pt'+idx).innerHTML=`<div class="ptag s">Run ${selPulls.length}</div>`;
     }
   }
   checkReady();
@@ -2228,16 +2887,16 @@ document.getElementById('goBtn').addEventListener('click', () => triggerRun());
 // Compare observed mph/krpm against predicted for the user's tire+gen+gear config.
 // Returns {gear, predicted, observed, delta_pct} for the best-matching gear, or null.
 function gearSanityCheck(prof, observed_mph_per_krpm){
-  if(!observed_mph_per_krpm || !prof.base.gears || !prof.base.fd) return null;
+  if(!observed_mph_per_krpm || !prof.gears || !prof.fd) return null;
   const tire_dia_in = prof.dia_m / 0.0254;
   // mph/krpm = (1000 wheel rev × tire_circ_in / 12 in/ft × 60 min/hr) / (5280 ft/mi × gear × fd)
   // simplified: factor / (gear × fd)
   const factor = (Math.PI * tire_dia_in * 60 * 1000) / (12 * 5280);
   let best = null;
-  for(let i = 0; i < prof.base.gears.length; i++){
-    const g = prof.base.gears[i];
+  for(let i = 0; i < prof.gears.length; i++){
+    const g = prof.gears[i];
     if(!g) continue;
-    const predicted = factor / (g * prof.base.fd);
+    const predicted = factor / (g * prof.fd);
     const delta_pct = (observed_mph_per_krpm - predicted) / predicted * 100;
     if(!best || Math.abs(delta_pct) < Math.abs(best.delta_pct)){
       best = { gear: i+1, predicted, observed: observed_mph_per_krpm, delta_pct };
@@ -2246,48 +2905,173 @@ function gearSanityCheck(prof, observed_mph_per_krpm){
   return best;
 }
 
-function runAnalysis(){
-  // FIX MAP-FI: If forced induction is selected AND baro was MAP-derived,
-  // override to default. MAP at WOT for an FI engine is post-throttle pressure
-  // including boost (could be 150-250 kPa), not atmospheric. Using it would
-  // give correction factor ~99/200 = 0.5 → WHP shown is half of reality.
-  // FI status isn't known at parse time, so we check here.
-  const forcedSel = document.getElementById('forced');
-  const isFI = forcedSel && forcedSel.value !== '0' && forcedSel.value !== '';
-  const baroSrc = window.__lastParseInfo?.baroSource || '';
-  let mapFiOverride = false;
-  if(isFI && baroSrc.includes('MAP')){
-    baro = 99.9;
-    mapFiOverride = true;
-    if(window.__lastParseInfo){
-      window.__lastParseInfo.baroSource = 'forced 99.9 kPa (FI selected, MAP-derived baro rejected)';
-    }
-    console.warn('[MiataDyno] FI selected with MAP-derived baro. Overriding to 99.9 kPa.');
-  }
-  // Surface the override visibly to the user
-  showAtmoWarning(mapFiOverride
-    ? 'Forced induction selected and barometric pressure was estimated from MAP. MAP under boost is far above atmospheric, so the estimate has been replaced with the standard 99.9 kPa fallback. For accurate readings on a boosted car, use a CSV that includes a barometric pressure (PID 0x33) channel.'
-    : null);
-
+// Phase G · Ticket 2.2 helpers ──────────────────────────────────────────
+// buildPreflightProf: minimal prof for the gear sanity check, built without
+// running the full analysis. Just needs dia_m + gears + fd.
+function buildPreflightProf(){
   const w = calcW();
-  const prof = { eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr, dia_m:w.dia_m };
+  const trans = document.getElementById('trans').value;
+  const transData = TRANS_DATA[trans] || TRANS_DATA['6mt'];
+  return { dia_m: w.dia_m, gears: transData.gears, fd: transData.fd };
+}
+// getPrimaryPull: same selection logic the post-analysis code uses to pick
+// which pull drives the gear sanity check. Same Setup uses selPulls[0];
+// Compare uses fileAfter.pulls[selA] (the user's "current mod state").
+function getPrimaryPull(){
+  if(analysisMode === 'compare'){
+    if(fileAfter && selA !== null) return fileAfter.pulls[selA];
+    if(selA !== null && pulls[selA]) return pulls[selA];
+    return null;
+  }
+  return selPulls[0] !== undefined ? pulls[selPulls[0]] : null;
+}
+// Format gear ordinal for human copy ("1st", "2nd", "3rd", "4th" ...).
+function gearOrdinal(g){
+  return g === 1 ? '1st' : g === 2 ? '2nd' : g === 3 ? '3rd' : g + 'th';
+}
+function showGearSanityModal(sanity){
+  const dir = sanity.delta_pct > 0 ? 'higher' : 'lower';
+  const realPctSign = sanity.delta_pct > 0 ? '+' : '';
+  const realImpact = (Math.pow(1 + sanity.delta_pct/100, 2) - 1) * 100;
+  document.getElementById('gearSanityBody').innerHTML =
+    `Run was in <strong>${gearOrdinal(sanity.gear)}</strong> gear (best fit). ` +
+    `Observed <strong>${sanity.observed.toFixed(2)}</strong> mph/krpm, ` +
+    `predicted <strong>${sanity.predicted.toFixed(2)}</strong> mph/krpm for your tire size. ` +
+    `Either your tires are ${dir} than entered, or your tune has a speedo offset. ` +
+    `<strong>Real WHP is approximately ${realPctSign}${realImpact.toFixed(0)}% from displayed.</strong>`;
+  document.getElementById('gearSanityModal').classList.add('vis');
+}
+function closeGearSanityModal(){
+  document.getElementById('gearSanityModal').classList.remove('vis');
+}
+function acknowledgeGearWarning(){
+  closeGearSanityModal();
+  gearWarningAcknowledged = true;
+  runAnalysis();
+}
+function scrollToWheels(){
+  closeGearSanityModal();
+  const findWheelsSec = (root) => Array.from(root.querySelectorAll('.sec-t'))
+    .find(el => el.textContent.toLowerCase().includes('wheel'))?.closest('.sec');
+  if(isMobile()){
+    // Mobile: open the vehicle edit modal (which hosts the same .sec elements),
+    // then scroll within it to the wheels section.
+    openVehicleEdit();
+    setTimeout(() => {
+      const sec = findWheelsSec(document.getElementById('modal-sections-host'));
+      if(sec){ sec.classList.remove('coll'); sec.scrollIntoView({behavior:'smooth', block:'start'}); }
+    }, 100);
+  } else {
+    const sec = findWheelsSec(document.querySelector('.sidebar'));
+    if(sec){
+      sec.classList.remove('coll');
+      sec.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  }
+}
+
+// Phase D-4 helper: MAP-FI override. If FI is selected AND baro was MAP-
+// derived, replace baro with 99.9 kPa (boost makes MAP non-atmospheric).
+// Returns true if the override fired so the caller can surface a banner.
+function applyMapFiOverride(file, fiSelectorId){
+  if(!file) return false;
+  const sel = document.getElementById(fiSelectorId);
+  const isFI = sel && sel.value !== '0' && sel.value !== '';
+  const baroSrc = file.baroSource || '';
+  if(isFI && baroSrc.includes('MAP')){
+    file.baro = 99.9;
+    file.baroSource = 'forced 99.9 kPa (FI selected, MAP-derived baro rejected)';
+    console.warn(`[MiataDyno] FI selected with MAP-derived baro on ${fiSelectorId === 'forced' ? 'Before' : 'After'} file. Overriding to 99.9 kPa.`);
+    return true;
+  }
+  return false;
+}
+
+function runAnalysis(opts){
+  const trans = document.getElementById('trans').value;
+  const transData = TRANS_DATA[trans] || TRANS_DATA['6mt'];
+  const isCompare = analysisMode === 'compare';
+
+  // Phase D-4: MAP-FI override per file. Same Setup checks #forced against
+  // fileBefore. Compare checks #forced vs fileBefore AND #forcedAfter vs
+  // fileAfter independently — supports the NA-Before / FI-After workflow.
+  const overrideBefore = applyMapFiOverride(fileBefore, 'forced');
+  const overrideAfter  = isCompare ? applyMapFiOverride(fileAfter, 'forcedAfter') : false;
+
+  // Phase D-5: showAtmoWarning composes per-file context. In Compare,
+  // prefix each banner with which file it applies to.
+  let atmoMsg = null;
+  if(overrideBefore && overrideAfter){
+    atmoMsg = `<strong>Both files:</strong> Forced induction selected and barometric pressure was estimated from MAP for each file. Both have been replaced with the 99.9 kPa fallback. For accurate readings, use logs with a barometric pressure (PID 0x33) channel.`;
+  } else if(overrideBefore){
+    atmoMsg = `${isCompare ? '<strong>Before file:</strong> ' : ''}Forced induction selected and barometric pressure was estimated from MAP. MAP under boost is far above atmospheric, so the estimate has been replaced with the standard 99.9 kPa fallback. For accurate readings on a boosted car, use a CSV that includes a barometric pressure (PID 0x33) channel.`;
+  } else if(overrideAfter){
+    atmoMsg = `<strong>After file:</strong> Forced induction selected and barometric pressure was estimated from MAP. The estimate has been replaced with the 99.9 kPa fallback. For accurate readings, use a CSV with a barometric pressure (PID 0x33) channel.`;
+  }
+  showAtmoWarning(atmoMsg);
+
   const mod = document.getElementById('modDesc').value || 'Current Setup';
-  const vn = w.base.name;
-  if(analysisMode === 'compare') runCompareAnalysis(prof, w, mod, vn);
-  else runSameSetupAnalysis(prof, w, mod, vn);
-  // Gear-vs-tire sanity check against the primary selected pull
-  const primaryPullIdx = analysisMode === 'compare' ? selA : (selPulls[0] !== undefined ? selPulls[0] : null);
+
+  // Phase D-3: in Compare mode, build profBefore + profAfter independently
+  // (so per-file FI weight delta is reflected). Same Setup keeps single prof.
+  // gearProf is hoisted to function scope so the gear sanity check below
+  // can reference it after the if/else (uses profAfter in Compare — that's
+  // the user's "current mod state" — and the single prof in Same Setup).
+  let gearProf = null;
+  if(isCompare){
+    const wB = calcW('before');
+    const wA = calcW('after');
+    const profBefore = {
+      eff:wB.eff, tot_kg:wB.tot_kg, base:wB.base, Cd:wB.Cd, spd_corr:wB.spd_corr, dia_m:wB.dia_m,
+      gears: transData.gears, fd: transData.fd,
+      baro: fileBefore?.baro ?? 99.9,
+    };
+    const profAfter = {
+      eff:wA.eff, tot_kg:wA.tot_kg, base:wA.base, Cd:wA.Cd, spd_corr:wA.spd_corr, dia_m:wA.dia_m,
+      gears: transData.gears, fd: transData.fd,
+      baro: fileAfter?.baro ?? 99.9,
+    };
+    const vn = wA.base.name;  // gen is shared; use After for naming
+    gearProf = profAfter;
+    runCompareAnalysis(profBefore, profAfter, wB, wA, mod, vn);
+  } else {
+    const w = calcW();
+    const prof = {
+      eff:w.eff, tot_kg:w.tot_kg, base:w.base, Cd:w.Cd, spd_corr:w.spd_corr, dia_m:w.dia_m,
+      gears: transData.gears, fd: transData.fd,
+      baro: fileBefore?.baro ?? 99.9,
+    };
+    const vn = w.base.name;
+    gearProf = prof;
+    runSameSetupAnalysis(prof, w, mod, vn);
+  }
+  // Gear-vs-tire sanity check against the primary selected pull.
+  // Phase C-5: in two-file Compare, the primary pull lives in fileAfter
+  // (the user's "current mod state"). Same Setup uses fileBefore.pulls
+  // (= the global pulls mirror).
+  let primaryPull = null;
+  if(analysisMode === 'compare'){
+    if(fileAfter && selA !== null) primaryPull = fileAfter.pulls[selA];
+    else if(selA !== null) primaryPull = pulls[selA];   // legacy single-file Compare safety net
+  } else if(selPulls[0] !== undefined){
+    primaryPull = pulls[selPulls[0]];
+  }
   const gearBanner = document.getElementById('gearBanner');
-  if(primaryPullIdx !== null && pulls[primaryPullIdx]){
-    const sanity = gearSanityCheck(prof, pulls[primaryPullIdx].mph_per_krpm);
-    if(sanity && Math.abs(sanity.delta_pct) > 3){
+  // Phase G · Ticket 2.2: if the user already saw the pre-flight modal and
+  // chose "Run anyway", suppress the post-analysis banner. Showing the same
+  // warning twice trains users to ignore it.
+  if(gearWarningAcknowledged){
+    gearBanner.classList.remove('vis');
+  } else if(primaryPull){
+    const sanity = gearSanityCheck(gearProf, primaryPull.mph_per_krpm);
+    if(sanity && Math.abs(sanity.delta_pct) > POST_GEAR_THRESHOLD){
       const dir = sanity.delta_pct > 0 ? 'higher' : 'lower';
       const realPctSign = sanity.delta_pct > 0 ? '+' : '';
       const realImpact = (Math.pow(1 + sanity.delta_pct/100, 2) - 1) * 100;
       document.getElementById('gearBannerT').textContent =
         `Speed reading off by ${sanity.delta_pct.toFixed(1)}% from ${sanity.gear === 1 ? '1st' : sanity.gear === 2 ? '2nd' : sanity.gear === 3 ? '3rd' : sanity.gear+'th'} gear math`;
       document.getElementById('gearBannerB').innerHTML =
-        `Pull was in ${sanity.gear === 1 ? '1st' : sanity.gear === 2 ? '2nd' : sanity.gear === 3 ? '3rd' : sanity.gear+'th'} gear (best fit). ` +
+        `Run was in ${sanity.gear === 1 ? '1st' : sanity.gear === 2 ? '2nd' : sanity.gear === 3 ? '3rd' : sanity.gear+'th'} gear (best fit). ` +
         `Observed <strong>${sanity.observed.toFixed(2)}</strong> mph/krpm, predicted <strong>${sanity.predicted.toFixed(2)}</strong> mph/krpm for your tire size. ` +
         `Either your tires are ${dir} than entered, or your tune has a speedo offset. ` +
         `<strong>Real WHP is approximately ${realPctSign}${realImpact.toFixed(0)}% from displayed</strong> — current shown number under-reads if speed reading is high.`;
@@ -2299,16 +3083,33 @@ function runAnalysis(){
     gearBanner.classList.remove('vis');
   }
   document.getElementById('results').classList.add('vis');
-  if(typeof incrementUsage === 'function') incrementUsage();
-  if(window.goatcounter) window.goatcounter.count({path:'/event/analysis-completed', event:true});
+  // Skip usage increment + analysis-completed event when re-running due to a
+  // mode-toggle on already-loaded data. Per PHILOSOPHY.md, the free tier is
+  // one analysis, ever — toggling Same-Setup ↔ Compare on the same data
+  // shouldn't burn a credit. Fire a separate event so we still see the
+  // toggle signal in analytics.
+  const fromModeSwitch = opts && opts.fromModeSwitch;
+  if(!fromModeSwitch){
+    if(typeof incrementUsage === 'function') incrementUsage();
+    if(window.goatcounter) window.goatcounter.count({path:'/event/analysis-completed', event:true});
+  } else {
+    if(window.goatcounter) window.goatcounter.count({path:'/event/analysis-mode-switched', event:true});
+  }
   if(isMobile()) setState('result');
   else setTimeout(() => document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'}), 100);
 }
 
-function runCompareAnalysis(prof, w, mod, vn){
-  if(selB === null || selA === null){ alert('Select both BEFORE and AFTER pulls.'); return; }
-  const rB = calcHP(pulls[selB].rows, prof, pulls[selB].iat_c);
-  const rA = calcHP(pulls[selA].rows, prof, pulls[selA].iat_c);
+// Phase D-3: runCompareAnalysis takes two profs + two weight contexts.
+// profBefore drives the Before pull's calcHP + speed traps (uses fileBefore.baro
+// and Before's FI weight). profAfter drives the After pull's. wBefore + wAfter
+// supply gen/total-weight context for display strings.
+function runCompareAnalysis(profBefore, profAfter, wBefore, wAfter, mod, vn){
+  if(selB === null || selA === null){ alert('Select both BEFORE and AFTER runs.'); return; }
+  const pullB = fileBefore?.pulls[selB] ?? pulls[selB];
+  const pullA = (fileAfter?.pulls[selA]) ?? pulls[selA];
+  if(!pullB || !pullA){ alert('Selected runs are missing — re-select Before and After.'); return; }
+  const rB = calcHP(pullB.rows, profBefore, pullB.iat_c);
+  const rA = calcHP(pullA.rows, profAfter, pullA.iat_c);
   if(!rB || !rA){ alert('Not enough clean data.'); return; }
   const bB = bin(rB), bA = bin(rA);
   if(!bB.length || !bA.length){ alert('Not enough binned data.'); return; }
@@ -2318,6 +3119,7 @@ function runCompareAnalysis(prof, w, mod, vn){
   const tA = Math.max(...bA.map(r=>r.WTQ));
   const hg = pA-pB, tg = tA-tB;
 
+  document.getElementById('resContext').textContent = 'Comparing your Before and After files';
   document.getElementById('statsLabels').innerHTML = `
     <div class="sbox"><div class="slbl">Before WHP</div><div class="sval">${pB.toFixed(1)}</div><div class="sunit">wheel hp</div></div>
     <div class="sbox"><div class="slbl">After WHP</div><div class="sval">${pA.toFixed(1)}</div><div class="sunit">wheel hp</div></div>
@@ -2332,37 +3134,55 @@ function runCompareAnalysis(prof, w, mod, vn){
   document.getElementById('cBefL').textContent = 'Before WHP';
   document.getElementById('cAftL').textContent = 'After WHP';
   document.getElementById('cGainL').textContent = 'WHP Gain';
-  document.getElementById('cCond').textContent = `Baro ${baro.toFixed(1)} kPa · IAT ${(iat_k-273.15).toFixed(1)}C · ${w.tot.toFixed(0)} lbs`;
+  // Phase D-3: per-file atmospheric + weight in cCond. If both files share
+  // identical conditions (e.g. identical-files smoke test), collapse to one
+  // line. Otherwise show both for transparency about what each pull was
+  // corrected with.
+  const baroB = fileBefore?.baro ?? 99.9;
+  const baroA = fileAfter?.baro  ?? baroB;
+  const iatB  = fileBefore?.iat_k ?? 298.15;
+  const iatA  = fileAfter?.iat_k  ?? iatB;
+  const sameCond = Math.abs(baroB - baroA) < 0.05 && Math.abs(iatB - iatA) < 0.05 && wBefore.tot.toFixed(0) === wAfter.tot.toFixed(0);
+  document.getElementById('cCond').textContent = sameCond
+    ? `Baro ${baroB.toFixed(1)} kPa · Intake air temp ${(iatB-273.15).toFixed(1)}C · ${wBefore.tot.toFixed(0)} lbs`
+    : `Before: ${baroB.toFixed(1)} kPa / ${(iatB-273.15).toFixed(1)}C intake / ${wBefore.tot.toFixed(0)} lbs · After: ${baroA.toFixed(1)} kPa / ${(iatA-273.15).toFixed(1)}C intake / ${wAfter.tot.toFixed(0)} lbs`;
 
   const banner = document.getElementById('resBanner');
   const bTitle = document.getElementById('resBannerT');
   const bBody = document.getElementById('resBannerB');
-  const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
+  // gen is shared between Before and After (single car).
+  // Phase G · Ticket 1.3: mirror refRange.label pattern from runSameSetupAnalysis
+  // so banner copy matches the user's actual gen instead of hardcoded "NC2/3".
+  const gen = wAfter.gen;
+  const ref = gen === 'nc1'
+    ? {lo:113, hi:123, crank:170, label:'NC1'}
+    : {lo:118, hi:128, crank:170, label:'NC2/NC3'};
   if(pA >= ref.lo && pA <= ref.hi){
-    bTitle.textContent = 'Healthy stock NC2/3 power';
-    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> after lands in the typical Dynojet range for stock NC2/3 (${ref.lo}-${ref.hi} WHP).`;
+    bTitle.textContent = `Healthy stock ${ref.label} power`;
+    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> after lands in the typical Dynojet range for stock ${ref.label} (${ref.lo}-${ref.hi} WHP).`;
     banner.classList.add('vis');
   } else if(pA < ref.lo){
     bTitle.textContent = 'Below typical stock range';
-    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> is below typical NC2/3 (${ref.lo}-${ref.hi} WHP). Most likely lifted before peak power.`;
+    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> is below typical ${ref.label} (${ref.lo}-${ref.hi} WHP). Most likely lifted before peak power.`;
     banner.classList.add('vis');
   } else {
     bTitle.textContent = 'Above typical stock';
-    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> is above stock (${ref.lo}-${ref.hi} WHP). Either mods are working or weight/tire input is off.`;
+    bBody.innerHTML = `Your <strong>${pA.toFixed(0)} WHP</strong> is above stock ${ref.label} (${ref.lo}-${ref.hi} WHP). Either mods are working or weight/tire input is off.`;
     banner.classList.add('vis');
   }
   // Speed traps for before and after — uses corrected speed (real-world mph).
   // Per Principle 2, this is the most trustworthy comparison signal.
-  const trapsB = speedTrapsForPull(pulls[selB].rows, prof.spd_corr);
-  const trapsA = speedTrapsForPull(pulls[selA].rows, prof.spd_corr);
+  // Phase D-3: spd_corr is same on both profs (single tire size = single car).
+  const trapsB = speedTrapsForPull(pullB.rows, profBefore.spd_corr);
+  const trapsA = speedTrapsForPull(pullA.rows, profAfter.spd_corr);
   renderSpeedTraps('compare', [trapsB, trapsA]);
 
   drawCompareChart(bB, bA);
-  genCompareInterp(pB, pA, hg, tg, mod, vn, w.gen);
+  genCompareInterp(pB, pA, hg, tg, mod, vn, gen);
 }
 
 function runSameSetupAnalysis(prof, w, mod, vn){
-  if(!selPulls.length){ alert('Select at least one pull.'); return; }
+  if(!selPulls.length){ alert('Select at least one run.'); return; }
   // Track pull index alongside binned HP so speed traps can use the same
   // kept pulls (post-outlier-rejection) as HP averaging.
   const pullsHP = selPulls.map(idx => {
@@ -2370,7 +3190,7 @@ function runSameSetupAnalysis(prof, w, mod, vn){
     return { idx, binned: (calc && calc.length) ? bin(calc) : null };
   }).filter(p => p.binned && p.binned.length);
   const allBinnedRaw = pullsHP.map(p => p.binned);
-  if(!allBinnedRaw.length){ alert('No selected pulls had enough clean data.'); return; }
+  if(!allBinnedRaw.length){ alert('No selected runs had enough clean data.'); return; }
 
   // Outlier rejection: drop pulls more than 5 WHP from the median peak.
   // Catches partial-throttle bursts, headwind/uphill pulls, mid-pull lifts.
@@ -2387,7 +3207,7 @@ function runSameSetupAnalysis(prof, w, mod, vn){
   if(allBinnedRaw.length > 1 && numRejected > 0 && numRejected < allBinnedRaw.length){
     allBinned = allBinnedRaw.filter((_, i) => keepMask[i]);
     keptPullsHP = pullsHP.filter((_, i) => keepMask[i]);
-    rejectedNote = `${numRejected} pull${numRejected>1?'s':''} rejected as outlier${numRejected>1?'s':''}`;
+    rejectedNote = `${numRejected} run${numRejected>1?'s':''} rejected as outlier${numRejected>1?'s':''}`;
   } else {
     allBinned = allBinnedRaw;
     keptPullsHP = pullsHP;
@@ -2434,22 +3254,39 @@ function runSameSetupAnalysis(prof, w, mod, vn){
   const avgTorque = avgCurve.length ? Math.max(...avgCurve.map(r=>r.WTQ)) : bestTorque;
   const meanStd = avgCurve.filter(r=>r.n>1).reduce((s,r)=>s+r.stdHP, 0) / Math.max(1, avgCurve.filter(r=>r.n>1).length);
   const consistencyScore = Math.max(0, Math.min(100, 100 - meanStd*8));
-  const DTL = 0.15;
+  const trans = document.getElementById('trans').value;
+  const DTL = TRANS_DATA[trans]?.dtl || 0.15;
   const bestCrankHP = bestPeak / (1 - DTL);
 
+  // Phase G · Ticket 1.1: confidence intervals on headline stats.
+  // - Best/Avg WHP get ±meanStd (already computed for the consistency score).
+  // - Crank HP gets ±3% DTL uncertainty: the magnitude of the difference
+  //   between crank HP at the assumed DTL and at DTL+0.03.
+  // - Single-pull analyses have no σ → omit the .sval-ci element entirely.
+  // - Compare-mode stat cards intentionally skip CI (per-pull σ not available
+  //   without modifying the analysis path). Deferred.
+  const multiPull = allBinned.length > 1;
+  const ciWhp = multiPull ? `<div class="sval-ci">± ${meanStd.toFixed(1)}</div>` : '';
+  const ciCrank = Math.abs(bestPeak / (1 - DTL) - bestPeak / (1 - DTL - 0.03));
+  const ciCrankHtml = multiPull ? `<div class="sval-ci">± ${ciCrank.toFixed(0)}</div>` : '';
+
   // Stat cards: Best WHP is the headline (highlighted), Avg is secondary
-  const avgCellHtml = allBinned.length > 1
-    ? `<div class="sbox"><div class="slbl">Avg WHP</div><div class="sval">${avgPeak.toFixed(1)}</div><div class="sunit">${allBinned.length} pulls averaged</div></div>`
+  const avgCellHtml = multiPull
+    ? `<div class="sbox"><div class="slbl">Avg WHP</div><div class="sval">${avgPeak.toFixed(1)}</div>${ciWhp}<div class="sunit">${allBinned.length} runs averaged</div></div>`
     : `<div class="sbox"><div class="slbl">Best WTQ</div><div class="sval">${bestTorque.toFixed(1)}</div><div class="sunit">lb-ft torque</div></div>`;
 
-  const consistencyHtml = allBinned.length > 1
+  const consistencyHtml = multiPull
     ? `<div class="sbox"><div class="slbl">Consistency</div><div class="sval">${consistencyScore.toFixed(0)}</div><div class="sunit">${consistencyScore>=85?'excellent':consistencyScore>=70?'good':'noisy'}</div></div>`
-    : `<div class="sbox"><div class="slbl">Consistency</div><div class="sval">N/A</div><div class="sunit">single pull</div></div>`;
+    : `<div class="sbox"><div class="slbl">Consistency</div><div class="sval">N/A</div><div class="sunit">single run</div></div>`;
 
+  const ctxLabel = allBinned.length === 1
+    ? 'Analyzing 1 run from your log'
+    : `Analyzing ${allBinned.length} runs from your log`;
+  document.getElementById('resContext').textContent = ctxLabel;
   document.getElementById('statsLabels').innerHTML = `
-    <div class="sbox hl"><div class="slbl">Best WHP</div><div class="sval a">${bestPeak.toFixed(1)}</div><div class="sunit">peak from your best run</div></div>
+    <div class="sbox hl"><div class="slbl">Best WHP</div><div class="sval a">${bestPeak.toFixed(1)}</div>${ciWhp}<div class="sunit">peak from your best run</div></div>
     ${avgCellHtml}
-    <div class="sbox"><div class="slbl">Est. Crank HP</div><div class="sval">${bestCrankHP.toFixed(0)}</div><div class="sunit">at engine, ~15% DTL</div></div>
+    <div class="sbox"><div class="slbl">Est. Crank HP</div><div class="sval">${bestCrankHP.toFixed(0)}</div>${ciCrankHtml}<div class="sunit">at engine, ~15% drivetrain loss</div></div>
     ${consistencyHtml}`;
 
   // Share card: WHP / WTQ / Crank HP — all from best pull
@@ -2461,28 +3298,32 @@ function runSameSetupAnalysis(prof, w, mod, vn){
   document.getElementById('cBefL').textContent = 'WHP';
   document.getElementById('cAftL').textContent = 'WTQ';
   document.getElementById('cGainL').textContent = 'Crank HP';
-  const condBits = [`${allBinned.length} pull${allBinned.length>1?'s':''} kept`];
+  const condBits = [`${allBinned.length} run${allBinned.length>1?'s':''} kept`];
   if(numRejected > 0 && rejectedNote) condBits.push(`${numRejected} rejected`);
-  condBits.push(`Baro ${baro.toFixed(1)} kPa`);
-  condBits.push(`${(iat_k-273.15).toFixed(0)}C`);
+  condBits.push(`Baro ${(fileBefore?.baro ?? 99.9).toFixed(1)} kPa`);
+  condBits.push(`${((fileBefore?.iat_k ?? 298.15)-273.15).toFixed(0)}C`);
   document.getElementById('cCond').textContent = condBits.join(' · ');
 
   // Banner uses BEST not AVG
   const banner = document.getElementById('resBanner');
   const bTitle = document.getElementById('resBannerT');
   const bBody = document.getElementById('resBannerB');
-  const ref = w.gen === 'nc1' ? {lo:113, hi:123, crank:170} : {lo:118, hi:128, crank:170};
+  // Phase G · Ticket 1.3: gen-aware banner copy. Same fix as runCompareAnalysis;
+  // spec author thought this path was correct but it had the identical bug.
+  const ref = w.gen === 'nc1'
+    ? {lo:113, hi:123, crank:170, label:'NC1'}
+    : {lo:118, hi:128, crank:170, label:'NC2/NC3'};
   if(bestPeak >= ref.lo && bestPeak <= ref.hi){
-    bTitle.textContent = 'Healthy stock NC2/3 power';
-    bBody.innerHTML = `Your best pull at <strong>${bestPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for stock NC2/3 (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 15-18% on its way to the wheels.`;
+    bTitle.textContent = `Healthy stock ${ref.label} power`;
+    bBody.innerHTML = `Your best run at <strong>${bestPeak.toFixed(0)} WHP</strong> is right in the typical Dynojet range for stock ${ref.label} (${ref.lo}-${ref.hi} WHP). Mazda's <strong>${ref.crank} hp</strong> rating is at the engine crankshaft. The drivetrain eats roughly 15-18% on its way to the wheels.`;
     banner.classList.add('vis');
   } else if(bestPeak < ref.lo){
     bTitle.textContent = 'Below typical stock range';
-    bBody.innerHTML = `Your best pull at <strong>${bestPeak.toFixed(0)} WHP</strong> is below the NC range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (around 6,700-7,000 RPM) or were on an uphill grade.`;
+    bBody.innerHTML = `Your best run at <strong>${bestPeak.toFixed(0)} WHP</strong> is below the ${ref.label} range (${ref.lo}-${ref.hi} WHP). Most likely you lifted before peak power (around 6,700-7,000 RPM) or were on an uphill grade.`;
     banner.classList.add('vis');
   } else {
     bTitle.textContent = 'Above typical stock';
-    bBody.innerHTML = `Your best pull at <strong>${bestPeak.toFixed(0)} WHP</strong> is above stock range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off.`;
+    bBody.innerHTML = `Your best run at <strong>${bestPeak.toFixed(0)} WHP</strong> is above stock ${ref.label} range (${ref.lo}-${ref.hi} WHP). Either your mods are working, or one of your inputs (weight, tire size) is off.`;
     banner.classList.add('vis');
   }
 
@@ -2503,7 +3344,7 @@ function drawCompareChart(bef, aft){
   const isLight = document.body.classList.contains('light');
   const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(30,37,53,0.8)';
   const subGridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(30,37,53,0.5)';
-  const axisColor = isLight ? '#5a6478' : '#6478a0';
+  const axisColor = isLight ? '#5a6478' : '#8898b8';
   Chart.defaults.color = axisColor;
   const allVals = [...bef, ...aft].flatMap(r=>[r.WHP, r.WTQ]).filter(v=>!isNaN(v) && v>0);
   const yMax = Math.ceil((Math.max(...allVals)*1.15)/20)*20;
@@ -2567,7 +3408,7 @@ function renderSpeedTraps(mode, pullTraps){
     }).filter(r => r !== null);
     grid.innerHTML = rows.length
       ? `<div class="trap-table">${rows.join('')}</div>`
-      : '<p style="color:var(--dim);font-size:12px;padding:14px;">No brackets reached in either pull.</p>';
+      : '<p style="color:var(--dim);font-size:12px;padding:14px;">No brackets reached in either run.</p>';
   } else {
     // Same-setup aggregation: mean ± stddev across all kept pulls
     const cards = SPEED_TRAPS.map(([lo, hi]) => {
@@ -2584,7 +3425,7 @@ function renderSpeedTraps(mode, pullTraps){
         return `<div class="sbox trap-card">
           <div class="slbl">${lo}-${hi} MPH</div>
           <div class="sval">${times[0].toFixed(2)}<span style="font-size:.5em;">s</span></div>
-          <div class="sunit">1 pull</div>
+          <div class="sunit">1 run</div>
         </div>`;
       }
       const mean = times.reduce((a,b) => a+b, 0) / times.length;
@@ -2596,7 +3437,7 @@ function renderSpeedTraps(mode, pullTraps){
       return `<div class="sbox trap-card">
         <div class="slbl">${lo}-${hi} MPH</div>
         <div class="sval">${mean.toFixed(2)}<span style="font-size:.5em;">s</span></div>
-        <div class="sunit">±${stddev.toFixed(3)}s · ${times.length} pulls · ${minT.toFixed(2)}–${maxT.toFixed(2)}s</div>
+        <div class="sunit">±${stddev.toFixed(3)}s · ${times.length} runs · ${minT.toFixed(2)}–${maxT.toFixed(2)}s</div>
       </div>`;
     });
     grid.innerHTML = cards.join('');
@@ -2608,16 +3449,38 @@ function drawSameSetupChart(allBinned, avgCurve){
   const isLight = document.body.classList.contains('light');
   const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(30,37,53,0.8)';
   const subGridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(30,37,53,0.5)';
-  const axisColor = isLight ? '#5a6478' : '#6478a0';
+  const axisColor = isLight ? '#5a6478' : '#8898b8';
   Chart.defaults.color = axisColor;
   const allVals = [...allBinned.flat(), ...avgCurve].flatMap(r=>[r.WHP, r.WTQ]).filter(v=>!isNaN(v) && v>0);
   const yMax = Math.ceil((Math.max(...allVals)*1.15)/20)*20;
   const colors = ['rgba(150,168,196,0.35)','rgba(180,140,90,0.35)','rgba(120,170,140,0.35)','rgba(190,120,160,0.35)'];
   const datasets = [];
+
+  // Phase G · Ticket 2.1: confidence band around the average power curve.
+  // Two datasets — upper and lower — placed FIRST in the array so the band
+  // sits visually behind the per-pull lines and the average. Lower bound has
+  // fill:'-1' which fills to the previous dataset (the upper bound). Both
+  // are excluded from the legend below. Only renders when we have ≥2 pulls
+  // (single pull has no σ — stdHP is 0 and the band collapses to nothing).
+  const showBand = allBinned.length > 1;
+  if(showBand){
+    datasets.push({
+      label: '__band_upper',
+      data: avgCurve.map(r => ({x: r.rpm, y: r.WHP + r.stdHP})),
+      borderColor: 'transparent', borderWidth: 0, pointRadius: 0, tension: .35, fill: false,
+    });
+    datasets.push({
+      label: '__band_lower',
+      data: avgCurve.map(r => ({x: r.rpm, y: r.WHP - r.stdHP})),
+      borderColor: 'transparent', borderWidth: 0, pointRadius: 0, tension: .35,
+      fill: '-1', backgroundColor: 'rgba(232, 160, 32, 0.12)',
+    });
+  }
+
   allBinned.forEach((b, i) => {
-    datasets.push({label:`Pull ${i+1}`, data:b.map(r=>({x:r.rpm, y:r.WHP})), borderColor:colors[i%colors.length], borderWidth:1.5, pointRadius:isMobile()?1:2, tension:.35, fill:false});
+    datasets.push({label:`Run ${i+1}`, data:b.map(r=>({x:r.rpm, y:r.WHP})), borderColor:colors[i%colors.length], borderWidth:1.5, pointRadius:isMobile()?1:2, tension:.35, fill:false});
   });
-  datasets.push({label:`Average WHP (${allBinned.length} pulls)`, data:avgCurve.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:isMobile()?2.5:3, pointRadius:isMobile()?2:4, tension:.35, fill:false});
+  datasets.push({label:`Average WHP (${allBinned.length} runs)`, data:avgCurve.map(r=>({x:r.rpm, y:r.WHP})), borderColor:'#e8a020', borderWidth:isMobile()?2.5:3, pointRadius:isMobile()?2:4, tension:.35, fill:false});
   datasets.push({label:'Average WTQ', data:avgCurve.map(r=>({x:r.rpm, y:r.WTQ})), borderColor:'rgba(232,160,32,.5)', borderWidth:1.5, borderDash:[3,3], pointRadius:0, tension:.35, fill:false});
   chart = new Chart(document.getElementById('dynoChart').getContext('2d'), {
     type:'line', data:{datasets},
@@ -2625,7 +3488,12 @@ function drawSameSetupChart(allBinned, avgCurve){
       responsive: true, maintainAspectRatio: false,
       animation: {duration:900},
       interaction: {mode:'index', intersect:false},
-      plugins: {legend:{labels:{color:axisColor, font:{family:'JetBrains Mono', size:11}}}},
+      plugins: {legend:{labels:{
+        color:axisColor, font:{family:'JetBrains Mono', size:11},
+        // Phase G · Ticket 2.1: hide the band's upper/lower datasets from the
+        // legend — they're a visual aid, not data series users should toggle.
+        filter: (item) => !item.text.startsWith('__band_'),
+      }}},
       scales: {
         x: {type:'linear', min:2000, max:7500, title:{display:true, text:'Engine RPM', color:axisColor}, ticks:{color:axisColor, stepSize:500}, grid:{color:gridColor}},
         y: {suggestedMin:0, suggestedMax:yMax, beginAtZero:true, title:{display:true, text:'WHP / WTQ (lb-ft)', color:axisColor}, ticks:{color:axisColor}, grid:{color:subGridColor}}
@@ -2647,14 +3515,14 @@ function genSameSetupInterp(bestPeak, avgPeak, bestCrankHP, consistencyScore, me
   const numRej = (info.pullsSelected || selPulls.length) - numKept;
   const parts = [];
 
-  parts.push(`<strong>Your best pull:</strong> ${bestPeak.toFixed(1)} WHP at the wheels. That's roughly ${bestCrankHP.toFixed(0)} crank HP after typical 15% drivetrain loss.`);
+  parts.push(`<strong>Your best run:</strong> ${bestPeak.toFixed(1)} WHP at the wheels. That's roughly ${bestCrankHP.toFixed(0)} crank HP after typical 15% drivetrain loss.`);
 
   if(numRej > 0){
-    parts.push(`<strong>Outlier rejection:</strong> ${numRej} pull${numRej>1?"s were":" was"} dropped because ${numRej>1?"they":"it"} fell more than 5 WHP from the median. Common causes: slight uphill grade, headwind, mid-pull throttle lift, or wheel slip. The rejected pull${numRej>1?"s aren't":" isn't a"} reflection of your engine's actual power.`);
+    parts.push(`<strong>Outlier rejection:</strong> ${numRej} run${numRej>1?"s were":" was"} dropped because ${numRej>1?"they":"it"} fell more than 5 WHP from the median. Common causes: slight uphill grade, headwind, mid-run throttle lift, or wheel slip. The rejected run${numRej>1?"s aren't":" isn't a"} reflection of your engine's actual power.`);
   }
 
   if(numKept > 1){
-    parts.push(`<strong>Across ${numKept} kept pulls:</strong> average peak ${avgPeak.toFixed(1)} WHP, ±${meanStd.toFixed(1)} WHP run-to-run. ${consistencyScore >= 85 ? 'Excellent consistency — your data is trustworthy.' : consistencyScore >= 70 ? 'Good consistency.' : 'Noisy data — try logging on flatter, calmer roads.'}`);
+    parts.push(`<strong>Across ${numKept} kept runs:</strong> average peak ${avgPeak.toFixed(1)} WHP, ±${meanStd.toFixed(1)} WHP run-to-run. ${consistencyScore >= 85 ? 'Excellent consistency — your data is trustworthy.' : consistencyScore >= 70 ? 'Good consistency.' : 'Noisy data — try logging on flatter, calmer roads.'}`);
   }
 
   parts.push(`<strong>Why this isn't 170 HP:</strong> Mazda's 170 HP figure is at the crankshaft. After drivetrain loss, a stock NC delivers about ${(170*0.85).toFixed(0)} WHP. Your estimated crank HP is ${bestCrankHP.toFixed(0)}, which lines up with stock NC2/3 spec (${crankRef} HP).`);
@@ -2685,7 +3553,7 @@ function genCompareInterp(pB, pA, hg, tg, mod, vn, gen){
   const sign = hg>=0?'+':'';
   const tsign = tg>=0?'+':'';
   let main;
-  if(Math.abs(hg)<4) main = `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Within measurement variance. Do 2-3 more pulls to confirm.`;
+  if(Math.abs(hg)<4) main = `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Within measurement variance. Do 2-3 more runs to confirm.`;
   else if(Math.abs(hg)<12) main = `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Solid result.`;
   else main = `${sign}${hg.toFixed(1)} WHP / ${tsign}${tg.toFixed(1)} WTQ from ${mod}. Strong result.`;
   el.innerHTML = `<p>${main + context}</p>`;
@@ -2706,7 +3574,7 @@ async function dlCard(){
   chartImg.src = chartCanvas.toDataURL('image/png');
   chartImg.style.cssText = 'width:100%;background:#0d1018;border:1px solid #2a3347;padding:16px;box-sizing:border-box;';
   const footer = document.createElement('div');
-  footer.style.cssText = 'margin-top:14px;text-align:center;font-size:11px;color:#6478a0;letter-spacing:.05em;';
+  footer.style.cssText = 'margin-top:14px;text-align:center;font-size:11px;color:#8898b8;letter-spacing:.05em;';
   footer.textContent = 'dannyhng.github.io/miatadyno · Virtual Dyno for NC Miata';
   wrap.appendChild(cardClone);
   wrap.appendChild(chartImg);
@@ -2811,7 +3679,8 @@ const LEGAL_CONTENT = {
 <p><strong>Local Storage.</strong> Used only for theme preference and usage limit tracking.</p>`},
   disclaimer: {title:'Accuracy Disclaimer', body:`<p>MiataDyno measures the difference between two acceleration runs on the same road. The delta is the reliable output. Absolute power is an estimate.</p>
 <p><strong>Validation.</strong> Physics engine validated against a stock NC2 PRHT producing approximately 126 WHP, within the 118-128 WHP Dynojet reference range.</p>
-<p><strong>Tire weight precision.</strong> Tire weights from the dropdown are ±2 lb estimates. For precision, weigh one of your tires and enter the value in Custom Tire Size mode.</p>`}
+<p><strong>Tire weight precision.</strong> Tire weights from the dropdown are ±2 lb estimates. For precision, weigh one of your tires and enter the value in Custom Tire Size mode.</p>
+<p style="margin-top:12px;"><a href="methodology.html" style="color:var(--amber);text-decoration:none;">How It Works →</a></p>`}
 };
 function openLegal(key){
   const c = LEGAL_CONTENT[key];
@@ -2865,9 +3734,11 @@ window.addEventListener('resize', () => {
 // ═══════════════════════════════════════════════════════════════
 setRim(17);
 setWeightMode('estimate');
-setAnalysisMode('same');
+setAnalysisMode('same');           // sets default analysisMode + body.dataset.mode (no UI yet)
+on5MTGenChange();                  // hide 5MT option if default gen isn't NC1
 calcW();
 updateProgress();
+setState('landing');               // Phase F: entry experience starts at landing
 if(isMobile()) updateMobileVehicleCard();
 
 // Mobile vehicle card auto-update on any form change. Registered once at init.
